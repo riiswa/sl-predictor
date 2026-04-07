@@ -12,6 +12,14 @@ export default async function AdminPage() {
         .select('id, name, flag, country, date_start, date_end, prediction_deadline, status, organizer')
         .order('date_start', { ascending: true })
 
+    const { data: driveFiles } = await supabase
+        .from('drive_files')
+        .select('sync_status')
+
+    const needsAttention = driveFiles?.filter(
+        f => f.sync_status === 'new' || f.sync_status === 'outdated' || f.sync_status === 'results_pending'
+    ).length ?? 0
+
     const counts = {
         upcoming: competitions?.filter(c => c.status === 'upcoming').length ?? 0,
         open:     competitions?.filter(c => c.status === 'open').length ?? 0,
@@ -26,20 +34,34 @@ export default async function AdminPage() {
                 title="DASHBOARD"
                 subtitle="Manage competitions, rosters and results"
             >
-                <Link href="/admin/new">
-                    <Button size="md">+ New Competition</Button>
+                <Link href="/admin/drive">
+                    <Button size="md">
+                        Drive Sync {needsAttention > 0 && `(${needsAttention})`}
+                    </Button>
                 </Link>
             </PageHeader>
 
             <div className="max-w-7xl mx-auto px-6 py-10">
 
+                {/* Drive alert if files need attention */}
+                {needsAttention > 0 && (
+                    <div className="border border-yellow-400/20 bg-yellow-400/5 px-5 py-4 mb-8 flex items-center justify-between">
+                        <p className="font-condensed text-sm text-yellow-400 tracking-wide">
+                            ⚠ {needsAttention} Drive file{needsAttention > 1 ? 's' : ''} need{needsAttention === 1 ? 's' : ''} attention
+                        </p>
+                        <Link href="/admin/drive">
+                            <Button size="sm" variant="ghost">Go to Drive Sync →</Button>
+                        </Link>
+                    </div>
+                )}
+
                 {/* Stats row */}
                 <div className="grid grid-cols-4 gap-px mb-10">
                     {[
-                        { val: competitions?.length ?? 0, label: 'Total', color: 'text-white' },
-                        { val: counts.open,     label: 'Open',     color: 'text-green-400' },
-                        { val: counts.upcoming, label: 'Upcoming', color: 'text-yellow-400' },
-                        { val: counts.done,     label: 'Results in', color: 'text-blue-light' },
+                        { val: competitions?.length ?? 0, label: 'Total',       color: 'text-white' },
+                        { val: counts.open,               label: 'Open',        color: 'text-green-400' },
+                        { val: counts.upcoming,           label: 'Upcoming',    color: 'text-yellow-400' },
+                        { val: counts.done,               label: 'Results in',  color: 'text-blue-light' },
                     ].map(s => (
                         <div key={s.label} className="bg-blue/8 border border-blue/20 px-6 py-5">
                             <div className={`font-bebas text-4xl leading-none ${s.color}`}>{s.val}</div>
@@ -53,15 +75,15 @@ export default async function AdminPage() {
                     <div className="border border-blue/20 px-6 py-20 text-center">
                         <p className="font-bebas text-3xl tracking-wide text-gray-muted/40 mb-3">NO COMPETITIONS YET</p>
                         <p className="text-gray-muted/40 text-sm font-condensed tracking-wide mb-6">
-                            Create your first competition to get started.
+                            Add a CSV file to your Drive folder and sync it to create your first competition.
                         </p>
-                        <Link href="/admin/new">
-                            <Button size="md">+ Create Competition</Button>
+                        <Link href="/admin/drive">
+                            <Button size="md">Go to Drive Sync →</Button>
                         </Link>
                     </div>
                 ) : (
                     <div className="border border-blue/20">
-                        {/* Desktop header — hidden on mobile */}
+                        {/* Desktop header */}
                         <div className="hidden md:grid grid-cols-[2fr_1fr_1fr_1fr_100px] gap-4 px-5 py-3 border-b border-blue/20">
                             {['Competition', 'Date', 'Deadline', 'Status', 'Actions'].map(h => (
                                 <div key={h} className="font-condensed text-xs tracking-[3px] uppercase text-gray-muted">{h}</div>
@@ -113,27 +135,6 @@ export default async function AdminPage() {
                                         </div>
                                         <StatusBadge status={comp.status} />
                                     </div>
-
-                                    <div className="grid grid-cols-2 gap-x-4 gap-y-1 mt-1">
-                                        <div>
-                                            <p className="font-condensed text-xs tracking-[2px] uppercase text-gray-muted/60">Date</p>
-                                            <p className="font-condensed text-xs text-gray-muted">
-                                                {new Date(comp.date_start).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' })}
-                                                {comp.date_end && comp.date_end !== comp.date_start && (
-                                                    <span> → {new Date(comp.date_end).toLocaleDateString('en-GB', { day: '2-digit', month: 'short' })}</span>
-                                                )}
-                                            </p>
-                                        </div>
-                                        <div>
-                                            <p className="font-condensed text-xs tracking-[2px] uppercase text-gray-muted/60">Deadline</p>
-                                            <p className="font-condensed text-xs text-gray-muted">
-                                                {new Date(comp.prediction_deadline).toLocaleDateString('en-GB', {
-                                                    day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit'
-                                                })}
-                                            </p>
-                                        </div>
-                                    </div>
-
                                     <div className="mt-1">
                                         <Link href={`/admin/${comp.id}`}>
                                             <Button variant="ghost" size="sm" className="w-full">Manage</Button>

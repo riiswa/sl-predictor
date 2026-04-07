@@ -40,21 +40,18 @@ export default function CompForm() {
     const [error,   setError]   = useState<string | null>(null)
 
     const [form, setForm] = useState({
-        name:                 '',
-        country:              '',
-        flag:                 '',
-        organizer:            '',
-        date_start:           '',
-        date_end:             '',
-        prediction_deadline:  '',
-        google_sheet_id:      '',
-        google_sheet_tab:     '',
+        name:                '',
+        country:             '',
+        flag:                '',
+        organizer:           '',
+        date_start:          '',
+        date_end:            '',
+        prediction_deadline: '',
     })
 
     function set(key: keyof typeof form, value: string) {
         setForm(prev => {
             const next = { ...prev, [key]: value }
-            // Auto-fill flag when country changes
             if (key === 'country') next.flag = FLAGS[value.toUpperCase()] ?? ''
             return next
         })
@@ -81,9 +78,8 @@ export default function CompForm() {
                 date_start:          form.date_start,
                 date_end:            form.date_end || form.date_start,
                 prediction_deadline: form.prediction_deadline,
-                google_sheet_id:     form.google_sheet_id.trim() || null,
-                google_sheet_tab:    form.google_sheet_tab.trim() || null,
                 status:              'upcoming',
+                results_visible:     false,
                 scoring_config:      DEFAULT_SCORING,
             })
             .select('id')
@@ -95,6 +91,7 @@ export default function CompForm() {
             return
         }
 
+        // Auto-create 12 standard categories
         await supabase.from('categories').insert(
             DEFAULT_CATEGORIES.map(cat => ({ ...cat, competition_id: data.id }))
         )
@@ -106,7 +103,7 @@ export default function CompForm() {
     return (
         <form onSubmit={handleSubmit} className="flex flex-col gap-6">
 
-            {/* Section — Basic info */}
+            {/* Basic info */}
             <div className="border border-blue/20 p-6 flex flex-col gap-5">
                 <p className="font-condensed text-xs tracking-[4px] uppercase text-accent">Basic Info</p>
 
@@ -143,7 +140,7 @@ export default function CompForm() {
                 />
             </div>
 
-            {/* Section — Dates */}
+            {/* Dates */}
             <div className="border border-blue/20 p-6 flex flex-col gap-5">
                 <p className="font-condensed text-xs tracking-[4px] uppercase text-accent">Dates</p>
 
@@ -173,40 +170,19 @@ export default function CompForm() {
                 />
             </div>
 
-            {/* Section — Google Sheets */}
-            <div className="border border-blue/20 p-6 flex flex-col gap-5">
-                <p className="font-condensed text-xs tracking-[4px] uppercase text-accent">Google Sheets — Results</p>
-                <p className="text-gray-muted/50 text-xs font-condensed tracking-wide -mt-2">
-                    Optional now — can be added later once results are ready.
-                </p>
-
-                <Input
-                    label="Sheet ID"
-                    hint="(from the URL: /spreadsheets/d/SHEET_ID/)"
-                    value={form.google_sheet_id}
-                    onChange={e => set('google_sheet_id', e.target.value)}
-                    placeholder="1BxiMVs0XRA5nFMdKvBdBZjgmUUq..."
-                />
-
-                <Input
-                    label="Tab name"
-                    hint="(default tab if results are on one sheet)"
-                    value={form.google_sheet_tab}
-                    onChange={e => set('google_sheet_tab', e.target.value)}
-                    placeholder="Results"
-                />
-            </div>
-
             {/* Scoring preview */}
             <div className="border border-blue/10 p-5 bg-blue/5">
                 <p className="font-condensed text-xs tracking-[4px] uppercase text-gray-muted mb-3">Default scoring</p>
-                <div className="flex gap-8 text-sm font-condensed">
+                <div className="flex flex-wrap gap-6 text-sm font-condensed">
                     <span className="text-gray-muted">Podium exact: <span className="text-green-400">10 pts</span></span>
                     <span className="text-gray-muted">Podium partial: <span className="text-yellow-400">5 pts</span></span>
                     <span className="text-gray-muted">P4P exact: <span className="text-green-400">20 pts</span></span>
                     <span className="text-gray-muted">P4P partial: <span className="text-yellow-400">10 pts</span></span>
                 </div>
-                <p className="text-gray-muted/30 text-xs mt-2">Editable in Supabase after creation.</p>
+                <p className="text-gray-muted/30 text-xs mt-2">
+                    12 standard categories will be created automatically.
+                    Editable in Supabase after creation.
+                </p>
             </div>
 
             {error && (

@@ -5,10 +5,7 @@ import PageHeader from '@/components/ui/PageHeader'
 import Button from '@/components/ui/Button'
 import StatusBadge from '@/components/admin/StatusBadge'
 import StatusChanger from '@/components/admin/StatusChanger'
-import RosterImport from '@/components/admin/RosterImport'
-import DeleteCategoryButton from "@/components/admin/DeleteCategoryButton";
-
-const STATUS_FLOW = ['upcoming', 'open', 'closed', 'results_in'] as const
+import DeleteCategoryButton from '@/components/admin/DeleteCategoryButton'
 
 export default async function ManageCompPage({ params }: { params: Promise<{ compId: string }> }) {
     const { compId } = await params
@@ -46,9 +43,14 @@ export default async function ManageCompPage({ params }: { params: Promise<{ com
                 title={comp.name}
                 subtitle={`${new Date(comp.date_start).toLocaleDateString('en-GB', { day: '2-digit', month: 'long', year: 'numeric' })} · ${comp.organizer ?? ''}`}
             >
-                <Link href="/admin">
-                    <Button variant="ghost" size="md">← Back</Button>
-                </Link>
+                <div className="flex gap-2">
+                    <Link href="/admin/drive">
+                        <Button variant="ghost" size="md">Drive Sync</Button>
+                    </Link>
+                    <Link href="/admin">
+                        <Button variant="ghost" size="md">← Back</Button>
+                    </Link>
+                </div>
             </PageHeader>
 
             <div className="max-w-7xl mx-auto px-6 py-10 flex flex-col gap-8">
@@ -116,13 +118,20 @@ export default async function ManageCompPage({ params }: { params: Promise<{ com
                         <p className="font-condensed text-xs tracking-[4px] uppercase text-accent">
                             Categories ({categories?.length ?? 0})
                         </p>
-                        <AddDefaultCategoriesButton compId={compId} hasCategories={(categories?.length ?? 0) > 0} />
                     </div>
 
                     {!categories || categories.length === 0 ? (
-                        <p className="text-gray-muted/40 text-sm font-condensed tracking-wide py-4">
-                            No categories yet. Import the 12 standard categories above.
-                        </p>
+                        <div className="py-4">
+                            <p className="text-gray-muted/40 text-sm font-condensed tracking-wide mb-3">
+                                No categories yet.
+                            </p>
+                            <p className="text-gray-muted/30 text-xs font-condensed">
+                                Categories are auto-detected from the roster file.{' '}
+                                <Link href="/admin/drive" className="text-blue-light hover:text-white transition-colors">
+                                    Go to Drive Sync →
+                                </Link>
+                            </p>
+                        </div>
                     ) : (
                         <div className="grid grid-cols-2 md:grid-cols-3 gap-px">
                             {categories.map(cat => (
@@ -147,15 +156,32 @@ export default async function ManageCompPage({ params }: { params: Promise<{ com
                     )}
                 </div>
 
-                {/* Roster import */}
+                {/* Athletes */}
                 <div className="border border-blue/20 p-6">
-                    <p className="font-condensed text-xs tracking-[4px] uppercase text-accent mb-5">
-                        Athlete Roster ({athletes?.length ?? 0} athletes)
-                    </p>
-                    <RosterImport compId={compId} categories={categories ?? []} />
+                    <div className="flex items-center justify-between mb-5">
+                        <p className="font-condensed text-xs tracking-[4px] uppercase text-accent">
+                            Athletes ({athletes?.length ?? 0})
+                        </p>
+                        <Link href="/admin/drive">
+                            <Button variant="ghost" size="sm">Update via Drive →</Button>
+                        </Link>
+                    </div>
 
-                    {athletes && athletes.length > 0 && (
-                        <div className="mt-5 border border-blue/10">
+                    {!athletes || athletes.length === 0 ? (
+                        <div>
+                            <p className="text-gray-muted/40 text-sm font-condensed tracking-wide mb-2">
+                                No athletes yet.
+                            </p>
+                            <p className="text-gray-muted/30 text-xs font-condensed">
+                                Upload a roster file in{' '}
+                                <Link href="/admin/drive" className="text-blue-light hover:text-white transition-colors">
+                                    Drive Sync
+                                </Link>{' '}
+                                to import athletes automatically.
+                            </p>
+                        </div>
+                    ) : (
+                        <div className="border border-blue/10">
                             <div className="grid grid-cols-[1fr_1fr_80px_1fr] gap-3 px-4 py-2 border-b border-blue/10">
                                 {['First name', 'Last name', 'Nat.', 'Category'].map(h => (
                                     <div key={h} className="font-condensed text-xs tracking-[2px] uppercase text-gray-muted">{h}</div>
@@ -182,16 +208,5 @@ export default async function ManageCompPage({ params }: { params: Promise<{ com
 
             </div>
         </div>
-    )
-}
-
-// Server-side button to add default categories
-function AddDefaultCategoriesButton({ compId, hasCategories }: { compId: string, hasCategories: boolean }) {
-    if (hasCategories) return null
-    return (
-        <form action={`/api/admin/categories/default`} method="POST">
-            <input type="hidden" name="competition_id" value={compId} />
-            <Button size="sm" type="submit">Import 12 standard categories</Button>
-        </form>
     )
 }

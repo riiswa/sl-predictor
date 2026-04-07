@@ -6,7 +6,6 @@ import Countdown from '@/components/ui/Countdown'
 import Button from '@/components/ui/Button'
 import PodiumSelector, { type PodiumSelections } from '@/components/predict/PodiumSelector'
 import P4PSelector, { type P4PSelections } from '@/components/predict/P4PSelector'
-import StrongestSelector, { type StrongestSelections } from '@/components/predict/StrongestSelector'
 
 interface Props {
     comp: {
@@ -17,43 +16,37 @@ interface Props {
     }
     categories: any[]
     alreadySubmitted: boolean
-    seasonSubmitted: { gender: 'men' | 'women', name: string }[]
-    menAthletes: any[]
-    womenAthletes: any[]
 }
 
 const TABS = [
-    { id: 'podium',    label: '🏆 The Podium',     desc: 'Top 3 per weight category' },
-    { id: 'p4p',       label: '⚡ P4P',             desc: 'Top 3 RIS overall' },
-    { id: 'strongest', label: '👑 Strongest',       desc: 'Season champion pick' },
+    { id: 'podium', label: '🏆 The Podium', desc: 'Top 3 per weight category' },
+    { id: 'p4p',    label: '⚡ P4P',        desc: 'Top 3 RIS overall' },
 ] as const
 
 type Tab = typeof TABS[number]['id']
 
-export default function PredictClient({
-                                          comp, categories, alreadySubmitted, seasonSubmitted, menAthletes, womenAthletes
-                                      }: Props) {
+export default function PredictClient({ comp, categories, alreadySubmitted }: Props) {
     const router = useRouter()
 
-    const [activeTab,  setActiveTab]  = useState<Tab>('podium')
-    const [podium,     setPodium]     = useState<PodiumSelections>({})
-    const [p4p,        setP4P]        = useState<P4PSelections>({ men: [], women: [] })
-    const [strongest,  setStrongest]  = useState<StrongestSelections>({ men_athlete_id: null, women_athlete_id: null })
-    const [loading,    setLoading]    = useState(false)
-    const [error,      setError]      = useState<string | null>(null)
-    const [submitted,  setSubmitted]  = useState(alreadySubmitted)
-    const [showModal,  setShowModal]  = useState(false)
+    const [activeTab, setActiveTab] = useState<Tab>('podium')
+    const [podium,    setPodium]    = useState<PodiumSelections>({})
+    const [p4p,       setP4P]       = useState<P4PSelections>({ men: [], women: [] })
+    const [loading,   setLoading]   = useState(false)
+    const [error,     setError]     = useState<string | null>(null)
+    const [submitted, setSubmitted] = useState(alreadySubmitted)
+    const [showModal, setShowModal] = useState(false)
 
     const isDeadlinePassed = new Date() > new Date(comp.prediction_deadline)
     const locked = submitted || isDeadlinePassed
 
-    // Completion checks
-    const podiumComplete  = categories.every(cat => (podium[cat.id]?.length ?? 0) === 3)
-    const p4pComplete     = p4p.men.length === 3 && p4p.women.length === 3
-    const canSubmit       = podiumComplete && p4pComplete && !locked
+    const podiumComplete = categories.every(cat => (podium[cat.id]?.length ?? 0) === 3)
+    const p4pComplete    = p4p.men.length === 3 && p4p.women.length === 3
+    const canSubmit      = podiumComplete && p4pComplete && !locked
 
-    // Count podium selections
     const podiumFilled = categories.filter(cat => (podium[cat.id]?.length ?? 0) === 3).length
+
+    const menCats   = categories.filter((c: any) => c.gender === 'men')
+    const womenCats = categories.filter((c: any) => c.gender === 'women')
 
     async function handleSubmit() {
         setLoading(true)
@@ -62,12 +55,7 @@ export default function PredictClient({
         const res = await fetch('/api/predictions', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-                competition_id: comp.id,
-                podium,
-                p4p,
-                strongest,
-            }),
+            body: JSON.stringify({ competition_id: comp.id, podium, p4p }),
         })
 
         const data = await res.json()
@@ -85,9 +73,6 @@ export default function PredictClient({
         setLoading(false)
     }
 
-    const menCats   = categories.filter(c => c.gender === 'men')
-    const womenCats = categories.filter(c => c.gender === 'women')
-
     return (
         <div className="flex flex-col gap-6">
 
@@ -95,13 +80,13 @@ export default function PredictClient({
             <div className="flex items-center justify-between border border-blue/20 px-5 py-4 bg-blue/5">
                 <div className="flex items-center gap-6">
                     {submitted ? (
-                        <span className="font-condensed text-sm tracking-[2px] uppercase text-green-400 flex items-center gap-2">
-              ✓ Predictions submitted
-            </span>
+                        <span className="font-condensed text-sm tracking-[2px] uppercase text-green-400">
+                            ✓ Predictions submitted
+                        </span>
                     ) : isDeadlinePassed ? (
                         <span className="font-condensed text-sm tracking-[2px] uppercase text-gray-muted">
-              Deadline passed
-            </span>
+                            Deadline passed
+                        </span>
                     ) : (
                         <div className="flex items-center gap-6">
                             <div>
@@ -118,7 +103,7 @@ export default function PredictClient({
                 <Countdown deadline={comp.prediction_deadline} />
             </div>
 
-            {/* Already submitted message */}
+            {/* Submitted message */}
             {submitted && (
                 <div className="border border-green-400/20 bg-green-400/5 px-5 py-4">
                     <p className="font-condensed text-sm text-green-400 tracking-wide">
@@ -174,26 +159,6 @@ export default function PredictClient({
                         />
                     </div>
                 )}
-
-                {activeTab === 'strongest' && (
-                    <div className="flex flex-col gap-4">
-                        <div className="border border-yellow-400/10 bg-yellow-400/3 px-4 py-3">
-                            <p className="font-condensed text-xs tracking-[3px] uppercase text-yellow-400/60 mb-1">Season bonus</p>
-                            <p className="text-sm text-gray-muted/70">
-                                This pick is for the entire season — not just this competition.
-                                Finding the season's top RIS athlete earns you <span className="text-yellow-400">+100 bonus points</span> at the end of the season.
-                                You can only submit this once.
-                            </p>
-                        </div>
-                        <StrongestSelector
-                            menAthletes={menAthletes}
-                            womenAthletes={womenAthletes}
-                            onChange={setStrongest}
-                            locked={locked}
-                            alreadySubmitted={seasonSubmitted}
-                        />
-                    </div>
-                )}
             </div>
 
             {/* Error */}
@@ -203,7 +168,7 @@ export default function PredictClient({
                 </div>
             )}
 
-            {/* Submit button */}
+            {/* Submit */}
             {!locked && (
                 <div className="border-t border-blue/20 pt-6 flex items-center justify-between">
                     <div>
@@ -219,15 +184,11 @@ export default function PredictClient({
                         )}
                         {canSubmit && (
                             <p className="text-green-400 text-xs font-condensed tracking-wide">
-                                ✓ All required picks completed — ready to submit
+                                ✓ All picks completed — ready to submit
                             </p>
                         )}
                     </div>
-                    <Button
-                        onClick={() => setShowModal(true)}
-                        disabled={!canSubmit}
-                        size="lg"
-                    >
+                    <Button onClick={() => setShowModal(true)} disabled={!canSubmit} size="lg">
                         Submit Predictions →
                     </Button>
                 </div>
@@ -239,28 +200,22 @@ export default function PredictClient({
                     <div className="bg-dark border border-blue-light/30 p-8 max-w-md w-full">
                         <p className="font-bebas text-4xl tracking-wide mb-2">Confirm Submission</p>
                         <p className="text-gray-muted text-sm mb-6">
-                            Once submitted you cannot change your predictions. Make sure you're happy with your picks.
+                            Once submitted you cannot change your predictions.
                         </p>
 
                         <div className="flex flex-col gap-2 mb-6 border border-blue/20 p-4 bg-blue/5">
                             <div className="flex justify-between font-condensed text-sm">
                                 <span className="text-gray-muted">Podium picks</span>
                                 <span className={podiumComplete ? 'text-green-400' : 'text-accent'}>
-                  {podiumFilled}/{categories.length} categories
-                </span>
+                                    {podiumFilled}/{categories.length} categories
+                                </span>
                             </div>
                             <div className="flex justify-between font-condensed text-sm">
                                 <span className="text-gray-muted">P4P picks</span>
                                 <span className={p4pComplete ? 'text-green-400' : 'text-accent'}>
-                  {p4p.men.length}/3 men · {p4p.women.length}/3 women
-                </span>
+                                    {p4p.men.length}/3 men · {p4p.women.length}/3 women
+                                </span>
                             </div>
-                            {(strongest.men_athlete_id || strongest.women_athlete_id) && (
-                                <div className="flex justify-between font-condensed text-sm">
-                                    <span className="text-gray-muted">Strongest Streetlifter</span>
-                                    <span className="text-yellow-400">Included</span>
-                                </div>
-                            )}
                         </div>
 
                         <div className="flex gap-3">

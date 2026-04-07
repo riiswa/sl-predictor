@@ -1,7 +1,7 @@
 import { createServerClient } from '@supabase/ssr'
 import { NextResponse, type NextRequest } from 'next/server'
 
-const PROTECTED_ROUTES = ['/pari', '/profil', '/ranking']
+const PROTECTED_ROUTES = ['/predict', '/profile', '/ranking']
 const ADMIN_ROUTES     = ['/admin']
 const AUTH_ROUTES      = ['/login', '/register']
 
@@ -28,7 +28,7 @@ export async function proxy(request: NextRequest) {
     const { data: { user } } = await supabase.auth.getUser()
     const path = request.nextUrl.pathname
 
-    // Redirige les non-connectés vers /login
+    // Redirect unauthenticated users to /login
     const needsAuth = PROTECTED_ROUTES.some(r => path.startsWith(r)) ||
         ADMIN_ROUTES.some(r => path.startsWith(r))
     if (needsAuth && !user) {
@@ -38,14 +38,14 @@ export async function proxy(request: NextRequest) {
         return NextResponse.redirect(url)
     }
 
-    // Redirige les connectés hors des pages auth
+    // Redirect authenticated users away from auth pages
     if (AUTH_ROUTES.some(r => path.startsWith(r)) && user) {
         const url = request.nextUrl.clone()
         url.pathname = '/ranking'
         return NextResponse.redirect(url)
     }
 
-    // Vérifie le rôle admin
+    // Check admin role
     if (ADMIN_ROUTES.some(r => path.startsWith(r)) && user) {
         const { data: profile } = await supabase
             .from('profiles')
