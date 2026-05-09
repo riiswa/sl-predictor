@@ -2,6 +2,51 @@ import { redirect } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
 import PageHeader from '@/components/ui/PageHeader'
 
+interface Athlete {
+    id: string
+    first_name: string
+    last_name: string
+    nationality: string | null
+}
+
+interface Category {
+    id: string
+    name: string
+    gender: string
+    weight_class: string
+}
+
+interface Competition {
+    id: string
+    name: string
+    flag: string | null
+    status: string
+    results_visible: boolean
+    date_start: string
+}
+
+interface Prediction {
+    id: string
+    module: string
+    position: number
+    points_earned: number | null
+    is_exact: boolean | null
+    is_partial: boolean | null
+    submitted_at: string
+    competitions: Competition | null
+    athletes: Athlete | null
+    categories: Category | null
+}
+
+interface CompEntry {
+    comp: Competition
+    predictions: Prediction[]
+    points: number
+    exact: number
+    partial: number
+    total: number
+}
+
 export default async function ProfilePage() {
     const supabase = await createClient()
     const { data: { user } } = await supabase.auth.getUser()
@@ -22,28 +67,29 @@ export default async function ProfilePage() {
             categories ( id, name, gender, weight_class )
         `)
         .eq('user_id', user.id)
-        .order('submitted_at', { ascending: false })
+        .order('submitted_at', { ascending: false }) as { data: Prediction[] | null }
 
-    const byComp: Record<string, {
-        comp: any
-        predictions: any[]
-        points: number
-        exact: number
-        partial: number
-        total: number
-    }> = {}
+    const byComp: Record<string, CompEntry> = {}
 
     for (const pred of predictions ?? []) {
-        const compId = pred.competitions?.id
-        if (!compId) continue
+        if (!pred.competitions?.id) continue
+        const compId = pred.competitions.id
+
         if (!byComp[compId]) {
-            byComp[compId] = { comp: pred.competitions, predictions: [], points: 0, exact: 0, partial: 0, total: 0 }
+            byComp[compId] = {
+                comp: pred.competitions,
+                predictions: [],
+                points: 0,
+                exact: 0,
+                partial: 0,
+                total: 0
+            }
         }
         byComp[compId].predictions.push(pred)
         byComp[compId].total++
-        if (pred.points_earned) byComp[compId].points  += pred.points_earned
-        if (pred.is_exact)      byComp[compId].exact++
-        if (pred.is_partial)    byComp[compId].partial++
+        if (pred.points_earned) byComp[compId].points += pred.points_earned
+        if (pred.is_exact) byComp[compId].exact++
+        if (pred.is_partial) byComp[compId].partial++
     }
 
     const compEntries = Object.values(byComp).sort(
@@ -133,9 +179,9 @@ export default async function ProfilePage() {
                         {compEntries.map(({ comp, predictions: preds, points, exact, partial, total }) => {
                             const hasResults  = comp.results_visible
                             const missed      = total - exact - partial
-                            const podiumPreds = preds.filter((p: any) => p.module === 'podium')
-                            const p4pMen      = preds.filter((p: any) => p.module === 'p4p_men')
-                            const p4pWomen    = preds.filter((p: any) => p.module === 'p4p_women')
+                            const podiumPreds = preds.filter((p) => p.module === 'podium')
+                            const p4pMen      = preds.filter((p) => p.module === 'p4p_men')
+                            const p4pWomen    = preds.filter((p) => p.module === 'p4p_women')
 
                             return (
                                 <div key={comp.id} className="border border-blue/20 overflow-hidden">
@@ -173,11 +219,11 @@ export default async function ProfilePage() {
                                                 <p className="font-condensed text-xs tracking-[3px] uppercase text-gray-muted/50 mb-2">🏆 Podium</p>
                                                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-px">
                                                     {podiumPreds
-                                                        .sort((a: any, b: any) => {
+                                                        .sort((a, b) => {
                                                             const cat = (a.categories?.name ?? '').localeCompare(b.categories?.name ?? '')
                                                             return cat !== 0 ? cat : a.position - b.position
                                                         })
-                                                        .map((pred: any) => <PredRow key={pred.id} pred={pred} hasResults={hasResults} />)
+                                                        .map((pred) => <PredRow key={pred.id} pred={pred} hasResults={hasResults} />)
                                                     }
                                                 </div>
                                             </div>
@@ -186,7 +232,7 @@ export default async function ProfilePage() {
                                             <div>
                                                 <p className="font-condensed text-xs tracking-[3px] uppercase text-blue-light/50 mb-2">⚡ P4P Men</p>
                                                 <div className="grid grid-cols-1 sm:grid-cols-3 gap-px">
-                                                    {p4pMen.sort((a: any, b: any) => a.position - b.position).map((pred: any) => (
+                                                    {p4pMen.sort((a, b) => a.position - b.position).map((pred) => (
                                                         <PredRow key={pred.id} pred={pred} hasResults={hasResults} />
                                                     ))}
                                                 </div>
@@ -196,7 +242,7 @@ export default async function ProfilePage() {
                                             <div>
                                                 <p className="font-condensed text-xs tracking-[3px] uppercase text-pink-400/50 mb-2">⚡ P4P Women</p>
                                                 <div className="grid grid-cols-1 sm:grid-cols-3 gap-px">
-                                                    {p4pWomen.sort((a: any, b: any) => a.position - b.position).map((pred: any) => (
+                                                    {p4pWomen.sort((a, b) => a.position - b.position).map((pred) => (
                                                         <PredRow key={pred.id} pred={pred} hasResults={hasResults} />
                                                     ))}
                                                 </div>
@@ -215,7 +261,7 @@ export default async function ProfilePage() {
 
 const MEDALS = ['🥇', '🥈', '🥉']
 
-function PredRow({ pred, hasResults }: { pred: any; hasResults: boolean }) {
+function PredRow({ pred, hasResults }: { pred: Prediction; hasResults: boolean }) {
     let borderColor = 'border-blue/10'
     let bgColor     = 'bg-dark/40'
     let badge       = null
