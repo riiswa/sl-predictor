@@ -7,6 +7,7 @@ import StatusBadge from '@/components/admin/StatusBadge'
 import StatusChanger from '@/components/admin/StatusChanger'
 import DeleteCategoryButton from '@/components/admin/DeleteCategoryButton'
 import DeleteCompButton from "@/components/admin/DeleteCompButton";
+import RevealResultsButton from '@/components/admin/RevealResultsButton'
 
 export default async function ManageCompPage({ params }: { params: Promise<{ compId: string }> }) {
     const { compId } = await params
@@ -76,6 +77,12 @@ export default async function ManageCompPage({ params }: { params: Promise<{ com
                 <div className="border border-blue/20 p-6">
                     <p className="font-condensed text-xs tracking-[4px] uppercase text-accent mb-5">Change Status</p>
                     <StatusChanger compId={compId} currentStatus={comp.status} />
+                    {!comp.results_visible && comp.status === 'closed' && (
+                        <div className="mt-6 pt-5 border-t border-blue/10">
+                            <p className="font-condensed text-xs tracking-[4px] uppercase text-gray-muted mb-3">Results</p>
+                            <RevealResultsButton compId={compId} />
+                        </div>
+                    )}
                 </div>
 
                 {/* Scoring config */}
