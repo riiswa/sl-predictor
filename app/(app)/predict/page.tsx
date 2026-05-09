@@ -8,7 +8,6 @@ export default async function PredictPage() {
     const { data: { user } } = await supabase.auth.getUser()
     if (!user) redirect('/login')
 
-    // Get open competition
     const { data: comp } = await supabase
         .from('competitions')
         .select('id, name, flag, country, date_start, prediction_deadline, status, scoring_config')
@@ -17,7 +16,6 @@ export default async function PredictPage() {
         .limit(1)
         .single()
 
-    // No open competition
     if (!comp) {
         return (
             <div>
@@ -32,24 +30,20 @@ export default async function PredictPage() {
         )
     }
 
-    // Get categories with athletes
     const { data: categories } = await supabase
         .from('categories')
-        .select(`
-            id, name, gender, weight_class, display_order,
-            athletes ( id, first_name, last_name, nationality, pr_muscle_up, pr_pullup, pr_dip, pr_squat )
-        `)
+        .select('id, name, gender, weight_class, display_order, athletes ( id, first_name, last_name, nationality )')
         .eq('competition_id', comp.id)
         .order('display_order')
 
-    // Check if user already submitted for this competition
-    const { count: existingCount } = await supabase
+    // Load existing predictions to pre-fill form
+    const { data: existingPredictions } = await supabase
         .from('predictions')
-        .select('id', { count: 'exact', head: true })
+        .select('id, module, position, athlete_id, category_id, submitted_at')
         .eq('user_id', user.id)
         .eq('competition_id', comp.id)
 
-    const alreadySubmitted = (existingCount ?? 0) > 0
+    const alreadySubmitted = (existingPredictions?.length ?? 0) > 0
 
     return (
         <div>
@@ -65,6 +59,7 @@ export default async function PredictPage() {
                     comp={comp}
                     categories={categories ?? []}
                     alreadySubmitted={alreadySubmitted}
+                    existingPredictions={existingPredictions ?? []}
                 />
             </div>
         </div>

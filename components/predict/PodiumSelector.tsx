@@ -7,10 +7,6 @@ interface Athlete {
     first_name: string
     last_name: string
     nationality: string
-    pr_muscle_up: number | null
-    pr_pullup: number | null
-    pr_dip: number | null
-    pr_squat: number | null
 }
 
 interface Category {
@@ -28,26 +24,26 @@ interface PodiumPick {
     athlete_name: string
 }
 
-export type PodiumSelections = Record<string, PodiumPick[]> // category_id → picks
+export type PodiumSelections = Record<string, PodiumPick[]>
 
 interface Props {
     categories: Category[]
     onChange: (selections: PodiumSelections) => void
     locked?: boolean
+    initialSelections?: PodiumSelections
 }
 
-const MEDALS = ['🥇', '🥈', '🥉']
+const MEDALS    = ['🥇', '🥈', '🥉']
+const POS_LABEL = ['1st', '2nd', '3rd']
 const POSITIONS: Array<1 | 2 | 3> = [1, 2, 3]
 
-export default function PodiumSelector({ categories, onChange, locked = false }: Props) {
-    const [selections, setSelections] = useState<PodiumSelections>({})
+export default function PodiumSelector({ categories, onChange, locked = false, initialSelections }: Props) {
+    const [selections, setSelections] = useState<PodiumSelections>(initialSelections ?? {})
 
     function pick(catId: string, position: 1 | 2 | 3, athlete: Athlete) {
         if (locked) return
-
         const catPicks = [...(selections[catId] ?? [])]
         const filtered = catPicks.filter(p => p.athlete_id !== athlete.id && p.position !== position)
-
         const next = {
             ...selections,
             [catId]: [...filtered, {
@@ -56,100 +52,98 @@ export default function PodiumSelector({ categories, onChange, locked = false }:
                 athlete_name: `${athlete.first_name} ${athlete.last_name}`,
             }].sort((a, b) => a.position - b.position),
         }
-
         setSelections(next)
         onChange(next)
     }
 
     function getPickForPosition(catId: string, position: 1 | 2 | 3): PodiumPick | undefined {
-        return selections[catId]?.find(p => p.position === position)
+        return (selections[catId] ?? []).find(p => p.position === position)
     }
 
     function isAthleteUsed(catId: string, athleteId: string): boolean {
-        return selections[catId]?.some(p => p.athlete_id === athleteId) ?? false
+        return (selections[catId] ?? []).some(p => p.athlete_id === athleteId)
     }
 
-    function completedCount() {
-        return categories.filter(cat =>
-            (selections[cat.id]?.length ?? 0) === 3
-        ).length
+    function getAthletePosition(catId: string, athleteId: string): 1 | 2 | 3 | null {
+        return (selections[catId] ?? []).find(p => p.athlete_id === athleteId)?.position ?? null
     }
 
-    const women = categories.filter(c => c.gender === 'women').sort((a,b) => a.display_order - b.display_order)
-    const men   = categories.filter(c => c.gender === 'men').sort((a,b) => a.display_order - b.display_order)
+    function isCatComplete(catId: string): boolean {
+        return (selections[catId] ?? []).length === 3
+    }
+
+    function completedCount(): number {
+        return categories.filter(cat => isCatComplete(cat.id)).length
+    }
+
+    const women = categories.filter(c => c.gender === 'women').sort((a, b) => a.display_order - b.display_order)
+    const men   = categories.filter(c => c.gender === 'men').sort((a, b) => a.display_order - b.display_order)
+    const total = categories.length
+    const done  = completedCount()
 
     return (
-        <div className="flex flex-col gap-2">
-
+        <div className="flex flex-col gap-4">
             {/* Progress */}
-            <div className="flex items-center justify-between mb-4">
-                <p className="font-condensed text-xs tracking-[4px] uppercase text-gray-muted">
-                    {completedCount()} / {categories.length} categories complete
-                </p>
-                <div className="flex-1 mx-6 h-px bg-blue/20 relative">
+            <div className="flex items-center gap-4 px-1">
+                <div className="flex-1 h-1 bg-blue/15 relative overflow-hidden">
                     <div
-                        className="absolute inset-y-0 left-0 bg-accent transition-all duration-300"
-                        style={{ width: `${(completedCount() / categories.length) * 100}%` }}
+                        className="absolute inset-y-0 left-0 bg-accent transition-all duration-500"
+                        style={{ width: `${total ? (done / total) * 100 : 0}%` }}
                     />
                 </div>
-                <p className="font-condensed text-xs tracking-[2px] text-accent">
-                    {Math.round((completedCount() / categories.length) * 100)}%
-                </p>
+                <span className="font-condensed text-xs tracking-[2px] text-gray-muted flex-shrink-0">{done}/{total}</span>
             </div>
 
-            {/* Women */}
-            <div className="mb-2">
-                <div className="font-condensed text-xs tracking-[4px] uppercase text-pink-400/60 mb-3 flex items-center gap-3">
-                    <span>Women</span>
-                    <div className="flex-1 h-px bg-pink-400/10" />
+            {women.length > 0 && (
+                <div>
+                    <div className="flex items-center gap-3 mb-2">
+                        <span className="font-condensed text-xs tracking-[4px] uppercase text-pink-400/70">Women</span>
+                        <div className="flex-1 h-px bg-pink-400/10" />
+                    </div>
+                    <div className="flex flex-col gap-1.5">
+                        {women.map(cat => (
+                            <CategoryBlock
+                                key={cat.id} cat={cat}
+                                getPickForPosition={getPickForPosition}
+                                isAthleteUsed={isAthleteUsed}
+                                getAthletePosition={getAthletePosition}
+                                pick={pick} locked={locked}
+                                complete={isCatComplete(cat.id)}
+                            />
+                        ))}
+                    </div>
                 </div>
-                {women.map(cat => (
-                    <CategoryBlock
-                        key={cat.id}
-                        cat={cat}
-                        positions={POSITIONS}
-                        medals={MEDALS}
-                        getPickForPosition={getPickForPosition}
-                        isAthleteUsed={isAthleteUsed}
-                        pick={pick}
-                        locked={locked}
-                        complete={(selections[cat.id]?.length ?? 0) === 3}
-                    />
-                ))}
-            </div>
+            )}
 
-            {/* Men */}
-            <div>
-                <div className="font-condensed text-xs tracking-[4px] uppercase text-blue-light/60 mb-3 flex items-center gap-3">
-                    <span>Men</span>
-                    <div className="flex-1 h-px bg-blue-light/10" />
+            {men.length > 0 && (
+                <div>
+                    <div className="flex items-center gap-3 mb-2">
+                        <span className="font-condensed text-xs tracking-[4px] uppercase text-blue-light/70">Men</span>
+                        <div className="flex-1 h-px bg-blue-light/10" />
+                    </div>
+                    <div className="flex flex-col gap-1.5">
+                        {men.map(cat => (
+                            <CategoryBlock
+                                key={cat.id} cat={cat}
+                                getPickForPosition={getPickForPosition}
+                                isAthleteUsed={isAthleteUsed}
+                                getAthletePosition={getAthletePosition}
+                                pick={pick} locked={locked}
+                                complete={isCatComplete(cat.id)}
+                            />
+                        ))}
+                    </div>
                 </div>
-                {men.map(cat => (
-                    <CategoryBlock
-                        key={cat.id}
-                        cat={cat}
-                        positions={POSITIONS}
-                        medals={MEDALS}
-                        getPickForPosition={getPickForPosition}
-                        isAthleteUsed={isAthleteUsed}
-                        pick={pick}
-                        locked={locked}
-                        complete={(selections[cat.id]?.length ?? 0) === 3}
-                    />
-                ))}
-            </div>
+            )}
         </div>
     )
 }
 
-function CategoryBlock({
-                           cat, positions, medals, getPickForPosition, isAthleteUsed, pick, locked, complete
-                       }: {
+function CategoryBlock({ cat, getPickForPosition, isAthleteUsed, getAthletePosition, pick, locked, complete }: {
     cat: Category
-    positions: Array<1 | 2 | 3>
-    medals: string[]
     getPickForPosition: (catId: string, position: 1 | 2 | 3) => PodiumPick | undefined
     isAthleteUsed: (catId: string, athleteId: string) => boolean
+    getAthletePosition: (catId: string, athleteId: string) => 1 | 2 | 3 | null
     pick: (catId: string, position: 1 | 2 | 3, athlete: Athlete) => void
     locked: boolean
     complete: boolean
@@ -157,109 +151,77 @@ function CategoryBlock({
     const [open, setOpen] = useState(true)
 
     return (
-        <div className={`border mb-2 transition-colors ${complete ? 'border-blue/30' : 'border-blue/15'}`}>
-            {/* Category header */}
+        <div className={`border transition-all ${complete ? 'border-blue/30 bg-blue/5' : 'border-blue/15'}`}>
             <button
                 onClick={() => setOpen(o => !o)}
-                className="w-full flex items-center justify-between px-5 py-3 hover:bg-blue/5 transition-colors"
+                className="w-full flex items-center justify-between px-4 py-3 hover:bg-blue/5 transition-colors"
             >
                 <div className="flex items-center gap-3">
-          <span className={`font-bebas text-lg tracking-wide ${
-              cat.gender === 'women' ? 'text-pink-400' : 'text-blue-light'
-          }`}>
-            {cat.name}
-          </span>
-                    <span className="text-gray-muted text-xs font-condensed">
-            {cat.athletes.length} athletes
-          </span>
+                    <span className={`font-bebas text-lg tracking-wide ${cat.gender === 'women' ? 'text-pink-400' : 'text-blue-light'}`}>
+                        {cat.name}
+                    </span>
+                    <span className="text-gray-muted/50 text-xs font-condensed">{cat.athletes.length} athletes</span>
                 </div>
-                <div className="flex items-center gap-3">
-                    {complete && (
-                        <span className="font-condensed text-xs tracking-[2px] uppercase text-green-400 bg-green-400/10 px-2 py-0.5">
-              ✓ Done
-            </span>
-                    )}
-                    <span className="text-gray-muted text-xs">{open ? '▲' : '▼'}</span>
+                <div className="flex items-center gap-2">
+                    {complete
+                        ? <span className="font-condensed text-xs tracking-[1px] uppercase text-green-400">✓ Done</span>
+                        : <span className="font-condensed text-xs text-gray-muted/40">{open ? '▲' : '▼'}</span>
+                    }
                 </div>
             </button>
 
             {open && (
-                <div className="border-t border-blue/10 p-4">
-                    {/* Podium slots */}
-                    <div className="grid grid-cols-3 gap-2 mb-4">
-                        {positions.map(pos => {
+                <div className="border-t border-blue/10">
+                    {/* Podium preview */}
+                    <div className="grid grid-cols-3 gap-px border-b border-blue/10">
+                        {POSITIONS.map(pos => {
                             const picked = getPickForPosition(cat.id, pos)
                             return (
-                                <div
-                                    key={pos}
-                                    className={`border px-3 py-2.5 min-h-[60px] flex flex-col justify-center ${
-                                        picked
-                                            ? 'border-blue-light/40 bg-blue/15'
-                                            : 'border-blue/10 bg-dark/40'
-                                    }`}
-                                >
-                                    <div className="flex items-center gap-2 mb-1">
-                                        <span className="text-base">{medals[pos - 1]}</span>
-                                        <span className="font-condensed text-xs tracking-[2px] uppercase text-gray-muted">
-                      {pos === 1 ? '1st' : pos === 2 ? '2nd' : '3rd'}
-                    </span>
+                                <div key={pos} className={`px-3 py-2.5 ${picked ? 'bg-blue/12' : 'bg-darker/30'}`}>
+                                    <div className="flex items-center gap-1.5 mb-0.5">
+                                        <span style={{ fontSize: '13px' }}>{MEDALS[pos - 1]}</span>
+                                        <span className="font-condensed text-xs text-gray-muted/50 tracking-[1px]">{POS_LABEL[pos - 1]}</span>
                                     </div>
-                                    {picked ? (
-                                        <p className="font-condensed text-sm font-semibold text-white leading-tight">
-                                            {picked.athlete_name}
-                                        </p>
-                                    ) : (
-                                        <p className="font-condensed text-xs text-gray-muted/40 italic">Not selected</p>
-                                    )}
+                                    {picked
+                                        ? <p className="font-condensed text-sm font-semibold text-white leading-tight truncate">{picked.athlete_name}</p>
+                                        : <p className="text-xs text-gray-muted/25 italic font-condensed">—</p>
+                                    }
                                 </div>
                             )
                         })}
                     </div>
 
-                    {/* Athletes grid */}
+                    {/* Athletes */}
                     {!locked && (
-                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-px">
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-px p-px">
                             {cat.athletes.map(athlete => {
                                 const used = isAthleteUsed(cat.id, athlete.id)
+                                const pos  = getAthletePosition(cat.id, athlete.id)
                                 return (
-                                    <div
-                                        key={athlete.id}
-                                        className={`border border-blue/10 px-4 py-3 ${used ? 'bg-blue/15' : 'bg-dark/40 hover:bg-blue/8'} transition-colors`}
-                                    >
-                                        <div className="flex items-center justify-between mb-2">
-                                            <div>
-                                                <p className="font-condensed font-semibold text-sm text-white">
-                                                    {athlete.first_name} {athlete.last_name}
-                                                </p>
-                                                <p className="text-xs text-gray-muted">{athlete.nationality}</p>
+                                    <div key={athlete.id} className={`flex items-center justify-between px-4 py-2.5 transition-colors ${used ? 'bg-blue/15' : 'bg-dark/60 hover:bg-blue/8'}`}>
+                                        <div className="flex items-center gap-2.5 min-w-0">
+                                            {pos !== null && <span style={{ fontSize: '14px', flexShrink: 0 }}>{MEDALS[pos - 1]}</span>}
+                                            <div className="min-w-0">
+                                                <p className="font-condensed font-semibold text-sm text-white truncate">{athlete.first_name} {athlete.last_name}</p>
+                                                <p className="text-xs text-gray-muted/60">{athlete.nationality}</p>
                                             </div>
-                                            {used && (
-                                                <span className="font-condensed text-xs text-blue-light">
-                          {positions.map(p => {
-                              const pk = getPickForPosition(cat.id, p)
-                              return pk?.athlete_id === athlete.id ? medals[p-1] : null
-                          })}
-                        </span>
-                                            )}
                                         </div>
-                                        {/* Position buttons */}
-                                        <div className="flex gap-1.5">
-                                            {positions.map(pos => {
-                                                const slotTaken = getPickForPosition(cat.id, pos)
-                                                const isThisPick = slotTaken?.athlete_id === athlete.id
+                                        <div className="flex gap-1 flex-shrink-0 ml-2">
+                                            {POSITIONS.map(p => {
+                                                const slotOwner  = getPickForPosition(cat.id, p)
+                                                const isThisPick = slotOwner?.athlete_id === athlete.id
+                                                const slotTaken  = slotOwner && !isThisPick
                                                 return (
                                                     <button
-                                                        key={pos}
-                                                        onClick={() => pick(cat.id, pos, athlete)}
-                                                        className={`flex-1 font-condensed text-xs tracking-[1px] py-1.5 border transition-all ${
-                                                            isThisPick
-                                                                ? 'bg-accent border-accent text-white'
-                                                                : slotTaken && !isThisPick
-                                                                    ? 'border-blue/20 text-gray-muted/30 cursor-pointer hover:border-blue/40 hover:text-gray-muted'
-                                                                    : 'border-blue/20 text-gray-muted hover:border-blue-light hover:text-white cursor-pointer'
+                                                        key={p}
+                                                        onClick={() => pick(cat.id, p, athlete)}
+                                                        className={`w-7 h-7 font-condensed text-xs border transition-all ${
+                                                            isThisPick ? 'bg-accent border-accent text-white'
+                                                                : slotTaken ? 'border-blue/10 text-gray-muted/20 hover:border-blue/30 hover:text-gray-muted/50'
+                                                                    : 'border-blue/20 text-gray-muted hover:border-blue-light hover:text-white'
                                                         }`}
                                                     >
-                                                        {medals[pos-1]}
+                                                        {MEDALS[p - 1]}
                                                     </button>
                                                 )
                                             })}

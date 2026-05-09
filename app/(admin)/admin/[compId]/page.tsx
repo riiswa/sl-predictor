@@ -6,6 +6,7 @@ import Button from '@/components/ui/Button'
 import StatusBadge from '@/components/admin/StatusBadge'
 import StatusChanger from '@/components/admin/StatusChanger'
 import DeleteCategoryButton from '@/components/admin/DeleteCategoryButton'
+import DeleteCompButton from "@/components/admin/DeleteCompButton";
 
 export default async function ManageCompPage({ params }: { params: Promise<{ compId: string }> }) {
     const { compId } = await params
@@ -47,6 +48,7 @@ export default async function ManageCompPage({ params }: { params: Promise<{ com
                     <Link href="/admin/drive">
                         <Button variant="ghost" size="md">Drive Sync</Button>
                     </Link>
+                    <DeleteCompButton compId={compId} compName={comp.name} />
                     <Link href="/admin">
                         <Button variant="ghost" size="md">← Back</Button>
                     </Link>
