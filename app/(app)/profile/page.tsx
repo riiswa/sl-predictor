@@ -172,7 +172,7 @@ export default async function ProfilePage() {
                 {/* Account settings */}
                 <div className="flex flex-col gap-4">
                     <p className="font-condensed text-xs tracking-[4px] uppercase text-accent">Account Settings</p>
-                    <AccountSettings email={user.email ?? ''} />
+                    <AccountSettings email={user.email ?? ''} username={profile?.username ?? ''} />
                 </div>
 
                 {compEntries.length === 0 ? (

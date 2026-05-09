@@ -71,6 +71,97 @@ function buildP4PSelections(preds: ExistingPrediction[], categories: any[]): P4P
     return sel
 }
 
+const MEDALS = ['🥇', '🥈', '🥉']
+
+function LockedRecap({
+    podium, p4p, categories, canEdit, onEdit,
+}: {
+    podium:     PodiumSelections
+    p4p:        P4PSelections
+    categories: any[]
+    canEdit:    boolean
+    onEdit:     () => void
+}) {
+    const catsWithPicks = categories.filter((c: any) => (podium[c.id]?.length ?? 0) > 0)
+
+    return (
+        <div className="flex flex-col gap-4">
+            <div className="border border-green-400/20 bg-green-400/5 px-5 py-4 flex items-center justify-between gap-4">
+                <div className="flex items-center gap-3">
+                    <div className="w-2 h-2 rounded-full bg-green-400 flex-shrink-0" />
+                    <div>
+                        <p className="font-condensed text-sm font-semibold text-green-400 tracking-wide">Your picks are locked in</p>
+                        <p className="text-gray-muted text-xs mt-0.5">
+                            {canEdit ? 'You can still modify until the deadline.' : 'Results will appear here after the competition.'}
+                        </p>
+                    </div>
+                </div>
+                {canEdit && (
+                    <button
+                        onClick={onEdit}
+                        className="font-condensed text-xs tracking-[2px] uppercase text-gray-muted hover:text-white transition-colors flex-shrink-0"
+                    >
+                        ✏ Modify
+                    </button>
+                )}
+            </div>
+
+            {/* Podium picks */}
+            {catsWithPicks.length > 0 && (
+                <div className="border border-blue/20 p-5 flex flex-col gap-4">
+                    <p className="font-condensed text-xs tracking-[4px] uppercase text-accent">🏆 Podium Picks</p>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-px">
+                        {catsWithPicks.map((cat: any) => {
+                            const picks = [...(podium[cat.id] ?? [])].sort((a, b) => a.position - b.position)
+                            return (
+                                <div key={cat.id} className="bg-dark/40 border border-blue/10 px-4 py-3">
+                                    <p className="font-condensed text-xs tracking-[2px] uppercase text-gray-muted mb-2">{cat.name}</p>
+                                    <div className="flex flex-col gap-1.5">
+                                        {picks.map(pick => (
+                                            <div key={pick.position} className="flex items-center gap-2">
+                                                <span className="text-sm w-5 flex-shrink-0">{MEDALS[pick.position - 1]}</span>
+                                                <span className="font-condensed text-sm text-white">{pick.athlete_name}</span>
+                                            </div>
+                                        ))}
+                                    </div>
+                                </div>
+                            )
+                        })}
+                    </div>
+                </div>
+            )}
+
+            {/* P4P picks */}
+            {(p4p.men.length > 0 || p4p.women.length > 0) && (
+                <div className="border border-blue/20 p-5 flex flex-col gap-4">
+                    <p className="font-condensed text-xs tracking-[4px] uppercase text-accent">⚡ P4P Picks</p>
+                    <div className="grid grid-cols-2 gap-px">
+                        {(['men', 'women'] as const).map(gender => {
+                            const picks = [...p4p[gender]].sort((a, b) => a.position - b.position)
+                            if (picks.length === 0) return null
+                            return (
+                                <div key={gender} className="bg-dark/40 border border-blue/10 px-4 py-3">
+                                    <p className={`font-condensed text-xs tracking-[2px] uppercase mb-2 ${gender === 'women' ? 'text-pink-400/60' : 'text-blue-light/60'}`}>
+                                        {gender === 'men' ? 'Men' : 'Women'}
+                                    </p>
+                                    <div className="flex flex-col gap-1.5">
+                                        {picks.map(pick => (
+                                            <div key={pick.position} className="flex items-center gap-2">
+                                                <span className="text-sm w-5 flex-shrink-0">{MEDALS[pick.position - 1]}</span>
+                                                <span className="font-condensed text-sm text-white">{pick.athlete_name}</span>
+                                            </div>
+                                        ))}
+                                    </div>
+                                </div>
+                            )
+                        })}
+                    </div>
+                </div>
+            )}
+        </div>
+    )
+}
+
 export default function PredictClient({ comp, categories, alreadySubmitted, existingPredictions }: Props) {
     const router = useRouter()
 
@@ -208,7 +299,19 @@ export default function PredictClient({ comp, categories, alreadySubmitted, exis
                 </div>
             </div>
 
-            {/* Tabs */}
+            {/* Locked recap — shown when submitted and not in edit mode */}
+            {submitted && !editMode && (
+                <LockedRecap
+                    podium={podium}
+                    p4p={p4p}
+                    categories={categories}
+                    canEdit={canEdit}
+                    onEdit={handleEditClick}
+                />
+            )}
+
+            {/* Tabs + content — only shown when editing or not yet submitted */}
+            {(!submitted || editMode) && <>
             <div className="flex gap-px">
                 {TABS.map(tab => {
                     const isActive = activeTab === tab.id
@@ -234,7 +337,6 @@ export default function PredictClient({ comp, categories, alreadySubmitted, exis
                 })}
             </div>
 
-            {/* Tab content */}
             <div>
                 {activeTab === 'podium' && (
                     <PodiumSelector categories={categories} onChange={setPodium} locked={locked} initialSelections={podium} />
@@ -260,6 +362,8 @@ export default function PredictClient({ comp, categories, alreadySubmitted, exis
                     </div>
                 )}
             </div>
+
+            </> }
 
             {error && (
                 <div className="border border-accent/30 bg-accent/8 px-4 py-3">
@@ -323,7 +427,7 @@ export default function PredictClient({ comp, categories, alreadySubmitted, exis
                         <p className="text-gray-muted text-sm mb-6">
                             {submitted
                                 ? 'This will replace your current predictions and update your tiebreaker timestamp.'
-                                : 'Once submitted you cannot change your predictions before the deadline.'}
+                                : 'Once submitted, you can still modify your picks until the deadline.'}
                         </p>
                         <div className="flex flex-col gap-2 mb-6 border border-blue/20 bg-blue/5 p-4">
                             <div className="flex justify-between font-condensed text-sm">

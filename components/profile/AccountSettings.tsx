@@ -23,9 +23,35 @@ function Feedback({ msg, isError }: { msg: string; isError?: boolean }) {
     )
 }
 
-export default function AccountSettings({ email }: { email: string }) {
+export default function AccountSettings({ email, username }: { email: string; username: string }) {
     const router   = useRouter()
     const supabase = createClient()
+
+    // — Change username —
+    const [newUsername,  setNewUsername]  = useState('')
+    const [unLoading,    setUnLoading]    = useState(false)
+    const [unFeedback,   setUnFeedback]   = useState<{ msg: string; isError: boolean } | null>(null)
+
+    async function handleChangeUsername(e: React.FormEvent) {
+        e.preventDefault()
+        const trimmed = newUsername.trim()
+        if (trimmed.length < 3) { setUnFeedback({ msg: 'Username must be at least 3 characters.', isError: true }); return }
+        setUnLoading(true)
+        setUnFeedback(null)
+
+        const { data: existing } = await supabase
+            .from('profiles').select('id').eq('username', trimmed).maybeSingle()
+        if (existing) { setUnFeedback({ msg: 'Username already taken.', isError: true }); setUnLoading(false); return }
+
+        const { error } = await supabase.auth.getUser().then(({ data: { user } }) =>
+            supabase.from('profiles').update({ username: trimmed }).eq('id', user!.id)
+        )
+        setUnLoading(false)
+        if (error) { setUnFeedback({ msg: error.message, isError: true }); return }
+        setUnFeedback({ msg: 'Username updated.', isError: false })
+        setNewUsername('')
+        router.refresh()
+    }
 
     // — Change password —
     const [newPassword,    setNewPassword]    = useState('')
@@ -79,6 +105,31 @@ export default function AccountSettings({ email }: { email: string }) {
 
     return (
         <div className="flex flex-col gap-4">
+
+            {/* Change username */}
+            <Section title="Change Username">
+                <p className="text-gray-muted/50 text-xs font-condensed tracking-wide -mt-2">
+                    Current: <span className="text-gray-muted">{username}</span>
+                </p>
+                <form onSubmit={handleChangeUsername} className="flex flex-col gap-4">
+                    <Input
+                        label="New username"
+                        type="text"
+                        required
+                        minLength={3}
+                        maxLength={20}
+                        value={newUsername}
+                        onChange={e => setNewUsername(e.target.value)}
+                        placeholder="NewUsername"
+                    />
+                    {unFeedback && <Feedback msg={unFeedback.msg} isError={unFeedback.isError} />}
+                    <div>
+                        <Button type="submit" size="md" loading={unLoading}>
+                            Update username →
+                        </Button>
+                    </div>
+                </form>
+            </Section>
 
             {/* Change password */}
             <Section title="Change Password">
