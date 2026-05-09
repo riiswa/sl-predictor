@@ -7,17 +7,16 @@ export default async function RankingPage() {
     const { data: { user } } = await supabase.auth.getUser()
 
     const { data: currentProfile } = await supabase
-        .from('profiles')
+        .from('predictor_standings')
         .select('id, username, total_points, season_rank, country, total_predictions, correct_predictions')
         .eq('id', user!.id)
         .single()
 
     // Full predictor leaderboard
     const { data: allProfiles } = await supabase
-        .from('profiles')
+        .from('predictor_standings')
         .select('id, username, total_points, season_rank, country, total_predictions, correct_predictions')
         .order('total_points', { ascending: false })
-        .order('season_rank', { ascending: true })
 
     // RIS results — only from visible competitions
     const { data: results } = await supabase

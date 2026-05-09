@@ -53,8 +53,8 @@ export default async function ProfilePage() {
     if (!user) redirect('/login')
 
     const { data: profile } = await supabase
-        .from('profiles')
-        .select('username, country, total_points, season_rank, total_predictions, correct_predictions, role')
+        .from('predictor_standings')
+        .select('id, username, country, total_points, season_rank, total_predictions, correct_predictions, role')
         .eq('id', user.id)
         .single()
 
