@@ -34,11 +34,16 @@ export default async function AdminPage() {
                 title="DASHBOARD"
                 subtitle="Manage competitions, rosters and results"
             >
-                <Link href="/admin/drive">
-                    <Button size="md">
-                        Drive Sync {needsAttention > 0 && `(${needsAttention})`}
-                    </Button>
-                </Link>
+                <div className="flex gap-2">
+                    <Link href="/admin/users">
+                        <Button variant="ghost" size="md">Users</Button>
+                    </Link>
+                    <Link href="/admin/drive">
+                        <Button size="md">
+                            Drive Sync {needsAttention > 0 && `(${needsAttention})`}
+                        </Button>
+                    </Link>
+                </div>
             </PageHeader>
 
             <div className="max-w-7xl mx-auto px-6 py-10">

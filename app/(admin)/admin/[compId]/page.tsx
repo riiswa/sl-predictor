@@ -6,8 +6,10 @@ import Button from '@/components/ui/Button'
 import StatusBadge from '@/components/admin/StatusBadge'
 import StatusChanger from '@/components/admin/StatusChanger'
 import DeleteCategoryButton from '@/components/admin/DeleteCategoryButton'
-import DeleteCompButton from "@/components/admin/DeleteCompButton";
+import DeleteCompButton from '@/components/admin/DeleteCompButton'
 import RevealResultsButton from '@/components/admin/RevealResultsButton'
+import UnrevealButton from '@/components/admin/UnrevealButton'
+import EditCompForm from '@/components/admin/EditCompForm'
 
 export default async function ManageCompPage({ params }: { params: Promise<{ compId: string }> }) {
     const { compId } = await params
@@ -73,52 +75,32 @@ export default async function ManageCompPage({ params }: { params: Promise<{ com
                     ))}
                 </div>
 
+                {/* Edit competition */}
+                <EditCompForm comp={comp} />
+
                 {/* Status changer */}
                 <div className="border border-blue/20 p-6">
-                    <p className="font-condensed text-xs tracking-[4px] uppercase text-accent mb-5">Change Status</p>
+                    <p className="font-condensed text-xs tracking-[4px] uppercase text-accent mb-5">Status</p>
                     <StatusChanger compId={compId} currentStatus={comp.status} />
+
+                    {/* Reveal — only when closed and not yet revealed */}
                     {!comp.results_visible && comp.status === 'closed' && (
                         <div className="mt-6 pt-5 border-t border-blue/10">
-                            <p className="font-condensed text-xs tracking-[4px] uppercase text-gray-muted mb-3">Results</p>
+                            <p className="font-condensed text-xs tracking-[4px] uppercase text-gray-muted mb-3">Reveal Results</p>
                             <RevealResultsButton compId={compId} />
                         </div>
                     )}
-                </div>
 
-                {/* Scoring config */}
-                <div className="border border-blue/20 p-6">
-                    <p className="font-condensed text-xs tracking-[4px] uppercase text-accent mb-4">Scoring Config</p>
-                    <div className="grid grid-cols-2 gap-px">
-                        <div className="bg-dark/60 px-5 py-4 border border-blue/10">
-                            <p className="font-condensed text-xs tracking-[3px] uppercase text-gray-muted mb-3">The Podium</p>
-                            <div className="flex gap-6">
-                                <div>
-                                    <div className="font-bebas text-2xl text-green-400">{comp.scoring_config?.podium?.points_exact ?? 10}</div>
-                                    <div className="text-xs text-gray-muted font-condensed tracking-wide">Exact rank</div>
-                                </div>
-                                <div>
-                                    <div className="font-bebas text-2xl text-yellow-400">{comp.scoring_config?.podium?.points_partial ?? 5}</div>
-                                    <div className="text-xs text-gray-muted font-condensed tracking-wide">Partial</div>
-                                </div>
-                            </div>
+                    {/* Un-reveal — only when results are visible */}
+                    {comp.results_visible && (
+                        <div className="mt-6 pt-5 border-t border-blue/10">
+                            <p className="font-condensed text-xs tracking-[4px] uppercase text-gray-muted mb-1">Un-reveal</p>
+                            <p className="text-gray-muted/40 text-xs font-condensed mb-3">
+                                Resets all scores for this competition. Users will lose their points until you reveal again.
+                            </p>
+                            <UnrevealButton compId={compId} />
                         </div>
-                        <div className="bg-dark/60 px-5 py-4 border border-blue/10">
-                            <p className="font-condensed text-xs tracking-[3px] uppercase text-gray-muted mb-3">P4P (RIS)</p>
-                            <div className="flex gap-6">
-                                <div>
-                                    <div className="font-bebas text-2xl text-green-400">{comp.scoring_config?.p4p?.points_exact ?? 20}</div>
-                                    <div className="text-xs text-gray-muted font-condensed tracking-wide">Exact rank</div>
-                                </div>
-                                <div>
-                                    <div className="font-bebas text-2xl text-yellow-400">{comp.scoring_config?.p4p?.points_partial ?? 10}</div>
-                                    <div className="text-xs text-gray-muted font-condensed tracking-wide">Partial</div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <p className="text-gray-muted/40 text-xs font-condensed mt-3">
-                        To change scoring, edit the <code className="text-gray-muted">scoring_config</code> JSON directly in Supabase → competitions table.
-                    </p>
+                    )}
                 </div>
 
                 {/* Categories */}
