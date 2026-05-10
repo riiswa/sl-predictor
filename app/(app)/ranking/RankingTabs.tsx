@@ -3,6 +3,7 @@
 import { useState } from 'react'
 import { avatarColor } from '@/lib/avatar'
 import EmptyState from '@/components/ui/EmptyState'
+import { RankDisplay } from '@/components/ui/Medal'
 
 interface Profile {
     id: string
@@ -41,8 +42,8 @@ interface Props {
 }
 
 const TABS = [
-    { id: 'predictors', label: '🎯 Predictors',   desc: 'Season leaderboard' },
-    { id: 'athletes',   label: '🏋️ Athletes RIS', desc: 'Competition rankings' },
+    { id: 'predictors', label: 'Predictors',   desc: 'Season leaderboard' },
+    { id: 'athletes',   label: 'Athletes RIS', desc: 'Competition rankings' },
 ] as const
 
 type Tab = typeof TABS[number]['id']
@@ -117,7 +118,7 @@ export default function RankingTabs({ currentUserId, currentProfile, allProfiles
                         </div>
 
                         {allProfiles.length === 0 ? (
-                            <EmptyState icon="🎯" title="NO SCORES YET" subtitle="Rankings populate after the first competition results are revealed." />
+                            <EmptyState icon="—" title="NO SCORES YET" subtitle="Rankings populate after the first competition results are revealed." />
                         ) : (
                             <>
                                 {allProfiles.slice(0, 10).map((p, i) => {
@@ -134,10 +135,7 @@ export default function RankingTabs({ currentUserId, currentProfile, allProfiles
                                             isMe ? 'bg-blue/15 border-l-2 border-l-accent' : isTop3 ? top3Bg : 'hover:bg-blue/5'
                                         } ${isTop3 ? 'py-5' : 'py-4'}`}>
                                             <div className={`font-bebas leading-none ${isTop3 ? 'text-3xl' : 'text-2xl'}`}>
-                                                {rank === 1 ? <span className="text-yellow-400">🥇</span>
-                                                    : rank === 2 ? <span className="text-gray-300">🥈</span>
-                                                        : rank === 3 ? <span className="text-orange-400">🥉</span>
-                                                            : <span className="text-gray-muted">{rank}</span>}
+                                                <RankDisplay rank={rank} />
                                             </div>
                                             <div className="flex items-center gap-3 min-w-0">
                                                 <div
@@ -237,7 +235,7 @@ export default function RankingTabs({ currentUserId, currentProfile, allProfiles
 
                     {visibleComps.length === 0 ? (
                         <div className="border border-blue/20">
-                            <EmptyState icon="🏋️" title="NO RESULTS YET" subtitle="Results will appear here after a competition is revealed." />
+                            <EmptyState icon="—" title="NO RESULTS YET" subtitle="Results will appear here after a competition is revealed." />
                         </div>
                     ) : filteredResults.length === 0 ? (
                         <div className="border border-blue/20">
@@ -266,7 +264,7 @@ export default function RankingTabs({ currentUserId, currentProfile, allProfiles
                                 return (
                                     <div key={r.id} className="grid grid-cols-[52px_1fr_80px_120px_90px_200px] gap-3 px-5 py-3.5 items-center border-b border-blue/8 last:border-0 hover:bg-blue/5 transition-colors">
                                         <div className={`font-bebas text-xl ${rankColor}`}>
-                                            {rank === 1 ? '🥇' : rank === 2 ? '🥈' : rank === 3 ? '🥉' : rank}
+                                            <RankDisplay rank={rank} />
                                         </div>
                                         <div>
                                             <p className="font-condensed font-semibold text-sm text-white">

@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import Countdown from '@/components/ui/Countdown'
+import Medal from '@/components/ui/Medal'
 import Button from '@/components/ui/Button'
 import Modal from '@/components/ui/Modal'
 import PodiumSelector, { type PodiumSelections } from '@/components/predict/PodiumSelector'
@@ -30,8 +31,8 @@ interface Props {
 }
 
 const TABS = [
-    { id: 'podium', label: 'The Podium', emoji: '🏆', desc: 'Top 3 per weight category' },
-    { id: 'p4p',    label: 'P4P',        emoji: '⚡', desc: 'Best RIS score overall' },
+    { id: 'podium', label: 'The Podium', desc: 'Top 3 per weight category' },
+    { id: 'p4p',    label: 'P4P',        desc: 'Best RIS score overall' },
 ] as const
 
 type Tab = typeof TABS[number]['id']
@@ -72,8 +73,6 @@ function buildP4PSelections(preds: ExistingPrediction[], categories: any[]): P4P
     return sel
 }
 
-const MEDALS = ['🥇', '🥈', '🥉']
-
 function LockedRecap({
     podium, p4p, categories, canEdit, onEdit,
 }: {
@@ -110,7 +109,7 @@ function LockedRecap({
             {/* Podium picks */}
             {catsWithPicks.length > 0 && (
                 <div className="border border-blue/20 p-5 flex flex-col gap-4">
-                    <p className="font-condensed text-xs tracking-[4px] uppercase text-accent">🏆 Podium Picks</p>
+                    <p className="font-condensed text-xs tracking-[4px] uppercase text-accent">Podium Picks</p>
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-px">
                         {catsWithPicks.map((cat: any) => {
                             const picks = [...(podium[cat.id] ?? [])].sort((a, b) => a.position - b.position)
@@ -120,7 +119,7 @@ function LockedRecap({
                                     <div className="flex flex-col gap-1.5">
                                         {picks.map(pick => (
                                             <div key={pick.position} className="flex items-center gap-2">
-                                                <span className="text-sm w-5 flex-shrink-0">{MEDALS[pick.position - 1]}</span>
+                                                <Medal position={pick.position} />
                                                 <span className="font-condensed text-sm text-white">{pick.athlete_name}</span>
                                             </div>
                                         ))}
@@ -135,7 +134,7 @@ function LockedRecap({
             {/* P4P picks */}
             {(p4p.men.length > 0 || p4p.women.length > 0) && (
                 <div className="border border-blue/20 p-5 flex flex-col gap-4">
-                    <p className="font-condensed text-xs tracking-[4px] uppercase text-accent">⚡ P4P Picks</p>
+                    <p className="font-condensed text-xs tracking-[4px] uppercase text-accent">P4P Picks</p>
                     <div className="grid grid-cols-2 gap-px">
                         {(['men', 'women'] as const).map(gender => {
                             const picks = [...p4p[gender]].sort((a, b) => a.position - b.position)
@@ -148,7 +147,7 @@ function LockedRecap({
                                     <div className="flex flex-col gap-1.5">
                                         {picks.map(pick => (
                                             <div key={pick.position} className="flex items-center gap-2">
-                                                <span className="text-sm w-5 flex-shrink-0">{MEDALS[pick.position - 1]}</span>
+                                                <Medal position={pick.position} />
                                                 <span className="font-condensed text-sm text-white">{pick.athlete_name}</span>
                                             </div>
                                         ))}
@@ -328,7 +327,7 @@ export default function PredictClient({ comp, categories, alreadySubmitted, exis
                             {isActive && <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-accent" />}
                             <div className="flex items-center justify-between">
                                 <div>
-                                    <p className="font-condensed text-sm font-semibold tracking-[1px] uppercase">{tab.emoji} {tab.label}</p>
+                                    <p className="font-condensed text-sm font-semibold tracking-[1px] uppercase">{tab.label}</p>
                                     <p className="text-xs opacity-60 normal-case tracking-normal mt-0.5">{tab.desc}</p>
                                 </div>
                                 {isDone && !locked && <span className="text-green-400 text-base">✓</span>}

@@ -2,6 +2,7 @@ import { redirect } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
 import PageHeader from '@/components/ui/PageHeader'
 import AccountSettings from '@/components/profile/AccountSettings'
+import Medal from '@/components/ui/Medal'
 
 interface Athlete {
     id: string
@@ -266,7 +267,6 @@ export default async function ProfilePage() {
     )
 }
 
-const MEDALS = ['🥇', '🥈', '🥉']
 
 function PredRow({ pred, hasResults }: { pred: Prediction; hasResults: boolean }) {
     let borderColor = 'border-blue/10'
@@ -307,7 +307,7 @@ function PredRow({ pred, hasResults }: { pred: Prediction; hasResults: boolean }
     return (
         <div className={`flex items-center justify-between px-3 py-2.5 border ${borderColor} ${bgColor}`}>
             <div className="flex items-center gap-2 min-w-0">
-                <span style={{ fontSize: '13px', flexShrink: 0 }}>{MEDALS[pred.position - 1]}</span>
+                <Medal position={pred.position as 1|2|3} />
                 <div className="min-w-0">
                     {pred.module === 'podium' && pred.categories && (
                         <p className="font-condensed text-xs text-gray-muted/40 tracking-[1px] uppercase truncate leading-tight">{pred.categories.name}</p>

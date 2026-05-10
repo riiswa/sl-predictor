@@ -1,6 +1,7 @@
 'use client'
 
 import { useState } from 'react'
+import Medal from '@/components/ui/Medal'
 
 interface Athlete {
     id: string
@@ -29,7 +30,6 @@ interface Props {
     initialSelections?: P4PSelections
 }
 
-const MEDALS    = ['🥇', '🥈', '🥉']
 const POS_LABEL = ['1st', '2nd', '3rd']
 const POSITIONS: Array<1 | 2 | 3> = [1, 2, 3]
 
@@ -98,7 +98,7 @@ export default function P4PSelector({ menAthletes, womenAthletes, onChange, lock
                                 return (
                                     <div key={pos} className={`px-3 py-2.5 ${picked ? 'bg-blue/12' : 'bg-darker/30'}`}>
                                         <div className="flex items-center gap-1.5 mb-0.5">
-                                            <span style={{ fontSize: '13px' }}>{MEDALS[pos - 1]}</span>
+                                            <Medal position={pos} />
                                             <span className="font-condensed text-xs text-gray-muted/50 tracking-[1px]">{POS_LABEL[pos - 1]}</span>
                                         </div>
                                         {picked
@@ -135,7 +135,7 @@ export default function P4PSelector({ menAthletes, womenAthletes, onChange, lock
                                             className={`flex items-center justify-between px-3 py-2.5 border-b border-blue/5 last:border-0 transition-colors ${isSelected ? 'bg-blue/15' : 'hover:bg-blue/8'}`}
                                         >
                                             <div className="flex items-center gap-2 min-w-0">
-                                                {pos !== null && <span style={{ fontSize: '13px', flexShrink: 0 }}>{MEDALS[pos - 1]}</span>}
+                                                {pos !== null && <Medal position={pos} />}
                                                 <div className="min-w-0">
                                                     <p className="font-condensed text-sm font-semibold text-white truncate">{athlete.first_name} {athlete.last_name}</p>
                                                     <p className="text-xs text-gray-muted/60 truncate">{athlete.nationality} · {athlete.category_name}</p>
@@ -156,7 +156,7 @@ export default function P4PSelector({ menAthletes, womenAthletes, onChange, lock
                                                                         : 'border-blue/20 text-gray-muted hover:border-blue-light hover:text-white'
                                                             }`}
                                                         >
-                                                            {MEDALS[p - 1]}
+                                                            {p}
                                                         </button>
                                                     )
                                                 })}
@@ -175,7 +175,7 @@ export default function P4PSelector({ menAthletes, womenAthletes, onChange, lock
                             <div className="flex flex-col gap-px p-px">
                                 {(selections[gender] ?? []).sort((a, b) => a.position - b.position).map(pick => (
                                     <div key={pick.athlete_id} className="flex items-center gap-2.5 px-4 py-2.5 bg-dark/40">
-                                        <span style={{ fontSize: '14px' }}>{MEDALS[pick.position - 1]}</span>
+                                        <Medal position={pick.position} />
                                         <p className="font-condensed text-sm text-white">{pick.athlete_name}</p>
                                     </div>
                                 ))}

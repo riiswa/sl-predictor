@@ -1,6 +1,7 @@
 'use client'
 
 import { useState } from 'react'
+import Medal from '@/components/ui/Medal'
 
 interface Athlete {
     id: string
@@ -33,7 +34,6 @@ interface Props {
     initialSelections?: PodiumSelections
 }
 
-const MEDALS    = ['🥇', '🥈', '🥉']
 const POS_LABEL = ['1st', '2nd', '3rd']
 const POSITIONS: Array<1 | 2 | 3> = [1, 2, 3]
 
@@ -179,7 +179,7 @@ function CategoryBlock({ cat, getPickForPosition, isAthleteUsed, getAthletePosit
                             return (
                                 <div key={pos} className={`px-3 py-2.5 ${picked ? 'bg-blue/12' : 'bg-darker/30'}`}>
                                     <div className="flex items-center gap-1.5 mb-0.5">
-                                        <span style={{ fontSize: '13px' }}>{MEDALS[pos - 1]}</span>
+                                        <Medal position={pos} />
                                         <span className="font-condensed text-xs text-gray-muted/50 tracking-[1px]">{POS_LABEL[pos - 1]}</span>
                                     </div>
                                     {picked
@@ -200,7 +200,7 @@ function CategoryBlock({ cat, getPickForPosition, isAthleteUsed, getAthletePosit
                                 return (
                                     <div key={athlete.id} className={`flex items-center justify-between px-4 py-2.5 transition-colors ${used ? 'bg-blue/15' : 'bg-dark/60 hover:bg-blue/8'}`}>
                                         <div className="flex items-center gap-2.5 min-w-0">
-                                            {pos !== null && <span style={{ fontSize: '14px', flexShrink: 0 }}>{MEDALS[pos - 1]}</span>}
+                                            {pos !== null && <Medal position={pos} />}
                                             <div className="min-w-0">
                                                 <p className="font-condensed font-semibold text-sm text-white truncate">{athlete.first_name} {athlete.last_name}</p>
                                                 <p className="text-xs text-gray-muted/60">{athlete.nationality}</p>
@@ -221,7 +221,7 @@ function CategoryBlock({ cat, getPickForPosition, isAthleteUsed, getAthletePosit
                                                                     : 'border-blue/20 text-gray-muted hover:border-blue-light hover:text-white'
                                                         }`}
                                                     >
-                                                        {MEDALS[p - 1]}
+                                                        {p}
                                                     </button>
                                                 )
                                             })}
