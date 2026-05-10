@@ -269,7 +269,7 @@ export async function POST(req: NextRequest) {
         }
 
         const newStatus = hasResults
-            ? (missingDataCount > 0 ? 'results_pending' : 'results_pending')
+            ? (missingDataCount > 0 ? 'results_pending' : 'results_ready')
             : 'synced'
 
         await supabase
