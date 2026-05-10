@@ -45,14 +45,21 @@ export default function LoginForm() {
                 onChange={e => setEmail(e.target.value)}
                 placeholder="your@email.com"
             />
-            <Input
-                label="Password"
-                type="password"
-                required
-                value={password}
-                onChange={e => setPassword(e.target.value)}
-                placeholder="••••••••"
-            />
+            <div className="flex flex-col gap-2">
+                <Input
+                    label="Password"
+                    type="password"
+                    required
+                    value={password}
+                    onChange={e => setPassword(e.target.value)}
+                    placeholder="••••••••"
+                />
+                <div className="flex justify-end">
+                    <Link href="/forgot-password" className="text-xs text-gray-muted/50 hover:text-gray-muted font-condensed tracking-wide transition-colors">
+                        Forgot password?
+                    </Link>
+                </div>
+            </div>
 
             {error && (
                 <div className="border border-accent/30 bg-accent/8 px-4 py-3">

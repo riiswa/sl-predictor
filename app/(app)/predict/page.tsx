@@ -2,6 +2,7 @@ import { redirect } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
 import PageHeader from '@/components/ui/PageHeader'
 import PredictClient from './PredictClient'
+import ShareButton from '@/components/predict/ShareButton'
 
 export default async function PredictPage() {
     const supabase = await createClient()
@@ -53,7 +54,9 @@ export default async function PredictPage() {
                 subtitle={`Competition: ${new Date(comp.date_start).toLocaleDateString('en-GB', {
                     day: '2-digit', month: 'long', year: 'numeric'
                 })}`}
-            />
+            >
+                <ShareButton compName={comp.name} />
+            </PageHeader>
             <div className="max-w-5xl mx-auto px-6 py-8">
                 <PredictClient
                     comp={comp}

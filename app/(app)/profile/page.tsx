@@ -1,6 +1,7 @@
 import { redirect } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
 import PageHeader from '@/components/ui/PageHeader'
+import AccountSettings from '@/components/profile/AccountSettings'
 
 interface Athlete {
     id: string
@@ -53,8 +54,8 @@ export default async function ProfilePage() {
     if (!user) redirect('/login')
 
     const { data: profile } = await supabase
-        .from('profiles')
-        .select('username, country, total_points, season_rank, total_predictions, correct_predictions, role')
+        .from('predictor_standings')
+        .select('id, username, country, total_points, season_rank, total_predictions, correct_predictions, role')
         .eq('id', user.id)
         .single()
 
@@ -168,6 +169,12 @@ export default async function ProfilePage() {
                 )}
 
                 {/* History */}
+                {/* Account settings */}
+                <div className="flex flex-col gap-4">
+                    <p className="font-condensed text-xs tracking-[4px] uppercase text-accent">Account Settings</p>
+                    <AccountSettings email={user.email ?? ''} username={profile?.username ?? ''} />
+                </div>
+
                 {compEntries.length === 0 ? (
                     <div className="border border-blue/20 px-6 py-20 text-center">
                         <p className="font-bebas text-3xl tracking-wide text-gray-muted/30 mb-2">NO PREDICTIONS YET</p>

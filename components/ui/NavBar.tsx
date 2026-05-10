@@ -4,12 +4,25 @@ import Link from 'next/link'
 import { usePathname, useRouter } from 'next/navigation'
 import { useState } from 'react'
 import { createClient } from '@/lib/supabase/client'
+import { avatarColor } from '@/lib/avatar'
 
 interface Profile {
     username: string
     total_points: number
     season_rank: number | null
     role: string
+}
+
+function Avatar({ username, size = 'w-8 h-8' }: { username: string; size?: string }) {
+    const bg = avatarColor(username)
+    return (
+        <div
+            className={`${size} rounded-full flex items-center justify-center font-bebas text-sm flex-shrink-0 border border-white/20`}
+            style={{ backgroundColor: bg }}
+        >
+            {username.charAt(0).toUpperCase()}
+        </div>
+    )
 }
 
 export default function NavBar({ profile }: { profile: Profile | null }) {
@@ -40,11 +53,7 @@ export default function NavBar({ profile }: { profile: Profile | null }) {
             <div className="max-w-7xl mx-auto px-4 sm:px-6 flex items-center h-14">
 
                 {/* Logo */}
-                <Link
-                    href="/ranking"
-                    className="flex-shrink-0 flex items-center gap-2 group"
-                    onClick={() => setMenuOpen(false)}
-                >
+                <Link href="/ranking" className="flex-shrink-0 flex items-center gap-2 group" onClick={() => setMenuOpen(false)}>
                     <img src="/logo.png" alt="SL Predictor" className="h-8 w-8" />
                     <span className="font-bebas text-lg tracking-[4px] uppercase text-white group-hover:text-off-white transition-colors">
                         PREDICTOR
@@ -66,7 +75,6 @@ export default function NavBar({ profile }: { profile: Profile | null }) {
                             {link.label}
                         </Link>
                     ))}
-
                     {profile?.role === 'admin' && (
                         <Link
                             href="/admin"
@@ -81,34 +89,31 @@ export default function NavBar({ profile }: { profile: Profile | null }) {
                     )}
                 </div>
 
-                {/* Right — desktop user info */}
-                <div className="hidden sm:flex items-center gap-4 ml-auto flex-shrink-0">
+                {/* Desktop right — avatar + username + points */}
+                <div className="hidden sm:flex items-center gap-3 ml-auto flex-shrink-0">
                     {profile && (
-                        <div className="text-right">
-                            <p className="font-condensed text-xs text-yellow-400 tracking-wide leading-none">
-                                {profile.total_points.toLocaleString()} pts
-                            </p>
-                            <p className="font-condensed text-xs text-gray-muted tracking-wide mt-0.5">
-                                {profile.season_rank ? `#${profile.season_rank}` : 'Unranked'}
-                            </p>
-                        </div>
+                        <>
+                            <Avatar username={profile.username} />
+                            <div className="text-right">
+                                <p className="font-condensed text-xs text-white tracking-wide leading-none">{profile.username}</p>
+                                <p className="font-condensed text-xs text-yellow-400 tracking-wide mt-0.5">
+                                    {profile.total_points.toLocaleString()} pts
+                                    <span className="text-gray-muted ml-2">{profile.season_rank ? `#${profile.season_rank}` : '—'}</span>
+                                </p>
+                            </div>
+                            <button
+                                onClick={handleLogout}
+                                className="font-condensed text-xs tracking-[2px] uppercase text-gray-muted hover:text-accent transition-colors ml-1"
+                            >
+                                Logout
+                            </button>
+                        </>
                     )}
-                    <div className="w-8 h-8 rounded-full bg-blue border border-blue-light flex items-center justify-center font-bebas text-sm flex-shrink-0">
-                        {profile?.username?.charAt(0).toUpperCase() ?? '?'}
-                    </div>
-                    <button
-                        onClick={handleLogout}
-                        className="font-condensed text-xs tracking-[2px] uppercase text-gray-muted hover:text-accent transition-colors"
-                    >
-                        Logout
-                    </button>
                 </div>
 
-                {/* Mobile right — avatar + hamburger */}
+                {/* Mobile right */}
                 <div className="flex sm:hidden items-center gap-3 ml-auto">
-                    <div className="w-7 h-7 rounded-full bg-blue border border-blue-light flex items-center justify-center font-bebas text-sm flex-shrink-0">
-                        {profile?.username?.charAt(0).toUpperCase() ?? '?'}
-                    </div>
+                    {profile && <Avatar username={profile.username} size="w-7 h-7" />}
                     <button
                         onClick={() => setMenuOpen(prev => !prev)}
                         className="flex flex-col justify-center items-center w-8 h-8 gap-1.5"
@@ -121,30 +126,21 @@ export default function NavBar({ profile }: { profile: Profile | null }) {
                 </div>
             </div>
 
-            {/* Mobile dropdown menu */}
+            {/* Mobile dropdown */}
             {menuOpen && (
                 <div className="sm:hidden border-t border-blue/30 bg-dark/98">
-                    {/* User info strip */}
                     {profile && (
                         <div className="flex items-center gap-3 px-4 py-3 border-b border-blue/20">
-                            <div className="w-8 h-8 rounded-full bg-blue border border-blue-light flex items-center justify-center font-bebas text-sm">
-                                {profile.username.charAt(0).toUpperCase()}
-                            </div>
+                            <Avatar username={profile.username} />
                             <div>
-                                <p className="font-condensed text-xs text-white tracking-wide leading-none">
-                                    {profile.username}
-                                </p>
+                                <p className="font-condensed text-xs text-white tracking-wide leading-none">{profile.username}</p>
                                 <p className="font-condensed text-xs text-yellow-400 tracking-wide mt-0.5">
                                     {profile.total_points.toLocaleString()} pts
-                                    <span className="text-gray-muted ml-2">
-                                        {profile.season_rank ? `#${profile.season_rank}` : 'Unranked'}
-                                    </span>
+                                    <span className="text-gray-muted ml-2">{profile.season_rank ? `#${profile.season_rank}` : 'Unranked'}</span>
                                 </p>
                             </div>
                         </div>
                     )}
-
-                    {/* Links */}
                     <div className="flex flex-col py-1">
                         {allLinks.map((link) => (
                             <Link
@@ -152,18 +148,13 @@ export default function NavBar({ profile }: { profile: Profile | null }) {
                                 href={link.href}
                                 onClick={() => setMenuOpen(false)}
                                 className={`font-condensed text-xs tracking-[2px] uppercase px-4 py-3.5 border-l-2 transition-colors ${'isAdmin' in link && link.isAdmin
-                                    ? pathname.startsWith('/admin')
-                                        ? 'text-accent border-accent bg-accent/5'
-                                        : 'text-accent/60 border-transparent hover:text-accent hover:border-accent/50'
-                                    : pathname.startsWith(link.href)
-                                        ? 'text-white border-accent bg-white/5'
-                                        : 'text-gray-muted border-transparent hover:text-off-white hover:border-blue/50'
+                                    ? pathname.startsWith('/admin') ? 'text-accent border-accent bg-accent/5' : 'text-accent/60 border-transparent hover:text-accent hover:border-accent/50'
+                                    : pathname.startsWith(link.href) ? 'text-white border-accent bg-white/5' : 'text-gray-muted border-transparent hover:text-off-white hover:border-blue/50'
                                 }`}
                             >
                                 {link.label}
                             </Link>
                         ))}
-
                         <button
                             onClick={() => { setMenuOpen(false); handleLogout() }}
                             className="font-condensed text-xs tracking-[2px] uppercase px-4 py-3.5 text-left border-l-2 border-transparent text-gray-muted hover:text-accent hover:border-accent/50 transition-colors"

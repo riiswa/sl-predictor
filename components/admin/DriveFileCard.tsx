@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import Button from '@/components/ui/Button'
 import Input from '@/components/ui/Input'
+import Modal from '@/components/ui/Modal'
 
 interface DriveFile {
     id:             string
@@ -56,12 +57,11 @@ const STATUS_CONFIG: Record<string, { label: string; color: string; dot: string 
 export default function DriveFileCard({ file }: { file: DriveFile }) {
     const router = useRouter()
 
-    const [showModal,   setShowModal]   = useState(false)
+    const [showModal,    setShowModal]    = useState(false)
     const [showWarnings, setShowWarnings] = useState(false)
-    const [syncing,     setSyncing]     = useState(false)
-    const [revealing,   setRevealing]   = useState(false)
-    const [error,       setError]       = useState<string | null>(null)
-    const [syncResult,  setSyncResult]  = useState<SyncResult | null>(null)
+    const [syncing,      setSyncing]      = useState(false)
+    const [error,        setError]        = useState<string | null>(null)
+    const [syncResult,   setSyncResult]   = useState<SyncResult | null>(null)
 
     const isNew = !file.competition_id
     const cfg   = STATUS_CONFIG[file.sync_status] ?? STATUS_CONFIG.new
@@ -109,31 +109,7 @@ export default function DriveFileCard({ file }: { file: DriveFile }) {
         setSyncing(false)
     }
 
-    async function handleReveal() {
-        if (!file.competition_id) return
-        const ok = confirm('Reveal results? This will calculate all scores and make results visible to users.')
-        if (!ok) return
-
-        setRevealing(true)
-        setError(null)
-
-        const res  = await fetch('/api/drive/reveal', {
-            method:  'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body:    JSON.stringify({ competition_id: file.competition_id }),
-        })
-        const data = await res.json()
-
-        if (!res.ok) {
-            setError(data.error ?? 'Reveal failed')
-        } else {
-            setSyncResult({ ...syncResult!, has_results: true, missing_data: 0, warnings: [] })
-            router.refresh()
-        }
-        setRevealing(false)
-    }
-
-    return (
+return (
         <>
             <div className={`border transition-colors ${
                 file.sync_status === 'outdated' || file.sync_status === 'results_pending'
@@ -248,12 +224,6 @@ export default function DriveFileCard({ file }: { file: DriveFile }) {
                                 file.sync_status === 'outdated' ? 'Re-sync' : 'Sync'}
                         </Button>
 
-                        {file.has_results && file.competition_id && !file.competitions?.results_visible && (
-                            <Button onClick={handleReveal} loading={revealing} size="sm" variant="primary">
-                                Reveal Results
-                            </Button>
-                        )}
-
                         {file.competition_id && (
                             <Link href={`/admin/${file.competition_id}`}>
                                 <Button variant="ghost" size="sm">Manage →</Button>
@@ -265,8 +235,8 @@ export default function DriveFileCard({ file }: { file: DriveFile }) {
 
             {/* Modal — new competition metadata */}
             {showModal && (
-                <div className="fixed inset-0 bg-dark/85 backdrop-blur-sm z-50 flex items-center justify-center px-4">
-                    <div className="bg-dark border border-blue-light/30 p-8 max-w-lg w-full max-h-[90vh] overflow-y-auto">
+                <Modal onClose={() => setShowModal(false)} borderColor="border-blue-light/30">
+                    <div>
                         <div className="flex items-center justify-between mb-6">
                             <div>
                                 <p className="section-tag mb-1">New Competition</p>
@@ -361,7 +331,7 @@ export default function DriveFileCard({ file }: { file: DriveFile }) {
                             </Button>
                         </div>
                     </div>
-                </div>
+                </Modal>
             )}
         </>
     )

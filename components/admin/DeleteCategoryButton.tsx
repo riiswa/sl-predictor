@@ -1,23 +1,41 @@
 'use client'
 
+import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 
 export default function DeleteCategoryButton({ catId }: { catId: string }) {
     const router   = useRouter()
     const supabase = createClient()
+    const [confirming, setConfirming] = useState(false)
 
     async function handleDelete() {
-        const ok = confirm('Delete this category? Athletes in it will also be deleted.')
-        if (!ok) return
-
         await supabase.from('categories').delete().eq('id', catId)
         router.refresh()
     }
 
+    if (confirming) {
+        return (
+            <div className="flex items-center gap-1">
+                <button
+                    onClick={handleDelete}
+                    className="font-condensed text-xs tracking-[1px] uppercase text-accent hover:text-white transition-colors px-2 py-1 border border-accent/40 hover:bg-accent"
+                >
+                    Confirm
+                </button>
+                <button
+                    onClick={() => setConfirming(false)}
+                    className="font-condensed text-xs tracking-[1px] uppercase text-gray-muted hover:text-white transition-colors px-2 py-1"
+                >
+                    ✕
+                </button>
+            </div>
+        )
+    }
+
     return (
         <button
-            onClick={handleDelete}
+            onClick={() => setConfirming(true)}
             className="font-condensed text-xs tracking-[1px] uppercase text-accent/50 hover:text-accent transition-colors px-2 py-1 border border-transparent hover:border-accent/30"
         >
             Remove

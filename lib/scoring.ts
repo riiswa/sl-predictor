@@ -161,36 +161,25 @@ export async function calculateCompetitionScores(competitionId: string) {
             .eq('id', u.id)
     }
 
-    // Aggregate points per user
+    // Upsert one row per user into the competition_scores ledger
     const userPoints: Record<string, number> = {}
     for (const u of updates) {
         const pred = predictions.find(p => p.id === u.id)!
         userPoints[pred.user_id] = (userPoints[pred.user_id] ?? 0) + u.points_earned
     }
 
-    for (const [userId, pts] of Object.entries(userPoints)) {
-        await supabase.rpc('increment_user_points', { user_id: userId, points: pts })
-    }
+    const ledgerRows = Object.entries(userPoints).map(([userId, pts]) => ({
+        user_id:        userId,
+        competition_id: competitionId,
+        points:         pts,
+        scored_at:      new Date().toISOString(),
+    }))
 
-    await recalculateRanks()
+    if (ledgerRows.length > 0) {
+        await supabase
+            .from('competition_scores')
+            .upsert(ledgerRows, { onConflict: 'user_id,competition_id' })
+    }
 
     return { updated: updates.length, warnings }
-}
-
-async function recalculateRanks() {
-    const supabase = await createClient()
-
-    const { data: profiles } = await supabase
-        .from('profiles')
-        .select('id, total_points')
-        .order('total_points', { ascending: false })
-
-    if (!profiles) return
-
-    for (let i = 0; i < profiles.length; i++) {
-        await supabase
-            .from('profiles')
-            .update({ season_rank: i + 1 })
-            .eq('id', profiles[i].id)
-    }
 }
