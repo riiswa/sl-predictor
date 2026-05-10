@@ -73,7 +73,7 @@ export default function RankingTabs({ currentUserId, currentProfile, allProfiles
                         className={`flex-1 px-5 py-3.5 text-left border transition-all relative ${
                             tab === t.id
                                 ? 'bg-blue/15 border-blue-light text-white'
-                                : 'bg-transparent border-blue/20 text-gray-muted hover:text-white hover:border-blue/40'
+                                : 'bg-transparent border-blue/30 text-gray-muted hover:text-white hover:border-blue/50'
                         }`}
                     >
                         {tab === t.id && <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-accent" />}
@@ -110,8 +110,8 @@ export default function RankingTabs({ currentUserId, currentProfile, allProfiles
                     )}
 
                     {/* Leaderboard table */}
-                    <div className="border border-blue/20">
-                        <div className="hidden md:grid grid-cols-[52px_1fr_80px_100px_80px_80px] gap-4 px-5 py-3 border-b border-blue/20">
+                    <div className="border border-blue/30">
+                        <div className="hidden md:grid grid-cols-[52px_1fr_80px_100px_80px_80px] gap-4 px-5 py-3 border-b border-blue/30">
                             {['#', 'Player', 'Country', 'Points', 'Picks', 'Accuracy'].map(h => (
                                 <div key={h} className="font-condensed text-xs tracking-[3px] uppercase text-gray-muted">{h}</div>
                             ))}
@@ -234,16 +234,16 @@ export default function RankingTabs({ currentUserId, currentProfile, allProfiles
                     </div>
 
                     {visibleComps.length === 0 ? (
-                        <div className="border border-blue/20">
+                        <div className="border border-blue/30">
                             <EmptyState icon="—" title="NO RESULTS YET" subtitle="Results will appear here after a competition is revealed." />
                         </div>
                     ) : filteredResults.length === 0 ? (
-                        <div className="border border-blue/20">
+                        <div className="border border-blue/30">
                             <EmptyState icon="—" title="NO RESULTS" subtitle="No results for this filter." />
                         </div>
                     ) : (
-                        <div className="border border-blue/20">
-                            <div className="hidden md:grid grid-cols-[52px_1fr_80px_120px_90px_200px] gap-3 px-5 py-3 border-b border-blue/20">
+                        <div className="border border-blue/30">
+                            <div className="hidden md:grid grid-cols-[52px_1fr_80px_120px_90px_200px] gap-3 px-5 py-3 border-b border-blue/30">
                                 {['#', 'Athlete', 'Nat.', 'Category', 'RIS', 'Lifts'].map(h => (
                                     <div key={h} className="font-condensed text-xs tracking-[3px] uppercase text-gray-muted">{h}</div>
                                 ))}
@@ -281,7 +281,7 @@ export default function RankingTabs({ currentUserId, currentProfile, allProfiles
                                         <div className="flex gap-2">
                                             {lifts.map((val, li) => (
                                                 <div key={li} className="flex flex-col items-center">
-                                                    <span className="font-condensed text-xs text-gray-muted/40 tracking-[1px]">{liftLabels[li]}</span>
+                                                    <span className="font-condensed text-xs text-gray-muted/60 tracking-[1px]">{liftLabels[li]}</span>
                                                     <span className="font-condensed text-xs font-semibold text-white">{val ?? '—'}</span>
                                                 </div>
                                             ))}

@@ -151,7 +151,7 @@ function CategoryBlock({ cat, getPickForPosition, isAthleteUsed, getAthletePosit
     const [open, setOpen] = useState(true)
 
     return (
-        <div className={`border transition-all ${complete ? 'border-blue/30 bg-blue/5' : 'border-blue/15'}`}>
+        <div className={`border transition-all ${complete ? 'border-blue/40 bg-blue/5' : 'border-blue/25'}`}>
             <button
                 onClick={() => setOpen(o => !o)}
                 className="w-full flex items-center justify-between px-4 py-3 hover:bg-blue/5 transition-colors"
@@ -160,12 +160,12 @@ function CategoryBlock({ cat, getPickForPosition, isAthleteUsed, getAthletePosit
                     <span className={`font-bebas text-lg tracking-wide ${cat.gender === 'women' ? 'text-pink-400' : 'text-blue-light'}`}>
                         {cat.name}
                     </span>
-                    <span className="text-gray-muted/50 text-xs font-condensed">{cat.athletes.length} athletes</span>
+                    <span className="text-gray-muted/60 text-xs font-condensed">{cat.athletes.length} athletes</span>
                 </div>
                 <div className="flex items-center gap-2">
                     {complete
                         ? <span className="font-condensed text-xs tracking-[1px] uppercase text-green-400">✓ Done</span>
-                        : <span className="font-condensed text-xs text-gray-muted/40">{open ? '▲' : '▼'}</span>
+                        : <span className="font-condensed text-xs text-gray-muted/60">{open ? '▲' : '▼'}</span>
                     }
                 </div>
             </button>
@@ -180,11 +180,11 @@ function CategoryBlock({ cat, getPickForPosition, isAthleteUsed, getAthletePosit
                                 <div key={pos} className={`px-3 py-2.5 ${picked ? 'bg-blue/12' : 'bg-darker/30'}`}>
                                     <div className="flex items-center gap-1.5 mb-0.5">
                                         <Medal position={pos} />
-                                        <span className="font-condensed text-xs text-gray-muted/50 tracking-[1px]">{POS_LABEL[pos - 1]}</span>
+                                        <span className="font-condensed text-xs text-gray-muted/70 tracking-[1px]">{POS_LABEL[pos - 1]}</span>
                                     </div>
                                     {picked
                                         ? <p className="font-condensed text-sm font-semibold text-white leading-tight truncate">{picked.athlete_name}</p>
-                                        : <p className="text-xs text-gray-muted/25 italic font-condensed">—</p>
+                                        : <p className="text-xs text-gray-muted/50 italic font-condensed">—</p>
                                     }
                                 </div>
                             )

@@ -85,7 +85,7 @@ export default function P4PSelector({ menAthletes, womenAthletes, onChange, lock
                 const complete = isComplete(gender)
 
                 return (
-                    <div key={gender} className={`border flex flex-col transition-colors ${complete ? 'border-blue/30' : 'border-blue/15'}`}>
+                    <div key={gender} className={`border flex flex-col transition-colors ${complete ? 'border-blue/40' : 'border-blue/25'}`}>
                         <div className="flex items-center justify-between px-4 py-3 border-b border-blue/10">
                             <span className={`font-bebas text-lg tracking-wide ${color}`}>{label}</span>
                             {complete && <span className="font-condensed text-xs tracking-[1px] uppercase text-green-400">✓ Done</span>}
@@ -99,11 +99,11 @@ export default function P4PSelector({ menAthletes, womenAthletes, onChange, lock
                                     <div key={pos} className={`px-3 py-2.5 ${picked ? 'bg-blue/12' : 'bg-darker/30'}`}>
                                         <div className="flex items-center gap-1.5 mb-0.5">
                                             <Medal position={pos} />
-                                            <span className="font-condensed text-xs text-gray-muted/50 tracking-[1px]">{POS_LABEL[pos - 1]}</span>
+                                            <span className="font-condensed text-xs text-gray-muted/70 tracking-[1px]">{POS_LABEL[pos - 1]}</span>
                                         </div>
                                         {picked
                                             ? <p className="font-condensed text-xs font-semibold text-white leading-tight truncate">{picked.athlete_name}</p>
-                                            : <p className="text-xs text-gray-muted/25 italic font-condensed">—</p>
+                                            : <p className="text-xs text-gray-muted/50 italic font-condensed">—</p>
                                         }
                                     </div>
                                 )
@@ -165,7 +165,7 @@ export default function P4PSelector({ menAthletes, womenAthletes, onChange, lock
                                     )
                                 })}
                                 {filtered(gender).length === 0 && (
-                                    <p className="px-4 py-6 text-center text-gray-muted/40 text-xs font-condensed">No athletes match</p>
+                                    <p className="px-4 py-6 text-center text-gray-muted/60 text-xs font-condensed">No athletes match</p>
                                 )}
                             </div>
                         )}

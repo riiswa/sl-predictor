@@ -128,14 +128,14 @@ export default async function ProfilePage() {
                             <div className="absolute bottom-0 left-0 w-full h-px bg-blue-light/20 group-hover:bg-accent/50 transition-colors duration-300" />
                             <div className={`font-bebas text-4xl leading-none ${s.color}`}>{s.val}</div>
                             <div className="font-condensed text-xs tracking-[3px] uppercase text-gray-muted mt-1">{s.label}</div>
-                            <div className="font-condensed text-xs text-gray-muted/30 mt-0.5">{s.sub}</div>
+                            <div className="font-condensed text-xs text-gray-muted/50 mt-0.5">{s.sub}</div>
                         </div>
                     ))}
                 </div>
 
                 {/* Accuracy breakdown bar */}
                 {totalPreds > 0 && (
-                    <div className="border border-blue/20 p-6">
+                    <div className="border border-blue/30 p-6">
                         <p className="font-condensed text-xs tracking-[4px] uppercase text-accent mb-5">Season Breakdown</p>
                         <div className="flex flex-col gap-4">
                             <div className="flex h-2 gap-px overflow-hidden">
@@ -160,7 +160,7 @@ export default async function ProfilePage() {
                                         <div>
                                             <p className={`font-bebas text-2xl leading-none ${s.color}`}>{s.count}</p>
                                             <p className="font-condensed text-xs text-gray-muted tracking-wide">{s.label}</p>
-                                            <p className="font-condensed text-xs text-gray-muted/30">{s.pts}</p>
+                                            <p className="font-condensed text-xs text-gray-muted/50">{s.pts}</p>
                                         </div>
                                     </div>
                                 ))}
@@ -177,9 +177,9 @@ export default async function ProfilePage() {
                 </div>
 
                 {compEntries.length === 0 ? (
-                    <div className="border border-blue/20 px-6 py-20 text-center">
-                        <p className="font-bebas text-3xl tracking-wide text-gray-muted/30 mb-2">NO PREDICTIONS YET</p>
-                        <p className="text-gray-muted/30 text-sm font-condensed">Submit your first predictions when a competition opens.</p>
+                    <div className="border border-blue/30 px-6 py-20 text-center">
+                        <p className="font-bebas text-3xl tracking-wide text-gray-muted/60 mb-2">NO PREDICTIONS YET</p>
+                        <p className="text-gray-muted/50 text-sm font-condensed">Submit your first predictions when a competition opens.</p>
                     </div>
                 ) : (
                     <div className="flex flex-col gap-3">
@@ -192,7 +192,7 @@ export default async function ProfilePage() {
                             const p4pWomen    = preds.filter((p) => p.module === 'p4p_women')
 
                             return (
-                                <div key={comp.id} className="border border-blue/20 overflow-hidden">
+                                <div key={comp.id} className="border border-blue/30 overflow-hidden">
                                     <div className="flex items-center justify-between px-5 py-4 bg-blue/5 border-b border-blue/10">
                                         <div>
                                             <p className="font-condensed font-semibold text-white flex items-center gap-2">
@@ -211,7 +211,7 @@ export default async function ProfilePage() {
                                                 <div className="flex items-center gap-3 mt-1 justify-end">
                                                     {exact > 0   && <span className="font-condensed text-xs text-green-400">{exact} exact</span>}
                                                     {partial > 0 && <span className="font-condensed text-xs text-yellow-400">{partial} partial</span>}
-                                                    {missed > 0  && <span className="font-condensed text-xs text-gray-muted/40">{missed} missed</span>}
+                                                    {missed > 0  && <span className="font-condensed text-xs text-gray-muted/60">{missed} missed</span>}
                                                 </div>
                                             </div>
                                         ) : (
@@ -224,7 +224,7 @@ export default async function ProfilePage() {
                                     <div className="p-5 flex flex-col gap-5">
                                         {podiumPreds.length > 0 && (
                                             <div>
-                                                <p className="font-condensed text-xs tracking-[3px] uppercase text-gray-muted/50 mb-2">🏆 Podium</p>
+                                                <p className="font-condensed text-xs tracking-[3px] uppercase text-gray-muted/70 mb-2">Podium</p>
                                                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-px">
                                                     {podiumPreds
                                                         .sort((a, b) => {
@@ -238,7 +238,7 @@ export default async function ProfilePage() {
                                         )}
                                         {p4pMen.length > 0 && (
                                             <div>
-                                                <p className="font-condensed text-xs tracking-[3px] uppercase text-blue-light/50 mb-2">⚡ P4P Men</p>
+                                                <p className="font-condensed text-xs tracking-[3px] uppercase text-blue-light/80 mb-2">P4P Men</p>
                                                 <div className="grid grid-cols-1 sm:grid-cols-3 gap-px">
                                                     {p4pMen.sort((a, b) => a.position - b.position).map((pred) => (
                                                         <PredRow key={pred.id} pred={pred} hasResults={hasResults} />
@@ -248,7 +248,7 @@ export default async function ProfilePage() {
                                         )}
                                         {p4pWomen.length > 0 && (
                                             <div>
-                                                <p className="font-condensed text-xs tracking-[3px] uppercase text-pink-400/50 mb-2">⚡ P4P Women</p>
+                                                <p className="font-condensed text-xs tracking-[3px] uppercase text-pink-400/80 mb-2">P4P Women</p>
                                                 <div className="grid grid-cols-1 sm:grid-cols-3 gap-px">
                                                     {p4pWomen.sort((a, b) => a.position - b.position).map((pred) => (
                                                         <PredRow key={pred.id} pred={pred} hasResults={hasResults} />
@@ -296,11 +296,11 @@ function PredRow({ pred, hasResults }: { pred: Prediction; hasResults: boolean }
             badge = (
                 <div className="flex items-center gap-1.5 flex-shrink-0">
                     <span className="w-1.5 h-1.5 rounded-full bg-gray-muted/20" />
-                    <span className="font-condensed text-xs text-gray-muted/30">0 pts</span>
+                    <span className="font-condensed text-xs text-gray-muted/50">0 pts</span>
                 </div>
             )
         } else {
-            badge = <span className="font-condensed text-xs text-gray-muted/25 flex-shrink-0">—</span>
+            badge = <span className="font-condensed text-xs text-gray-muted/50 flex-shrink-0">—</span>
         }
     }
 
@@ -310,7 +310,7 @@ function PredRow({ pred, hasResults }: { pred: Prediction; hasResults: boolean }
                 <Medal position={pred.position as 1|2|3} />
                 <div className="min-w-0">
                     {pred.module === 'podium' && pred.categories && (
-                        <p className="font-condensed text-xs text-gray-muted/40 tracking-[1px] uppercase truncate leading-tight">{pred.categories.name}</p>
+                        <p className="font-condensed text-xs text-gray-muted/60 tracking-[1px] uppercase truncate leading-tight">{pred.categories.name}</p>
                     )}
                     <p className="font-condensed text-sm font-semibold text-white truncate leading-tight">
                         {pred.athletes?.first_name} {pred.athletes?.last_name}
