@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 import Input from '@/components/ui/Input'
 import Button from '@/components/ui/Button'
+import { toast } from '@/lib/toast'
 
 function Section({ title, children }: { title: string; children: React.ReactNode }) {
     return (
@@ -15,22 +16,14 @@ function Section({ title, children }: { title: string; children: React.ReactNode
     )
 }
 
-function Feedback({ msg, isError }: { msg: string; isError?: boolean }) {
-    return (
-        <div className={`border px-4 py-3 ${isError ? 'border-accent/30 bg-accent/8' : 'border-blue/30 bg-blue/8'}`}>
-            <p className={`text-sm font-condensed tracking-wide ${isError ? 'text-accent' : 'text-white'}`}>{msg}</p>
-        </div>
-    )
-}
 
 export default function AccountSettings({ email, username }: { email: string; username: string }) {
     const router   = useRouter()
     const supabase = createClient()
 
     // — Change username —
-    const [newUsername,  setNewUsername]  = useState('')
-    const [unLoading,    setUnLoading]    = useState(false)
-    const [unFeedback,   setUnFeedback]   = useState<{ msg: string; isError: boolean } | null>(null)
+    const [newUsername, setNewUsername] = useState('')
+    const [unLoading,   setUnLoading]   = useState(false)
 
     async function handleChangeUsername(e: React.FormEvent) {
         e.preventDefault()
@@ -47,16 +40,15 @@ export default function AccountSettings({ email, username }: { email: string; us
             supabase.from('profiles').update({ username: trimmed }).eq('id', user!.id)
         )
         setUnLoading(false)
-        if (error) { setUnFeedback({ msg: error.message, isError: true }); return }
-        setUnFeedback({ msg: 'Username updated.', isError: false })
+        if (error) { toast(error.message, 'error'); return }
+        toast('Username updated.')
         setNewUsername('')
         router.refresh()
     }
 
     // — Change password —
-    const [newPassword,    setNewPassword]    = useState('')
-    const [pwLoading,      setPwLoading]      = useState(false)
-    const [pwFeedback,     setPwFeedback]     = useState<{ msg: string; isError: boolean } | null>(null)
+    const [newPassword, setNewPassword] = useState('')
+    const [pwLoading,   setPwLoading]   = useState(false)
 
     async function handleChangePassword(e: React.FormEvent) {
         e.preventDefault()
@@ -65,15 +57,14 @@ export default function AccountSettings({ email, username }: { email: string; us
         setPwFeedback(null)
         const { error } = await supabase.auth.updateUser({ password: newPassword })
         setPwLoading(false)
-        if (error) { setPwFeedback({ msg: error.message, isError: true }); return }
-        setPwFeedback({ msg: 'Password updated.', isError: false })
+        if (error) { toast(error.message, 'error'); return }
+        toast('Password updated.')
         setNewPassword('')
     }
 
     // — Change email —
     const [newEmail,   setNewEmail]   = useState('')
     const [emlLoading, setEmlLoading] = useState(false)
-    const [emlFeedback,setEmlFeedback]= useState<{ msg: string; isError: boolean } | null>(null)
 
     async function handleChangeEmail(e: React.FormEvent) {
         e.preventDefault()
@@ -81,8 +72,8 @@ export default function AccountSettings({ email, username }: { email: string; us
         setEmlFeedback(null)
         const { error } = await supabase.auth.updateUser({ email: newEmail })
         setEmlLoading(false)
-        if (error) { setEmlFeedback({ msg: error.message, isError: true }); return }
-        setEmlFeedback({ msg: `Confirmation sent to ${newEmail}. Check your inbox.`, isError: false })
+        if (error) { toast(error.message, 'error'); return }
+        toast(`Confirmation sent to ${newEmail}. Check your inbox.`)
         setNewEmail('')
     }
 
@@ -122,7 +113,6 @@ export default function AccountSettings({ email, username }: { email: string; us
                         onChange={e => setNewUsername(e.target.value)}
                         placeholder="NewUsername"
                     />
-                    {unFeedback && <Feedback msg={unFeedback.msg} isError={unFeedback.isError} />}
                     <div>
                         <Button type="submit" size="md" loading={unLoading}>
                             Update username →
@@ -144,7 +134,6 @@ export default function AccountSettings({ email, username }: { email: string; us
                         onChange={e => setNewPassword(e.target.value)}
                         placeholder="••••••••"
                     />
-                    {pwFeedback && <Feedback msg={pwFeedback.msg} isError={pwFeedback.isError} />}
                     <div>
                         <Button type="submit" size="md" loading={pwLoading}>
                             Update password →
@@ -167,7 +156,6 @@ export default function AccountSettings({ email, username }: { email: string; us
                         onChange={e => setNewEmail(e.target.value)}
                         placeholder="new@email.com"
                     />
-                    {emlFeedback && <Feedback msg={emlFeedback.msg} isError={emlFeedback.isError} />}
                     <div>
                         <Button type="submit" size="md" loading={emlLoading}>
                             Update email →

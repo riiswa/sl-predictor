@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import Button from '@/components/ui/Button'
 import Input from '@/components/ui/Input'
+import Modal from '@/components/ui/Modal'
 
 interface DriveFile {
     id:             string
@@ -234,8 +235,8 @@ return (
 
             {/* Modal — new competition metadata */}
             {showModal && (
-                <div className="fixed inset-0 bg-dark/85 backdrop-blur-sm z-50 flex items-center justify-center px-4">
-                    <div className="bg-dark border border-blue-light/30 p-8 max-w-lg w-full max-h-[90vh] overflow-y-auto">
+                <Modal onClose={() => setShowModal(false)} borderColor="border-blue-light/30">
+                    <div>
                         <div className="flex items-center justify-between mb-6">
                             <div>
                                 <p className="section-tag mb-1">New Competition</p>
@@ -330,7 +331,7 @@ return (
                             </Button>
                         </div>
                     </div>
-                </div>
+                </Modal>
             )}
         </>
     )

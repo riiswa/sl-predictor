@@ -3,6 +3,7 @@
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import Button from '@/components/ui/Button'
+import Modal from '@/components/ui/Modal'
 
 export default function DeleteCompButton({ compId, compName }: { compId: string; compName: string }) {
     const router = useRouter()
@@ -37,8 +38,8 @@ export default function DeleteCompButton({ compId, compName }: { compId: string;
             </Button>
 
             {showModal && (
-                <div className="fixed inset-0 bg-dark/85 backdrop-blur-sm z-50 flex items-center justify-center px-4">
-                    <div className="bg-dark border border-accent/40 p-8 max-w-md w-full">
+                <Modal onClose={() => { setShowModal(false); setConfirm('') }} borderColor="border-accent/40">
+                    <div>
                         <p className="font-bebas text-3xl tracking-wide text-accent mb-1">Delete Competition</p>
                         <p className="text-gray-muted text-sm mb-6">
                             This will permanently delete <span className="text-white font-semibold">{compName}</span> and all associated data — categories, athletes, results, and predictions. This cannot be undone.
@@ -80,7 +81,7 @@ export default function DeleteCompButton({ compId, compName }: { compId: string;
                             </Button>
                         </div>
                     </div>
-                </div>
+                </Modal>
             )}
         </>
     )

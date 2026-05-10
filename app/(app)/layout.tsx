@@ -2,6 +2,7 @@ import { redirect } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
 import NavBar from '@/components/ui/NavBar'
 import DeadlineBanner from '@/components/ui/DeadlineBanner'
+import Toaster from '@/components/ui/Toaster'
 
 export default async function AppLayout({ children }: { children: React.ReactNode }) {
     const supabase = await createClient()
@@ -21,6 +22,7 @@ export default async function AppLayout({ children }: { children: React.ReactNod
                 <DeadlineBanner deadline={openComp.prediction_deadline} compName={openComp.name} />
             )}
             <main>{children}</main>
+            <Toaster />
         </div>
     )
 }

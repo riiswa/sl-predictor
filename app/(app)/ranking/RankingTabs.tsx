@@ -1,6 +1,8 @@
 'use client'
 
 import { useState } from 'react'
+import { avatarColor } from '@/lib/avatar'
+import EmptyState from '@/components/ui/EmptyState'
 
 interface Profile {
     id: string
@@ -115,10 +117,7 @@ export default function RankingTabs({ currentUserId, currentProfile, allProfiles
                         </div>
 
                         {allProfiles.length === 0 ? (
-                            <div className="px-5 py-16 text-center">
-                                <p className="font-bebas text-3xl tracking-wide text-gray-muted/30 mb-2">NO SCORES YET</p>
-                                <p className="text-gray-muted/30 text-sm font-condensed">Rankings populate after the first competition results are revealed.</p>
-                            </div>
+                            <EmptyState icon="🎯" title="NO SCORES YET" subtitle="Rankings populate after the first competition results are revealed." />
                         ) : (
                             <>
                                 {allProfiles.slice(0, 10).map((p, i) => {
@@ -127,28 +126,33 @@ export default function RankingTabs({ currentUserId, currentProfile, allProfiles
                                     const acc    = p.total_predictions > 0
                                         ? `${Math.round((p.correct_predictions / p.total_predictions) * 100)}%`
                                         : '—'
+                                    const isTop3 = rank <= 3
+                                    const top3Bg = rank === 1 ? 'bg-yellow-400/5 border-l-2 border-l-yellow-400' : rank === 2 ? 'bg-gray-400/5 border-l-2 border-l-gray-400' : rank === 3 ? 'bg-orange-400/5 border-l-2 border-l-orange-400' : ''
 
                                     return (
-                                        <div key={p.id} className={`grid grid-cols-[52px_1fr_80px_100px_80px_80px] gap-4 px-5 py-4 items-center border-b border-blue/8 last:border-0 transition-colors ${
-                                            isMe ? 'bg-blue/15 border-l-2 border-l-accent' : 'hover:bg-blue/5'
-                                        }`}>
-                                            <div className="font-bebas text-2xl leading-none">
+                                        <div key={p.id} className={`grid grid-cols-[52px_1fr_80px_100px_80px_80px] gap-4 px-5 items-center border-b border-blue/8 last:border-0 transition-colors ${
+                                            isMe ? 'bg-blue/15 border-l-2 border-l-accent' : isTop3 ? top3Bg : 'hover:bg-blue/5'
+                                        } ${isTop3 ? 'py-5' : 'py-4'}`}>
+                                            <div className={`font-bebas leading-none ${isTop3 ? 'text-3xl' : 'text-2xl'}`}>
                                                 {rank === 1 ? <span className="text-yellow-400">🥇</span>
                                                     : rank === 2 ? <span className="text-gray-300">🥈</span>
                                                         : rank === 3 ? <span className="text-orange-400">🥉</span>
                                                             : <span className="text-gray-muted">{rank}</span>}
                                             </div>
                                             <div className="flex items-center gap-3 min-w-0">
-                                                <div className={`w-8 h-8 rounded-full bg-blue flex items-center justify-center font-bebas text-sm flex-shrink-0 ${isMe ? 'border border-accent' : 'border border-blue-light'}`}>
+                                                <div
+                                                    className={`rounded-full flex items-center justify-center font-bebas flex-shrink-0 border border-white/20 ${isTop3 ? 'w-9 h-9 text-base' : 'w-8 h-8 text-sm'} ${isMe ? 'ring-2 ring-accent' : ''}`}
+                                                    style={{ backgroundColor: avatarColor(p.username) }}
+                                                >
                                                     {p.username.charAt(0).toUpperCase()}
                                                 </div>
-                                                <p className="font-condensed font-semibold text-sm text-white truncate">
+                                                <p className={`font-condensed font-semibold text-white truncate ${isTop3 ? 'text-base' : 'text-sm'}`}>
                                                     {p.username}
                                                     {isMe && <span className="text-accent text-xs font-normal ml-2">You</span>}
                                                 </p>
                                             </div>
                                             <div className="font-condensed text-sm text-gray-muted">{p.country ?? '—'}</div>
-                                            <div className="font-bebas text-2xl text-white">{p.total_points.toLocaleString()}</div>
+                                            <div className={`font-bebas text-white ${isTop3 ? 'text-3xl' : 'text-2xl'}`}>{p.total_points.toLocaleString()}</div>
                                             <div className="font-condensed text-sm text-gray-muted">{p.total_predictions}</div>
                                             <div className="font-condensed text-sm text-blue-light">{acc}</div>
                                         </div>
@@ -164,7 +168,7 @@ export default function RankingTabs({ currentUserId, currentProfile, allProfiles
                                         <div className="grid grid-cols-[52px_1fr_80px_100px_80px_80px] gap-4 px-5 py-4 items-center bg-blue/15 border-l-2 border-l-accent">
                                             <div className="font-bebas text-2xl text-gray-muted">{currentProfile.season_rank ?? '—'}</div>
                                             <div className="flex items-center gap-3">
-                                                <div className="w-8 h-8 rounded-full bg-blue border border-accent flex items-center justify-center font-bebas text-sm">
+                                                <div className="w-8 h-8 rounded-full flex items-center justify-center font-bebas text-sm ring-2 ring-accent border border-white/20" style={{ backgroundColor: avatarColor(currentProfile.username) }}>
                                                     {currentProfile.username.charAt(0).toUpperCase()}
                                                 </div>
                                                 <p className="font-condensed font-semibold text-sm text-white">
@@ -232,13 +236,12 @@ export default function RankingTabs({ currentUserId, currentProfile, allProfiles
                     </div>
 
                     {visibleComps.length === 0 ? (
-                        <div className="border border-blue/20 px-6 py-20 text-center">
-                            <p className="font-bebas text-3xl tracking-wide text-gray-muted/30 mb-2">NO RESULTS YET</p>
-                            <p className="text-gray-muted/30 text-sm font-condensed">Results will appear here after a competition is revealed.</p>
+                        <div className="border border-blue/20">
+                            <EmptyState icon="🏋️" title="NO RESULTS YET" subtitle="Results will appear here after a competition is revealed." />
                         </div>
                     ) : filteredResults.length === 0 ? (
-                        <div className="border border-blue/20 px-6 py-12 text-center">
-                            <p className="text-gray-muted/40 text-sm font-condensed">No results for this filter.</p>
+                        <div className="border border-blue/20">
+                            <EmptyState icon="—" title="NO RESULTS" subtitle="No results for this filter." />
                         </div>
                     ) : (
                         <div className="border border-blue/20">
