@@ -11,6 +11,7 @@ export interface CSVAthlete {
     pullup:      number | null
     dip:         number | null
     squat:       number | null
+    instagram_id: string | null
 }
 
 export interface ParsedRoster {
@@ -61,6 +62,8 @@ function rowsToAthletes(rows: Record<string, any>[]): { athletes: CSVAthlete[], 
             hasResults = true
         }
 
+        const instaId = String(row.instagram_id || row.instagram || row.instagram_handle || '').trim() || null
+
         athletes.push({
             first_name:   String(firstName).trim(),
             last_name:    String(lastName).trim(),
@@ -72,6 +75,7 @@ function rowsToAthletes(rows: Record<string, any>[]): { athletes: CSVAthlete[], 
             pullup,
             dip,
             squat,
+            instagram_id: instaId,
         })
     }
 

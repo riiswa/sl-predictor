@@ -126,7 +126,7 @@ export async function POST(req: NextRequest) {
                 .eq('last_name', a.last_name)
                 .maybeSingle()
 
-            const athleteData = {
+            const baseAthleteData = {
                 competition_id: competitionId,
                 category_id:    categoryId,
                 first_name:     a.first_name,
@@ -142,15 +142,36 @@ export async function POST(req: NextRequest) {
             let athleteId: string
 
             if (existing) {
-                await supabase.from('athletes').update(athleteData).eq('id', existing.id)
+                // For existing athlete, only update Instagram if provided in CSV
+                const updateData: any = baseAthleteData
+                if (a.instagram_id) {
+                    updateData.instagram_id = a.instagram_id
+                    updateData.instagram_is_dummy = false
+                }
+                await supabase.from('athletes').update(updateData).eq('id', existing.id)
                 athleteId = existing.id
             } else {
+                // For new athlete, set Instagram ID or generate dummy
+                const athleteData = {
+                    ...baseAthleteData,
+                    instagram_id: a.instagram_id,
+                    instagram_is_dummy: false,
+                }
                 const { data: inserted } = await supabase
                     .from('athletes')
                     .insert(athleteData)
                     .select('id')
                     .single()
                 athleteId = inserted!.id
+
+                // Generate dummy Instagram ID if not provided
+                if (!a.instagram_id) {
+                    const dummyId = `dummy_${athleteId}`
+                    await supabase.from('athletes').update({
+                        instagram_id: dummyId,
+                        instagram_is_dummy: true,
+                    }).eq('id', athleteId)
+                }
             }
 
             const key = `${a.gender}_${a.weight_class}_${a.first_name}_${a.last_name}`
