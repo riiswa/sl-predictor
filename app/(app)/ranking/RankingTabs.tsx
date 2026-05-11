@@ -111,8 +111,8 @@ export default function RankingTabs({ currentUserId, currentProfile, allProfiles
 
                     {/* Leaderboard table */}
                     <div className="border border-blue/30 shadow-lg shadow-blue/10 rounded-sm overflow-hidden">
-                        <div className="hidden md:grid grid-cols-[52px_1fr_80px_100px_80px_80px] gap-4 px-5 py-3 border-b border-blue/20 bg-blue/5">
-                            {['#', 'Player', 'Country', 'Points', 'Picks', 'Accuracy'].map(h => (
+                        <div className="hidden md:grid grid-cols-[52px_1fr_100px_80px_80px] gap-4 px-5 py-3 border-b border-blue/20 bg-blue/5">
+                            {['#', 'Player', 'Points', 'Picks', 'Accuracy'].map(h => (
                                 <div key={h} className="font-condensed text-xs tracking-[3px] uppercase text-gray-muted">{h}</div>
                             ))}
                         </div>
@@ -132,7 +132,7 @@ export default function RankingTabs({ currentUserId, currentProfile, allProfiles
                                     const top3Bg = hasRank && rank === 1 ? 'bg-yellow-400/5 border-l-2 border-l-yellow-400' : hasRank && rank === 2 ? 'bg-gray-400/5 border-l-2 border-l-gray-400' : hasRank && rank === 3 ? 'bg-orange-400/5 border-l-2 border-l-orange-400' : ''
 
                                     return (
-                                        <div key={p.id} className={`grid grid-cols-[52px_1fr_80px_100px_80px_80px] gap-4 px-5 items-center border-b border-blue/8 last:border-0 transition-all duration-300 ${
+                                        <div key={p.id} className={`grid grid-cols-[52px_1fr_100px_80px_80px] gap-4 px-5 items-center border-b border-blue/8 last:border-0 transition-all duration-300 ${
                                             isMe ? 'bg-blue/15 border-l-2 border-l-accent' : isTop3 ? top3Bg : 'even:bg-blue/3 hover:bg-blue/8'
                                         } ${isTop3 ? 'py-5' : 'py-4'}`}>
                                             <div className="font-bebas leading-none">
@@ -150,7 +150,6 @@ export default function RankingTabs({ currentUserId, currentProfile, allProfiles
                                                     {isMe && <span className="text-accent text-xs font-normal ml-2">You</span>}
                                                 </p>
                                             </div>
-                                            <div className="font-condensed text-sm text-gray-muted">{p.country ?? '—'}</div>
                                             <div className={`font-bebas text-white ${isTop3 ? 'text-3xl' : 'text-2xl'}`}>{p.total_points.toLocaleString()}</div>
                                             <div className="font-condensed text-sm text-gray-muted">{p.total_predictions}</div>
                                             <div className="font-condensed text-sm text-blue-light">{acc}</div>
@@ -164,7 +163,7 @@ export default function RankingTabs({ currentUserId, currentProfile, allProfiles
                                         <div className="px-5 py-2 border-b border-blue/8">
                                             <p className="font-condensed text-xs text-gray-muted/30 tracking-wide">···</p>
                                         </div>
-                                        <div className="grid grid-cols-[52px_1fr_80px_100px_80px_80px] gap-4 px-5 py-4 items-center bg-blue/15 border-l-2 border-l-accent">
+                                        <div className="grid grid-cols-[52px_1fr_100px_80px_80px] gap-4 px-5 py-4 items-center bg-blue/15 border-l-2 border-l-accent">
                                             <div className="font-bebas text-2xl text-gray-muted">{currentProfile.season_rank ?? '—'}</div>
                                             <div className="flex items-center gap-3">
                                                 <div className="w-8 h-8 rounded-full flex items-center justify-center font-bebas text-sm ring-2 ring-accent border border-white/20" style={{ backgroundColor: avatarColor(currentProfile.username) }}>
@@ -175,7 +174,6 @@ export default function RankingTabs({ currentUserId, currentProfile, allProfiles
                                                     <span className="text-accent text-xs font-normal ml-2">You</span>
                                                 </p>
                                             </div>
-                                            <div className="font-condensed text-sm text-gray-muted">{currentProfile.country ?? '—'}</div>
                                             <div className="font-bebas text-2xl text-yellow-400">{currentProfile.total_points.toLocaleString()}</div>
                                             <div className="font-condensed text-sm text-gray-muted">{currentProfile.total_predictions}</div>
                                             <div className="font-condensed text-sm text-blue-light">
