@@ -23,7 +23,8 @@ export interface ParsedRoster {
 function parseNum(val: any): number | null {
     if (val === null || val === undefined || val === '') return null
     const n = parseFloat(String(val).trim())
-    return isNaN(n) ? null : n
+    if (isNaN(n) || n < 0 || n > 1000) return null
+    return n
 }
 
 function parseGender(val: any): 'men' | 'women' {
