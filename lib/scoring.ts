@@ -163,10 +163,13 @@ export async function calculateCompetitionScores(competitionId: string) {
     }
 
     // Upsert one row per user into the competition_scores ledger
+    const predMap = new Map(predictions.map(p => [p.id, p]))
     const userPoints: Record<string, number> = {}
     for (const u of updates) {
-        const pred = predictions.find(p => p.id === u.id)!
-        userPoints[pred.user_id] = (userPoints[pred.user_id] ?? 0) + u.points_earned
+        const pred = predMap.get(u.id)
+        if (pred) {
+            userPoints[pred.user_id] = (userPoints[pred.user_id] ?? 0) + u.points_earned
+        }
     }
 
     const ledgerRows = Object.entries(userPoints).map(([userId, pts]) => ({
