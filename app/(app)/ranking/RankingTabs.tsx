@@ -100,7 +100,7 @@ export default function RankingTabs({ currentUserId, currentProfile, allProfiles
                                     label: 'Accuracy', color: 'text-blue-light'
                                 },
                             ].map(s => (
-                                <div key={s.label} className="bg-blue/8 border border-blue/20 px-6 py-5 relative group overflow-hidden">
+                                <div key={s.label} className="bg-blue/8 border border-blue/30 px-6 py-5 relative group overflow-hidden shadow-lg shadow-blue/10 transition-all duration-300 hover:shadow-xl hover:shadow-blue/20">
                                     <div className="absolute bottom-0 left-0 w-full h-px bg-blue-light/20 group-hover:bg-accent/40 transition-colors" />
                                     <div className={`font-bebas text-4xl leading-none ${s.color}`}>{s.val}</div>
                                     <div className="font-condensed text-xs tracking-[3px] uppercase text-gray-muted mt-1">{s.label}</div>
@@ -110,8 +110,8 @@ export default function RankingTabs({ currentUserId, currentProfile, allProfiles
                     )}
 
                     {/* Leaderboard table */}
-                    <div className="border border-blue/30">
-                        <div className="hidden md:grid grid-cols-[52px_1fr_80px_100px_80px_80px] gap-4 px-5 py-3 border-b border-blue/30">
+                    <div className="border border-blue/30 shadow-lg shadow-blue/10 rounded-sm overflow-hidden">
+                        <div className="hidden md:grid grid-cols-[52px_1fr_80px_100px_80px_80px] gap-4 px-5 py-3 border-b border-blue/20 bg-blue/5">
                             {['#', 'Player', 'Country', 'Points', 'Picks', 'Accuracy'].map(h => (
                                 <div key={h} className="font-condensed text-xs tracking-[3px] uppercase text-gray-muted">{h}</div>
                             ))}
@@ -132,8 +132,8 @@ export default function RankingTabs({ currentUserId, currentProfile, allProfiles
                                     const top3Bg = hasRank && rank === 1 ? 'bg-yellow-400/5 border-l-2 border-l-yellow-400' : hasRank && rank === 2 ? 'bg-gray-400/5 border-l-2 border-l-gray-400' : hasRank && rank === 3 ? 'bg-orange-400/5 border-l-2 border-l-orange-400' : ''
 
                                     return (
-                                        <div key={p.id} className={`grid grid-cols-[52px_1fr_80px_100px_80px_80px] gap-4 px-5 items-center border-b border-blue/8 last:border-0 transition-colors ${
-                                            isMe ? 'bg-blue/15 border-l-2 border-l-accent' : isTop3 ? top3Bg : 'hover:bg-blue/5'
+                                        <div key={p.id} className={`grid grid-cols-[52px_1fr_80px_100px_80px_80px] gap-4 px-5 items-center border-b border-blue/8 last:border-0 transition-all duration-300 ${
+                                            isMe ? 'bg-blue/15 border-l-2 border-l-accent' : isTop3 ? top3Bg : 'even:bg-blue/3 hover:bg-blue/8'
                                         } ${isTop3 ? 'py-5' : 'py-4'}`}>
                                             <div className="font-bebas leading-none">
                                                 {hasRank ? <RankDisplay rank={rank} /> : <span className="text-4xl text-gray-muted">—</span>}
@@ -243,8 +243,8 @@ export default function RankingTabs({ currentUserId, currentProfile, allProfiles
                             <EmptyState icon="—" title="NO RESULTS" subtitle="No results for this filter." />
                         </div>
                     ) : (
-                        <div className="border border-blue/30">
-                            <div className="hidden md:grid grid-cols-[52px_1fr_80px_120px_90px_200px] gap-3 px-5 py-3 border-b border-blue/30">
+                        <div className="border border-blue/30 shadow-lg shadow-blue/10 rounded-sm overflow-hidden">
+                            <div className="hidden md:grid grid-cols-[52px_1fr_80px_120px_90px_200px] gap-3 px-5 py-3 border-b border-blue/20 bg-blue/5">
                                 {['#', 'Athlete', 'Nat.', 'Category', 'RIS', 'Lifts'].map(h => (
                                     <div key={h} className="font-condensed text-xs tracking-[3px] uppercase text-gray-muted">{h}</div>
                                 ))}
@@ -263,7 +263,7 @@ export default function RankingTabs({ currentUserId, currentProfile, allProfiles
                                             rank === 3 ? 'text-orange-400' : 'text-gray-muted'
 
                                 return (
-                                    <div key={r.id} className="grid grid-cols-[52px_1fr_80px_120px_90px_200px] gap-3 px-5 py-3.5 items-center border-b border-blue/8 last:border-0 hover:bg-blue/5 transition-colors">
+                                    <div key={r.id} className="grid grid-cols-[52px_1fr_80px_120px_90px_200px] gap-3 px-5 py-3.5 items-center border-b border-blue/8 last:border-0 even:bg-blue/3 hover:bg-blue/8 transition-all duration-300">
                                         <div className={`font-bebas ${rankColor}`}>
                                             <RankDisplay rank={rank} />
                                         </div>

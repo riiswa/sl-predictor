@@ -124,18 +124,18 @@ export default async function ProfilePage() {
                         { val: profile?.total_predictions?.toString() ?? '0',   label: 'Picks',   color: 'text-white',      sub: 'submitted' },
                         { val: accuracy !== null ? `${accuracy}%` : '—',        label: 'Accuracy',color: 'text-blue-light', sub: 'exact + partial' },
                     ].map(s => (
-                        <div key={s.label} className="bg-blue/8 border border-blue/20 px-6 py-5 relative group overflow-hidden">
+                        <div key={s.label} className="bg-blue/8 border border-blue/30 px-6 py-6 relative group overflow-hidden shadow-lg shadow-blue/10 transition-all duration-300 hover:shadow-xl hover:shadow-blue/20 rounded-sm">
                             <div className="absolute bottom-0 left-0 w-full h-px bg-blue-light/20 group-hover:bg-accent/50 transition-colors duration-300" />
                             <div className={`font-bebas text-4xl leading-none ${s.color}`}>{s.val}</div>
-                            <div className="font-condensed text-xs tracking-[3px] uppercase text-gray-muted mt-1">{s.label}</div>
-                            <div className="font-condensed text-xs text-gray-muted/50 mt-0.5">{s.sub}</div>
+                            <div className="font-condensed text-xs tracking-[3px] uppercase text-gray-muted mt-2">{s.label}</div>
+                            <div className="font-condensed text-xs text-gray-muted/50 mt-1">{s.sub}</div>
                         </div>
                     ))}
                 </div>
 
                 {/* Accuracy breakdown bar */}
                 {totalPreds > 0 && (
-                    <div className="border border-blue/30 p-6">
+                    <div className="border border-blue/30 p-6 shadow-lg shadow-blue/10 rounded-sm">
                         <p className="font-condensed text-xs tracking-[4px] uppercase text-accent mb-5">Season Breakdown</p>
                         <div className="flex flex-col gap-4">
                             <div className="flex h-2 gap-px overflow-hidden">
@@ -192,7 +192,7 @@ export default async function ProfilePage() {
                             const p4pWomen    = preds.filter((p) => p.module === 'p4p_women')
 
                             return (
-                                <div key={comp.id} className="border border-blue/30 overflow-hidden">
+                                <div key={comp.id} className="border border-blue/30 overflow-hidden shadow-lg shadow-blue/10 rounded-sm transition-all duration-300 hover:shadow-xl hover:shadow-blue/20">
                                     <div className="flex items-center justify-between px-5 py-4 bg-blue/5 border-b border-blue/10">
                                         <div>
                                             <p className="font-condensed font-semibold text-white flex items-center gap-2">
