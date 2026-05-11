@@ -123,19 +123,20 @@ export default function RankingTabs({ currentUserId, currentProfile, allProfiles
                             <>
                                 {allProfiles.slice(0, 10).map((p, i) => {
                                     const isMe   = p.id === currentUserId
-                                    const rank   = p.season_rank ?? i + 1
+                                    const rank   = p.season_rank
+                                    const hasRank = rank !== null && rank !== undefined
                                     const acc    = p.total_predictions > 0
                                         ? `${Math.round((p.correct_predictions / p.total_predictions) * 100)}%`
                                         : '—'
-                                    const isTop3 = rank <= 3
-                                    const top3Bg = rank === 1 ? 'bg-yellow-400/5 border-l-2 border-l-yellow-400' : rank === 2 ? 'bg-gray-400/5 border-l-2 border-l-gray-400' : rank === 3 ? 'bg-orange-400/5 border-l-2 border-l-orange-400' : ''
+                                    const isTop3 = hasRank && rank <= 3
+                                    const top3Bg = hasRank && rank === 1 ? 'bg-yellow-400/5 border-l-2 border-l-yellow-400' : hasRank && rank === 2 ? 'bg-gray-400/5 border-l-2 border-l-gray-400' : hasRank && rank === 3 ? 'bg-orange-400/5 border-l-2 border-l-orange-400' : ''
 
                                     return (
                                         <div key={p.id} className={`grid grid-cols-[52px_1fr_80px_100px_80px_80px] gap-4 px-5 items-center border-b border-blue/8 last:border-0 transition-colors ${
                                             isMe ? 'bg-blue/15 border-l-2 border-l-accent' : isTop3 ? top3Bg : 'hover:bg-blue/5'
                                         } ${isTop3 ? 'py-5' : 'py-4'}`}>
                                             <div className="font-bebas leading-none">
-                                                <RankDisplay rank={rank} />
+                                                {hasRank ? <RankDisplay rank={rank} /> : <span className="text-4xl text-gray-muted">—</span>}
                                             </div>
                                             <div className="flex items-center gap-3 min-w-0">
                                                 <div
