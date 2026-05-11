@@ -69,7 +69,13 @@ export default function PodiumSelector({ categories, onChange, locked = false, i
     }
 
     function isCatComplete(catId: string): boolean {
-        return (selections[catId] ?? []).length === 3
+        const cat = categories.find(c => c.id === catId)
+        if (!cat) return false
+        const numAthletes = cat.athletes.length
+        const numSelections = (selections[catId] ?? []).length
+        // Category is complete when all available athletes are selected (max 3)
+        const maxSelections = Math.min(numAthletes, 3)
+        return numSelections === maxSelections
     }
 
     function completedCount(): number {

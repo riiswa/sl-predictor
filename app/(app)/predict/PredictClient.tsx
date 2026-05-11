@@ -186,7 +186,12 @@ export default function PredictClient({ comp, categories, alreadySubmitted, exis
 
     const locked = !editMode || isDeadlinePassed
 
-    const podiumFilled   = categories.filter(cat => (podium[cat.id]?.length ?? 0) === 3).length
+    const podiumFilled   = categories.filter(cat => {
+        const numAthletes = cat.athletes?.length ?? 0
+        const maxSelections = Math.min(numAthletes, 3)
+        const numSelections = (podium[cat.id]?.length ?? 0)
+        return numSelections === maxSelections
+    }).length
     const podiumTotal    = categories.length
     const podiumComplete = podiumFilled === podiumTotal
     const p4pComplete    = p4p.men.length === 3 && p4p.women.length === 3
