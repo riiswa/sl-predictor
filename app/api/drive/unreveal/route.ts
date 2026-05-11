@@ -21,22 +21,28 @@ export async function POST(req: NextRequest) {
     if (!comp.results_visible) return NextResponse.json({ error: 'Results are not revealed yet' }, { status: 400 })
 
     // 1. Reset predictions scores for this competition
-    await supabase
+    const { error: predError } = await supabase
         .from('predictions')
         .update({ points_earned: null, is_exact: null, is_partial: null })
         .eq('competition_id', competition_id)
 
+    if (predError) return NextResponse.json({ error: `Failed to reset predictions: ${predError.message}` }, { status: 500 })
+
     // 2. Delete ledger rows for this competition
-    await supabase
+    const { error: ledgerError } = await supabase
         .from('competition_scores')
         .delete()
         .eq('competition_id', competition_id)
 
+    if (ledgerError) return NextResponse.json({ error: `Failed to delete scores: ${ledgerError.message}` }, { status: 500 })
+
     // 3. Reset competition flags
-    await supabase
+    const { error: compError } = await supabase
         .from('competitions')
         .update({ results_visible: false, status: 'closed' })
         .eq('id', competition_id)
+
+    if (compError) return NextResponse.json({ error: `Failed to update competition: ${compError.message}` }, { status: 500 })
 
     return NextResponse.json({ success: true })
 }
