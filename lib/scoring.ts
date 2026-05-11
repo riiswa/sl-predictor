@@ -13,10 +13,11 @@ export function computeRIS(
     squat:     number | null,
     bodyweight: number | null
 ): { ris_score: number | null; dnf: boolean; missing_data: boolean } {
-    // DNF if all lifts are null
     const lifts = [muscle_up, pullup, dip, squat]
     const allNull = lifts.every(l => l === null)
-    if (allNull) return { ris_score: null, dnf: false, missing_data: false }
+
+    // Missing data if all lifts are null
+    if (allNull) return { ris_score: null, dnf: false, missing_data: true }
 
     // DNF if any lift is missing (partial result = did not complete)
     const anyNull = lifts.some(l => l === null)
