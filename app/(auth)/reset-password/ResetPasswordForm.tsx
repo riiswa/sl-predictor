@@ -18,20 +18,31 @@ export default function ResetPasswordForm() {
     const [timeout,  setTimeout]  = useState(false)
 
     useEffect(() => {
-        const { data: { subscription } } = supabase.auth.onAuthStateChange((event) => {
-            if (event === 'PASSWORD_RECOVERY') setReady(true)
+        // Listen for auth state changes (PASSWORD_RECOVERY event)
+        const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
+            if (event === 'PASSWORD_RECOVERY') {
+                setReady(true)
+            }
+        })
+
+        // Also check if user already has a valid session (from clicking reset link)
+        supabase.auth.getSession().then(({ data: { session } }) => {
+            if (session) setReady(true)
         })
 
         // If recovery link doesn't load within 10 seconds, show error
         const timer = setTimeout(() => {
-            if (!ready) setTimeout(true)
+            setReady(prev => {
+                if (!prev) setTimeout(true)
+                return prev
+            })
         }, 10000)
 
         return () => {
             subscription.unsubscribe()
             clearTimeout(timer)
         }
-    }, [ready])
+    }, [])
 
     async function handleSubmit(e: React.FormEvent) {
         e.preventDefault()
