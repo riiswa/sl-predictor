@@ -144,6 +144,17 @@ export async function PUT(req: NextRequest) {
 
     if (deleteError) return NextResponse.json({ error: deleteError.message }, { status: 500 })
 
+    // Re-check deadline before insert (race condition protection)
+    const { data: compAfterDelete } = await supabase
+        .from('competitions')
+        .select('status, prediction_deadline')
+        .eq('id', competition_id)
+        .single()
+
+    if (!compAfterDelete) return NextResponse.json({ error: 'Competition not found' }, { status: 404 })
+    if (compAfterDelete.status !== 'open') return NextResponse.json({ error: 'Competition is not open' }, { status: 400 })
+    if (new Date() > new Date(compAfterDelete.prediction_deadline)) return NextResponse.json({ error: 'Deadline has passed' }, { status: 400 })
+
     // Re-insert with new submitted_at (tiebreaker resets)
     const now  = new Date().toISOString()
     const rows = buildRows(user.id, competition_id, podium, p4p, now)
