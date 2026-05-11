@@ -138,7 +138,7 @@ export default function P4PSelector({ menAthletes, womenAthletes, onChange, lock
                                                 {pos !== null && <Medal position={pos} />}
                                                 <div className="min-w-0">
                                                     <p className="font-condensed text-sm font-semibold text-white truncate">{athlete.first_name} {athlete.last_name}</p>
-                                                    <p className="text-xs text-gray-muted/60 truncate">{athlete.category_name}</p>
+                                                    <p className="text-xs text-gray-muted/60 truncate">{athlete.nationality} · {athlete.category_name}</p>
                                                 </div>
                                             </div>
                                             <div className="flex gap-1 flex-shrink-0 ml-2">

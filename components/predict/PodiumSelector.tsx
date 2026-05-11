@@ -193,6 +193,7 @@ function CategoryBlock({ cat, getPickForPosition, isAthleteUsed, getAthletePosit
                                             {pos !== null && <Medal position={pos} />}
                                             <div className="min-w-0">
                                                 <p className="font-condensed font-semibold text-sm text-white truncate">{athlete.first_name} {athlete.last_name}</p>
+                                                <p className="text-xs text-gray-muted/60">{athlete.nationality}</p>
                                             </div>
                                         </div>
                                         <div className="flex gap-1 flex-shrink-0 ml-2">
