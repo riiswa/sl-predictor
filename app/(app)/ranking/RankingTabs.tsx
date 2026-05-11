@@ -134,7 +134,7 @@ export default function RankingTabs({ currentUserId, currentProfile, allProfiles
                                         <div key={p.id} className={`grid grid-cols-[52px_1fr_80px_100px_80px_80px] gap-4 px-5 items-center border-b border-blue/8 last:border-0 transition-colors ${
                                             isMe ? 'bg-blue/15 border-l-2 border-l-accent' : isTop3 ? top3Bg : 'hover:bg-blue/5'
                                         } ${isTop3 ? 'py-5' : 'py-4'}`}>
-                                            <div className={`font-bebas leading-none ${isTop3 ? 'text-3xl' : 'text-2xl'}`}>
+                                            <div className="font-bebas leading-none">
                                                 <RankDisplay rank={rank} />
                                             </div>
                                             <div className="flex items-center gap-3 min-w-0">
@@ -263,7 +263,7 @@ export default function RankingTabs({ currentUserId, currentProfile, allProfiles
 
                                 return (
                                     <div key={r.id} className="grid grid-cols-[52px_1fr_80px_120px_90px_200px] gap-3 px-5 py-3.5 items-center border-b border-blue/8 last:border-0 hover:bg-blue/5 transition-colors">
-                                        <div className={`font-bebas text-xl ${rankColor}`}>
+                                        <div className={`font-bebas ${rankColor}`}>
                                             <RankDisplay rank={rank} />
                                         </div>
                                         <div>
