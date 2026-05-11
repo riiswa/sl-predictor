@@ -28,13 +28,12 @@ export default function AccountSettings({ email, username }: { email: string; us
     async function handleChangeUsername(e: React.FormEvent) {
         e.preventDefault()
         const trimmed = newUsername.trim()
-        if (trimmed.length < 3) { setUnFeedback({ msg: 'Username must be at least 3 characters.', isError: true }); return }
+        if (trimmed.length < 3) { toast('Username must be at least 3 characters.', 'error'); return }
         setUnLoading(true)
-        setUnFeedback(null)
 
         const { data: existing } = await supabase
             .from('profiles').select('id').eq('username', trimmed).maybeSingle()
-        if (existing) { setUnFeedback({ msg: 'Username already taken.', isError: true }); setUnLoading(false); return }
+        if (existing) { toast('Username already taken.', 'error'); setUnLoading(false); return }
 
         const { error } = await supabase.auth.getUser().then(({ data: { user } }) =>
             supabase.from('profiles').update({ username: trimmed }).eq('id', user!.id)
@@ -52,9 +51,8 @@ export default function AccountSettings({ email, username }: { email: string; us
 
     async function handleChangePassword(e: React.FormEvent) {
         e.preventDefault()
-        if (newPassword.length < 8) { setPwFeedback({ msg: 'Password must be at least 8 characters.', isError: true }); return }
+        if (newPassword.length < 8) { toast('Password must be at least 8 characters.', 'error'); return }
         setPwLoading(true)
-        setPwFeedback(null)
         const { error } = await supabase.auth.updateUser({ password: newPassword })
         setPwLoading(false)
         if (error) { toast(error.message, 'error'); return }
@@ -69,7 +67,6 @@ export default function AccountSettings({ email, username }: { email: string; us
     async function handleChangeEmail(e: React.FormEvent) {
         e.preventDefault()
         setEmlLoading(true)
-        setEmlFeedback(null)
         const { error } = await supabase.auth.updateUser({ email: newEmail })
         setEmlLoading(false)
         if (error) { toast(error.message, 'error'); return }
@@ -177,7 +174,7 @@ export default function AccountSettings({ email, username }: { email: string; us
                         onChange={e => setDeleteConfirm(e.target.value)}
                         placeholder="delete my account"
                     />
-                    {delError && <Feedback msg={delError} isError />}
+                    {delError && <p className="text-xs font-condensed text-accent">{delError}</p>}
                     <div>
                         <Button
                             variant="danger"

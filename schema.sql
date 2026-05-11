@@ -95,7 +95,9 @@ CREATE TABLE IF NOT EXISTS "public"."athletes" (
     "muscle_up" numeric,
     "pullup" numeric,
     "dip" numeric,
-    "squat" numeric
+    "squat" numeric,
+    "instagram_id" "text",
+    "instagram_is_dummy" boolean DEFAULT false
 );
 
 
@@ -225,6 +227,10 @@ ALTER TABLE "public"."season_predictions" OWNER TO "postgres";
 
 ALTER TABLE ONLY "public"."athletes"
     ADD CONSTRAINT "athletes_pkey" PRIMARY KEY ("id");
+
+
+ALTER TABLE ONLY "public"."athletes"
+    ADD CONSTRAINT "athletes_instagram_id_key" UNIQUE ("instagram_id");
 
 
 

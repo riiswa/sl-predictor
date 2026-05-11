@@ -3,6 +3,7 @@
 import { useState } from 'react'
 import { avatarColor } from '@/lib/avatar'
 import EmptyState from '@/components/ui/EmptyState'
+import { RankDisplay } from '@/components/ui/Medal'
 
 interface Profile {
     id: string
@@ -41,8 +42,8 @@ interface Props {
 }
 
 const TABS = [
-    { id: 'predictors', label: '🎯 Predictors',   desc: 'Season leaderboard' },
-    { id: 'athletes',   label: '🏋️ Athletes RIS', desc: 'Competition rankings' },
+    { id: 'predictors', label: 'Predictors',   desc: 'Season leaderboard' },
+    { id: 'athletes',   label: 'Athletes RIS', desc: 'Competition rankings' },
 ] as const
 
 type Tab = typeof TABS[number]['id']
@@ -72,7 +73,7 @@ export default function RankingTabs({ currentUserId, currentProfile, allProfiles
                         className={`flex-1 px-5 py-3.5 text-left border transition-all relative ${
                             tab === t.id
                                 ? 'bg-blue/15 border-blue-light text-white'
-                                : 'bg-transparent border-blue/20 text-gray-muted hover:text-white hover:border-blue/40'
+                                : 'bg-transparent border-blue/30 text-gray-muted hover:text-white hover:border-blue/50'
                         }`}
                     >
                         {tab === t.id && <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-accent" />}
@@ -109,15 +110,15 @@ export default function RankingTabs({ currentUserId, currentProfile, allProfiles
                     )}
 
                     {/* Leaderboard table */}
-                    <div className="border border-blue/20">
-                        <div className="hidden md:grid grid-cols-[52px_1fr_80px_100px_80px_80px] gap-4 px-5 py-3 border-b border-blue/20">
+                    <div className="border border-blue/30">
+                        <div className="hidden md:grid grid-cols-[52px_1fr_80px_100px_80px_80px] gap-4 px-5 py-3 border-b border-blue/30">
                             {['#', 'Player', 'Country', 'Points', 'Picks', 'Accuracy'].map(h => (
                                 <div key={h} className="font-condensed text-xs tracking-[3px] uppercase text-gray-muted">{h}</div>
                             ))}
                         </div>
 
                         {allProfiles.length === 0 ? (
-                            <EmptyState icon="🎯" title="NO SCORES YET" subtitle="Rankings populate after the first competition results are revealed." />
+                            <EmptyState icon="—" title="NO SCORES YET" subtitle="Rankings populate after the first competition results are revealed." />
                         ) : (
                             <>
                                 {allProfiles.slice(0, 10).map((p, i) => {
@@ -134,10 +135,7 @@ export default function RankingTabs({ currentUserId, currentProfile, allProfiles
                                             isMe ? 'bg-blue/15 border-l-2 border-l-accent' : isTop3 ? top3Bg : 'hover:bg-blue/5'
                                         } ${isTop3 ? 'py-5' : 'py-4'}`}>
                                             <div className={`font-bebas leading-none ${isTop3 ? 'text-3xl' : 'text-2xl'}`}>
-                                                {rank === 1 ? <span className="text-yellow-400">🥇</span>
-                                                    : rank === 2 ? <span className="text-gray-300">🥈</span>
-                                                        : rank === 3 ? <span className="text-orange-400">🥉</span>
-                                                            : <span className="text-gray-muted">{rank}</span>}
+                                                <RankDisplay rank={rank} />
                                             </div>
                                             <div className="flex items-center gap-3 min-w-0">
                                                 <div
@@ -236,16 +234,16 @@ export default function RankingTabs({ currentUserId, currentProfile, allProfiles
                     </div>
 
                     {visibleComps.length === 0 ? (
-                        <div className="border border-blue/20">
-                            <EmptyState icon="🏋️" title="NO RESULTS YET" subtitle="Results will appear here after a competition is revealed." />
+                        <div className="border border-blue/30">
+                            <EmptyState icon="—" title="NO RESULTS YET" subtitle="Results will appear here after a competition is revealed." />
                         </div>
                     ) : filteredResults.length === 0 ? (
-                        <div className="border border-blue/20">
+                        <div className="border border-blue/30">
                             <EmptyState icon="—" title="NO RESULTS" subtitle="No results for this filter." />
                         </div>
                     ) : (
-                        <div className="border border-blue/20">
-                            <div className="hidden md:grid grid-cols-[52px_1fr_80px_120px_90px_200px] gap-3 px-5 py-3 border-b border-blue/20">
+                        <div className="border border-blue/30">
+                            <div className="hidden md:grid grid-cols-[52px_1fr_80px_120px_90px_200px] gap-3 px-5 py-3 border-b border-blue/30">
                                 {['#', 'Athlete', 'Nat.', 'Category', 'RIS', 'Lifts'].map(h => (
                                     <div key={h} className="font-condensed text-xs tracking-[3px] uppercase text-gray-muted">{h}</div>
                                 ))}
@@ -266,7 +264,7 @@ export default function RankingTabs({ currentUserId, currentProfile, allProfiles
                                 return (
                                     <div key={r.id} className="grid grid-cols-[52px_1fr_80px_120px_90px_200px] gap-3 px-5 py-3.5 items-center border-b border-blue/8 last:border-0 hover:bg-blue/5 transition-colors">
                                         <div className={`font-bebas text-xl ${rankColor}`}>
-                                            {rank === 1 ? '🥇' : rank === 2 ? '🥈' : rank === 3 ? '🥉' : rank}
+                                            <RankDisplay rank={rank} />
                                         </div>
                                         <div>
                                             <p className="font-condensed font-semibold text-sm text-white">
@@ -283,7 +281,7 @@ export default function RankingTabs({ currentUserId, currentProfile, allProfiles
                                         <div className="flex gap-2">
                                             {lifts.map((val, li) => (
                                                 <div key={li} className="flex flex-col items-center">
-                                                    <span className="font-condensed text-xs text-gray-muted/40 tracking-[1px]">{liftLabels[li]}</span>
+                                                    <span className="font-condensed text-xs text-gray-muted/60 tracking-[1px]">{liftLabels[li]}</span>
                                                     <span className="font-condensed text-xs font-semibold text-white">{val ?? '—'}</span>
                                                 </div>
                                             ))}
