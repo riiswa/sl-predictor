@@ -83,16 +83,6 @@ export default function PodiumSelector({ categories, onChange, locked = false, i
 
     return (
         <div className="flex flex-col gap-4">
-            {/* Progress — sticky */}
-            <div className="sticky top-0 z-50 bg-dark py-3 px-4 flex items-center gap-4 shadow-md shadow-accent/10 border-b border-blue/20">
-                <div className="flex-1 h-1 bg-blue/15 relative overflow-hidden rounded-full">
-                    <div
-                        className="absolute inset-y-0 left-0 bg-accent transition-all duration-500"
-                        style={{ width: `${total ? (done / total) * 100 : 0}%` }}
-                    />
-                </div>
-                <span className="font-condensed text-xs tracking-[2px] text-gray-muted flex-shrink-0">{done}/{total}</span>
-            </div>
 
             {women.length > 0 && (
                 <div>
