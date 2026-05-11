@@ -113,10 +113,10 @@ export default function NavBar({ profile }: { profile: Profile | null }) {
 
                 {/* Mobile right */}
                 <div className="flex sm:hidden items-center gap-3 ml-auto">
-                    {profile && <Avatar username={profile.username} size="w-7 h-7" />}
+                    {profile && <Avatar username={profile.username} size="w-8 h-8" />}
                     <button
                         onClick={() => setMenuOpen(prev => !prev)}
-                        className="flex flex-col justify-center items-center w-8 h-8 gap-1.5"
+                        className="flex flex-col justify-center items-center w-10 h-10 gap-1.5"
                         aria-label="Toggle menu"
                     >
                         <span className={`block h-0.5 w-5 bg-gray-muted transition-all duration-200 origin-center ${menuOpen ? 'rotate-45 translate-y-2' : ''}`} />

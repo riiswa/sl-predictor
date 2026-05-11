@@ -147,7 +147,7 @@ function CategoryBlock({ cat, getPickForPosition, isAthleteUsed, getAthletePosit
                 className="w-full flex items-center justify-between px-4 py-3 hover:bg-blue/5 transition-colors"
             >
                 <div className="flex items-center gap-3">
-                    <span className={`font-bebas text-lg tracking-wide ${cat.gender === 'women' ? 'text-pink-400' : 'text-blue-light'}`}>
+                    <span className={`font-bebas text-base sm:text-lg tracking-wide ${cat.gender === 'women' ? 'text-pink-400' : 'text-blue-light'}`}>
                         {cat.name}
                     </span>
                     <span className="text-gray-muted/60 text-xs font-condensed">{cat.athletes.length} athletes</span>
@@ -205,7 +205,7 @@ function CategoryBlock({ cat, getPickForPosition, isAthleteUsed, getAthletePosit
                                                     <button
                                                         key={p}
                                                         onClick={() => pick(cat.id, p, athlete)}
-                                                        className={`w-7 h-7 font-condensed text-xs border transition-all ${
+                                                        className={`w-9 h-9 sm:w-7 sm:h-7 font-condensed text-xs border transition-all ${
                                                             isThisPick ? 'bg-accent border-accent text-white'
                                                                 : slotTaken ? 'border-blue/10 text-gray-muted/20 hover:border-blue/30 hover:text-gray-muted/50'
                                                                     : 'border-blue/20 text-gray-muted hover:border-blue-light hover:text-white'

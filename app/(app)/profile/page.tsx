@@ -124,7 +124,7 @@ export default async function ProfilePage() {
                         { val: profile?.total_predictions?.toString() ?? '0',   label: 'Picks',   color: 'text-white',      sub: 'submitted' },
                         { val: accuracy !== null ? `${accuracy}%` : '—',        label: 'Accuracy',color: 'text-blue-light', sub: 'exact + partial' },
                     ].map(s => (
-                        <div key={s.label} className="bg-blue/8 border border-blue/30 px-6 py-6 relative group overflow-hidden shadow-lg shadow-blue/10 transition-all duration-300 hover:shadow-xl hover:shadow-blue/20 rounded-sm">
+                        <div key={s.label} className="bg-blue/8 border border-blue/30 px-4 sm:px-6 py-6 relative group overflow-hidden shadow-lg shadow-blue/10 transition-all duration-300 hover:shadow-xl hover:shadow-blue/20 rounded-sm">
                             <div className="absolute bottom-0 left-0 w-full h-px bg-blue-light/20 group-hover:bg-accent/50 transition-colors duration-300" />
                             <div className={`font-bebas text-4xl leading-none ${s.color}`}>{s.val}</div>
                             <div className="font-condensed text-xs tracking-[3px] uppercase text-gray-muted mt-2">{s.label}</div>

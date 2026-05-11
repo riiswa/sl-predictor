@@ -100,7 +100,7 @@ export default function RankingTabs({ currentUserId, currentProfile, allProfiles
                                     label: 'Accuracy', color: 'text-blue-light'
                                 },
                             ].map(s => (
-                                <div key={s.label} className="bg-blue/8 border border-blue/30 px-6 py-5 relative group overflow-hidden shadow-lg shadow-blue/10 transition-all duration-300 hover:shadow-xl hover:shadow-blue/20">
+                                <div key={s.label} className="bg-blue/8 border border-blue/30 px-4 sm:px-6 py-5 relative group overflow-hidden shadow-lg shadow-blue/10 transition-all duration-300 hover:shadow-xl hover:shadow-blue/20">
                                     <div className="absolute bottom-0 left-0 w-full h-px bg-blue-light/20 group-hover:bg-accent/40 transition-colors" />
                                     <div className={`font-bebas text-4xl leading-none ${s.color}`}>{s.val}</div>
                                     <div className="font-condensed text-xs tracking-[3px] uppercase text-gray-muted mt-1">{s.label}</div>

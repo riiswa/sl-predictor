@@ -11,7 +11,7 @@ export default function PageHeader({ tag, title, subtitle, children }: PageHeade
             <div className="max-w-7xl mx-auto px-6 py-10 flex flex-wrap items-end justify-between gap-x-6 gap-y-4">
                 <div>
                     <p className="section-tag mb-3">{tag}</p>
-                    <h1 className="font-bebas text-5xl md:text-6xl tracking-wide leading-none">
+                    <h1 className="font-bebas text-3xl sm:text-5xl md:text-6xl tracking-wide leading-none">
                         {title}
                     </h1>
                     {subtitle && (
