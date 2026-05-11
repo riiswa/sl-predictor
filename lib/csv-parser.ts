@@ -47,8 +47,8 @@ function rowsToAthletes(rows: Record<string, any>[]): { athletes: CSVAthlete[], 
     let hasResults = false
 
     for (const row of rows) {
-        const firstName = row.first_name || row.firstname || row.prenom || ''
-        const lastName  = row.last_name  || row.lastname  || row.nom   || ''
+        const firstName = (row.first_name || row.firstname || row.prenom || '').toString().trim()
+        const lastName  = (row.last_name  || row.lastname  || row.nom   || '').toString().trim()
         if (!firstName && !lastName) continue
 
         const muscle_up = parseNum(row.muscle_up)
@@ -65,8 +65,8 @@ function rowsToAthletes(rows: Record<string, any>[]): { athletes: CSVAthlete[], 
         const instaId = String(row.instagram_id || row.instagram || row.instagram_handle || '').trim() || null
 
         athletes.push({
-            first_name:   String(firstName).trim(),
-            last_name:    String(lastName).trim(),
+            first_name:   firstName,
+            last_name:    lastName,
             nationality:  String(row.nationality || row.nat || row.country || '').toUpperCase().trim(),
             gender:       parseGender(row.gender || row.genre || ''),
             weight_class: String(row.weight_class || row.category || row.cat || '').trim(),
