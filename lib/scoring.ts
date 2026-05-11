@@ -151,6 +151,9 @@ export async function calculateCompetitionScores(competitionId: string) {
                 is_exact:      isExact,
                 is_partial:    isPartial,
             })
+        } else {
+            warnings.push(`Invalid prediction module: ${pred.module}`)
+            updates.push({ id: pred.id, points_earned: 0, is_exact: null, is_partial: null })
         }
     }
 
