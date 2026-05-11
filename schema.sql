@@ -420,6 +420,10 @@ CREATE POLICY "own_read" ON "public"."season_predictions" FOR SELECT USING (("au
 CREATE POLICY "own_update" ON "public"."profiles" FOR UPDATE USING (("auth"."uid"() = "id"));
 
 
+CREATE POLICY "admin_update" ON "public"."profiles" FOR UPDATE WITH CHECK ((EXISTS ( SELECT 1
+   FROM "public"."profiles"
+  WHERE (("profiles"."id" = "auth"."uid"()) AND ("profiles"."role" = 'admin'::"text")))));
+
 
 ALTER TABLE "public"."predictions" ENABLE ROW LEVEL SECURITY;
 
