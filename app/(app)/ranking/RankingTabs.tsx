@@ -132,27 +132,42 @@ export default function RankingTabs({ currentUserId, currentProfile, allProfiles
                                     const top3Bg = hasRank && rank === 1 ? 'bg-yellow-400/5 border-l-2 border-l-yellow-400' : hasRank && rank === 2 ? 'bg-gray-400/5 border-l-2 border-l-gray-400' : hasRank && rank === 3 ? 'bg-orange-400/5 border-l-2 border-l-orange-400' : ''
 
                                     return (
-                                        <div key={p.id} className={`grid grid-cols-[52px_1fr_100px_80px_80px] gap-4 px-5 items-center border-b border-blue/8 last:border-0 transition-all duration-300 ${
+                                        <div key={p.id} className={`md:grid md:grid-cols-[52px_1fr_100px_80px_80px] gap-4 px-5 border-b border-blue/8 last:border-0 transition-all duration-300 ${
                                             isMe ? 'bg-blue/15 border-l-2 border-l-accent' : isTop3 ? top3Bg : 'even:bg-blue/3 hover:bg-blue/8'
                                         } ${isTop3 ? 'py-5' : 'py-4'}`}>
-                                            <div className="font-bebas leading-none">
-                                                {hasRank ? <RankDisplay rank={rank} /> : <span className="text-4xl text-gray-muted">—</span>}
-                                            </div>
-                                            <div className="flex items-center gap-3 min-w-0">
-                                                <div
-                                                    className={`rounded-full flex items-center justify-center font-bebas flex-shrink-0 border border-white/20 ${isTop3 ? 'w-9 h-9 text-base' : 'w-8 h-8 text-sm'} ${isMe ? 'ring-2 ring-accent' : ''}`}
-                                                    style={{ backgroundColor: avatarColor(p.username) }}
-                                                >
-                                                    {p.username.charAt(0).toUpperCase()}
+                                            {/* Mobile: flex row with rank + username, desktop: grid item */}
+                                            <div className="md:col-span-2 flex items-center gap-3 mb-3 md:mb-0 md:col-span-1">
+                                                <div className="font-bebas leading-none">
+                                                    {hasRank ? <RankDisplay rank={rank} /> : <span className="text-4xl text-gray-muted">—</span>}
                                                 </div>
-                                                <p className={`font-condensed font-semibold text-white truncate ${isTop3 ? 'text-base' : 'text-sm'}`}>
-                                                    {p.username}
-                                                    {isMe && <span className="text-accent text-xs font-normal ml-2">You</span>}
-                                                </p>
+                                                <div className="flex items-center gap-3 min-w-0">
+                                                    <div
+                                                        className={`rounded-full flex items-center justify-center font-bebas flex-shrink-0 border border-white/20 ${isTop3 ? 'w-9 h-9 text-base' : 'w-8 h-8 text-sm'} ${isMe ? 'ring-2 ring-accent' : ''}`}
+                                                        style={{ backgroundColor: avatarColor(p.username) }}
+                                                    >
+                                                        {p.username.charAt(0).toUpperCase()}
+                                                    </div>
+                                                    <p className={`font-condensed font-semibold text-white ${isTop3 ? 'text-base' : 'text-sm'}`}>
+                                                        {p.username}
+                                                        {isMe && <span className="text-accent text-xs font-normal ml-2">You</span>}
+                                                    </p>
+                                                </div>
                                             </div>
-                                            <div className={`font-bebas text-white ${isTop3 ? 'text-3xl' : 'text-2xl'}`}>{p.total_points.toLocaleString()}</div>
-                                            <div className="font-condensed text-sm text-gray-muted">{p.total_predictions}</div>
-                                            <div className="font-condensed text-sm text-blue-light">{acc}</div>
+                                            {/* Mobile: row of stats, desktop: grid items */}
+                                            <div className="md:col-span-3 flex gap-4 md:gap-0 md:contents">
+                                                <div className={`flex-1 md:flex-none font-bebas text-white text-center md:text-left ${isTop3 ? 'text-3xl' : 'text-2xl'}`}>
+                                                    <span className="text-gray-muted text-xs md:hidden block mb-1">Points</span>
+                                                    {p.total_points.toLocaleString()}
+                                                </div>
+                                                <div className="flex-1 md:flex-none font-condensed text-sm text-gray-muted text-center md:text-left">
+                                                    <span className="text-gray-muted text-xs md:hidden block mb-1">Picks</span>
+                                                    {p.total_predictions}
+                                                </div>
+                                                <div className="flex-1 md:flex-none font-condensed text-sm text-blue-light text-center md:text-left">
+                                                    <span className="text-gray-muted text-xs md:hidden block mb-1">Acc</span>
+                                                    {acc}
+                                                </div>
+                                            </div>
                                         </div>
                                     )
                                 })}
@@ -163,23 +178,36 @@ export default function RankingTabs({ currentUserId, currentProfile, allProfiles
                                         <div className="px-5 py-2 border-b border-blue/8">
                                             <p className="font-condensed text-xs text-gray-muted/30 tracking-wide">···</p>
                                         </div>
-                                        <div className="grid grid-cols-[52px_1fr_100px_80px_80px] gap-4 px-5 py-4 items-center bg-blue/15 border-l-2 border-l-accent">
-                                            <div className="font-bebas text-2xl text-gray-muted">{currentProfile.season_rank ?? '—'}</div>
-                                            <div className="flex items-center gap-3">
-                                                <div className="w-8 h-8 rounded-full flex items-center justify-center font-bebas text-sm ring-2 ring-accent border border-white/20" style={{ backgroundColor: avatarColor(currentProfile.username) }}>
-                                                    {currentProfile.username.charAt(0).toUpperCase()}
+                                        <div className="md:grid md:grid-cols-[52px_1fr_100px_80px_80px] gap-4 px-5 py-4 bg-blue/15 border-l-2 border-l-accent">
+                                            {/* Mobile: flex row with rank + username, desktop: grid item */}
+                                            <div className="md:col-span-2 flex items-center gap-3 mb-3 md:mb-0 md:col-span-1">
+                                                <div className="font-bebas text-2xl text-gray-muted">{currentProfile.season_rank ?? '—'}</div>
+                                                <div className="flex items-center gap-3">
+                                                    <div className="w-8 h-8 rounded-full flex items-center justify-center font-bebas text-sm ring-2 ring-accent border border-white/20" style={{ backgroundColor: avatarColor(currentProfile.username) }}>
+                                                        {currentProfile.username.charAt(0).toUpperCase()}
+                                                    </div>
+                                                    <p className="font-condensed font-semibold text-sm text-white">
+                                                        {currentProfile.username}
+                                                        <span className="text-accent text-xs font-normal ml-2">You</span>
+                                                    </p>
                                                 </div>
-                                                <p className="font-condensed font-semibold text-sm text-white">
-                                                    {currentProfile.username}
-                                                    <span className="text-accent text-xs font-normal ml-2">You</span>
-                                                </p>
                                             </div>
-                                            <div className="font-bebas text-2xl text-yellow-400">{currentProfile.total_points.toLocaleString()}</div>
-                                            <div className="font-condensed text-sm text-gray-muted">{currentProfile.total_predictions}</div>
-                                            <div className="font-condensed text-sm text-blue-light">
-                                                {currentProfile.total_predictions > 0
-                                                    ? `${Math.round((currentProfile.correct_predictions / currentProfile.total_predictions) * 100)}%`
-                                                    : '—'}
+                                            {/* Mobile: row of stats, desktop: grid items */}
+                                            <div className="md:col-span-3 flex gap-4 md:gap-0 md:contents">
+                                                <div className="flex-1 md:flex-none font-bebas text-2xl text-yellow-400 text-center md:text-left">
+                                                    <span className="text-gray-muted text-xs md:hidden block mb-1">Points</span>
+                                                    {currentProfile.total_points.toLocaleString()}
+                                                </div>
+                                                <div className="flex-1 md:flex-none font-condensed text-sm text-gray-muted text-center md:text-left">
+                                                    <span className="text-gray-muted text-xs md:hidden block mb-1">Picks</span>
+                                                    {currentProfile.total_predictions}
+                                                </div>
+                                                <div className="flex-1 md:flex-none font-condensed text-sm text-blue-light text-center md:text-left">
+                                                    <span className="text-gray-muted text-xs md:hidden block mb-1">Acc</span>
+                                                    {currentProfile.total_predictions > 0
+                                                        ? `${Math.round((currentProfile.correct_predictions / currentProfile.total_predictions) * 100)}%`
+                                                        : '—'}
+                                                </div>
                                             </div>
                                         </div>
                                     </>
