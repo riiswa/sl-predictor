@@ -11,7 +11,7 @@ interface MedalProps {
 
 export default function Medal({ position, size = 'sm' }: MedalProps) {
     const s = STYLES[position]
-    const dim = size === 'lg' ? 'text-6xl' : size === 'md' ? 'text-3xl' : 'text-xl'
+    const dim = size === 'lg' ? 'text-4xl italic' : size === 'md' ? 'text-2xl italic' : 'text-lg italic'
     const glow = size === 'lg' ? s.glow : ''
     return (
         <span className={`font-bebas leading-none ${dim} ${s.text} ${glow}`}>
@@ -22,5 +22,5 @@ export default function Medal({ position, size = 'sm' }: MedalProps) {
 
 export function RankDisplay({ rank }: { rank: number }) {
     if (rank <= 3) return <Medal position={rank as 1 | 2 | 3} size="lg" />
-    return <span className="font-bebas text-4xl text-gray-muted leading-none">{rank}</span>
+    return <span className="font-bebas text-3xl italic text-gray-muted leading-none">{rank}</span>
 }
