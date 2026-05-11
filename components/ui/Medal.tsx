@@ -1,25 +1,26 @@
 const STYLES = {
-    1: { text: 'text-yellow-400', border: 'border-yellow-400/50', bg: 'bg-yellow-400/10' },
-    2: { text: 'text-gray-300',   border: 'border-gray-400/40',   bg: 'bg-gray-400/8'    },
-    3: { text: 'text-orange-400', border: 'border-orange-400/50', bg: 'bg-orange-400/10' },
+    1: { text: 'text-yellow-400', glow: 'shadow-2xl shadow-yellow-400/30' },
+    2: { text: 'text-gray-300', glow: 'shadow-2xl shadow-gray-300/20' },
+    3: { text: 'text-orange-400', glow: 'shadow-2xl shadow-orange-400/25' },
 } as const
 
 interface MedalProps {
     position: 1 | 2 | 3
-    size?: 'sm' | 'md'
+    size?: 'sm' | 'md' | 'lg'
 }
 
 export default function Medal({ position, size = 'sm' }: MedalProps) {
-    const s   = STYLES[position]
-    const dim = size === 'md' ? 'w-7 h-7 text-base' : 'w-5 h-5 text-xs'
+    const s = STYLES[position]
+    const dim = size === 'lg' ? 'text-4xl italic' : size === 'md' ? 'text-2xl italic' : 'text-lg italic'
+    const glow = size === 'lg' ? s.glow : ''
     return (
-        <span className={`font-bebas leading-none flex items-center justify-center flex-shrink-0 border ${dim} ${s.text} ${s.border} ${s.bg}`}>
+        <span className={`font-bebas leading-none ${dim} ${s.text} ${glow}`}>
             {position}
         </span>
     )
 }
 
 export function RankDisplay({ rank }: { rank: number }) {
-    if (rank <= 3) return <Medal position={rank as 1 | 2 | 3} size="md" />
-    return <span className="font-bebas text-xl text-gray-muted leading-none">{rank}</span>
+    if (rank <= 3) return <Medal position={rank as 1 | 2 | 3} size="lg" />
+    return <span className="font-bebas text-3xl italic text-gray-muted leading-none">{rank}</span>
 }

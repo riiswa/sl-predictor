@@ -35,15 +35,15 @@ export default async function UsersPage() {
                         { val: admins,             label: 'Admins',       color: 'text-accent' },
                         { val: (users?.length ?? 0) - admins, label: 'Regular users', color: 'text-gray-muted' },
                     ].map(s => (
-                        <div key={s.label} className="bg-blue/8 border border-blue/20 px-6 py-5">
+                        <div key={s.label} className="bg-blue/8 border border-blue/20 px-4 sm:px-6 py-5">
                             <div className={`font-bebas text-4xl leading-none ${s.color}`}>{s.val}</div>
                             <div className="font-condensed text-xs tracking-[3px] uppercase text-gray-muted mt-1">{s.label}</div>
                         </div>
                     ))}
                 </div>
 
-                <div className="border border-blue/20">
-                    <div className="grid grid-cols-[1fr_80px_100px_120px_140px] gap-4 px-5 py-3 border-b border-blue/20">
+                <div className="border border-blue/20 overflow-hidden md:overflow-visible overflow-x-auto">
+                    <div className="hidden md:grid grid-cols-[1fr_80px_100px_120px_140px] gap-4 px-5 py-3 border-b border-blue/20">
                         {['Username', 'Country', 'Points', 'Role', 'Actions'].map(h => (
                             <div key={h} className="font-condensed text-xs tracking-[3px] uppercase text-gray-muted">{h}</div>
                         ))}

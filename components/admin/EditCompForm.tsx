@@ -113,7 +113,7 @@ export default function EditCompForm({ comp }: Props) {
                     <div className="flex flex-col gap-4">
                         <p className="font-condensed text-xs tracking-[3px] uppercase text-gray-muted">Details</p>
                         <Input label="Name" required value={name} onChange={e => setName(e.target.value)} />
-                        <div className="grid grid-cols-2 gap-3">
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                             <Input
                                 label="Country code"
                                 value={country}
@@ -124,7 +124,7 @@ export default function EditCompForm({ comp }: Props) {
                             <Input label="Flag" value={flag} onChange={e => setFlag(e.target.value)} placeholder="🇳🇱" />
                         </div>
                         <Input label="Organizer" value={org} onChange={e => setOrg(e.target.value)} />
-                        <div className="grid grid-cols-2 gap-3">
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                             <Input label="Start date" type="date" required value={start} onChange={e => setStart(e.target.value)} />
                             <Input label="End date"   type="date"         value={end}   onChange={e => setEnd(e.target.value)} />
                         </div>
@@ -140,7 +140,7 @@ export default function EditCompForm({ comp }: Props) {
                     {/* Scoring config */}
                     <div className="flex flex-col gap-4 border-t border-blue/10 pt-5">
                         <p className="font-condensed text-xs tracking-[3px] uppercase text-gray-muted">Scoring Config</p>
-                        <div className="grid grid-cols-2 gap-px">
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-px">
                             <div className="bg-dark/40 border border-blue/10 px-4 py-4 flex flex-col gap-3">
                                 <p className="font-condensed text-xs tracking-[2px] uppercase text-gray-muted/60">Podium</p>
                                 <div className="grid grid-cols-3 gap-2">

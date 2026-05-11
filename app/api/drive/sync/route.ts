@@ -3,6 +3,7 @@ import { createClient } from '@/lib/supabase/server'
 import { readDriveFile } from '@/lib/google-drive'
 import { parseRoster } from '@/lib/csv-parser'
 import { computeRIS } from '@/lib/scoring'
+import { createHash } from 'crypto'
 
 export async function POST(req: NextRequest) {
     const supabase = await createClient()
@@ -164,9 +165,13 @@ export async function POST(req: NextRequest) {
                     .single()
                 athleteId = inserted!.id
 
-                // Generate dummy Instagram ID if not provided
+                // Generate deterministic dummy Instagram ID if not provided
                 if (!a.instagram_id) {
-                    const dummyId = `dummy_${athleteId}`
+                    const nameHash = createHash('sha256')
+                        .update(`${a.first_name}${a.last_name}`.toLowerCase())
+                        .digest('hex')
+                        .substring(0, 12)
+                    const dummyId = `dummy_${nameHash}`
                     await supabase.from('athletes').update({
                         instagram_id: dummyId,
                         instagram_is_dummy: true,

@@ -24,7 +24,7 @@ export default function Modal({ onClose, children, borderColor = 'border-blue-li
             className="fixed inset-0 bg-dark/85 backdrop-blur-sm z-50 flex items-center justify-center px-4"
             onMouseDown={(e) => { if (e.target === e.currentTarget) onClose() }}
         >
-            <div ref={panelRef} className={`bg-dark border ${borderColor} p-8 max-w-md w-full max-h-[90vh] overflow-y-auto`}>
+            <div ref={panelRef} className={`bg-dark border ${borderColor} p-6 sm:p-8 max-w-md w-full max-h-[90vh] overflow-y-auto`}>
                 {children}
             </div>
         </div>

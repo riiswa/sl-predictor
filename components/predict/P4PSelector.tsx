@@ -87,7 +87,7 @@ export default function P4PSelector({ menAthletes, womenAthletes, onChange, lock
                 return (
                     <div key={gender} className={`border flex flex-col transition-colors ${complete ? 'border-blue/40' : 'border-blue/25'}`}>
                         <div className="flex items-center justify-between px-4 py-3 border-b border-blue/10">
-                            <span className={`font-bebas text-lg tracking-wide ${color}`}>{label}</span>
+                            <span className={`font-bebas text-base sm:text-lg tracking-wide ${color}`}>{label}</span>
                             {complete && <span className="font-condensed text-xs tracking-[1px] uppercase text-green-400">✓ Done</span>}
                         </div>
 
@@ -150,7 +150,7 @@ export default function P4PSelector({ menAthletes, womenAthletes, onChange, lock
                                                         <button
                                                             key={p}
                                                             onClick={() => pick(gender, p, athlete)}
-                                                            className={`w-7 h-7 text-xs border transition-all ${
+                                                            className={`w-9 h-9 sm:w-7 sm:h-7 font-condensed text-xs border transition-all ${
                                                                 isThisPick ? 'bg-accent border-accent text-white'
                                                                     : slotTaken ? 'border-blue/10 text-gray-muted/20 hover:border-blue/30 hover:text-gray-muted/50'
                                                                         : 'border-blue/20 text-gray-muted hover:border-blue-light hover:text-white'

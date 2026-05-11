@@ -28,6 +28,7 @@ interface Props {
     categories: any[]
     alreadySubmitted: boolean
     existingPredictions: ExistingPrediction[]
+    allComps?: any[]
 }
 
 const TABS = [
@@ -162,11 +163,12 @@ function LockedRecap({
     )
 }
 
-export default function PredictClient({ comp, categories, alreadySubmitted, existingPredictions }: Props) {
+export default function PredictClient({ comp, categories, alreadySubmitted, existingPredictions, allComps }: Props) {
     const router = useRouter()
 
     const isDeadlinePassed = new Date() > new Date(comp.prediction_deadline)
     const canEdit          = alreadySubmitted && !isDeadlinePassed
+    const [currentComp, setCurrentComp] = useState(comp)
 
     const [activeTab,  setActiveTab]  = useState<Tab>('podium')
     const [editMode,   setEditMode]   = useState(!alreadySubmitted)
@@ -233,8 +235,8 @@ export default function PredictClient({ comp, categories, alreadySubmitted, exis
     return (
         <div className="flex flex-col gap-5">
 
-            {/* Status bar */}
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border border-blue/20 px-5 py-4 bg-blue/5">
+            {/* Status bar — sticky below navbar (h-14 = 56px) */}
+            <div className="sticky top-14 z-40 flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-blue/30 px-3 sm:px-5 py-3 bg-dark shadow-md shadow-blue/10">
                 {submitted && !editMode ? (
                     <div className="flex items-center gap-3">
                         <div className="w-2 h-2 rounded-full bg-green-400 flex-shrink-0" />
@@ -310,8 +312,18 @@ export default function PredictClient({ comp, categories, alreadySubmitted, exis
                 />
             )}
 
-            {/* Tabs + content — only shown when editing or not yet submitted */}
-            {(!submitted || editMode) && <>
+            {/* Deadline passed message — shown when no submission and deadline passed */}
+            {!submitted && isDeadlinePassed && (
+                <div className="border border-gray-muted/30 bg-gray-muted/5 px-6 py-8 text-center rounded-sm">
+                    <p className="font-bebas text-2xl tracking-wide text-gray-muted/60 mb-2">Predictions Closed</p>
+                    <p className="text-gray-muted/50 text-sm font-condensed">
+                        The deadline for this competition has passed. You can no longer submit predictions.
+                    </p>
+                </div>
+            )}
+
+            {/* Tabs + content — only shown when editing or not yet submitted AND deadline not passed */}
+            {(!submitted || editMode) && !isDeadlinePassed && <>
             <div className="flex gap-px">
                 {TABS.map(tab => {
                     const isActive = activeTab === tab.id
@@ -320,7 +332,7 @@ export default function PredictClient({ comp, categories, alreadySubmitted, exis
                         <button
                             key={tab.id}
                             onClick={() => setActiveTab(tab.id)}
-                            className={`flex-1 px-5 py-3.5 text-left border transition-all relative ${
+                            className={`flex-1 px-3 sm:px-5 py-3.5 text-left border transition-all relative ${
                                 isActive ? 'bg-blue/15 border-blue-light text-white' : 'bg-transparent border-blue/20 text-gray-muted hover:text-white hover:border-blue/40'
                             }`}
                         >

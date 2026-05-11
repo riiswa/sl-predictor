@@ -34,7 +34,7 @@ export default function UserRow({ user, currentUserId }: { user: User; currentUs
     }
 
     return (
-        <div className="grid grid-cols-[1fr_80px_100px_120px_140px] gap-4 px-5 py-3 border-b border-blue/5 hover:bg-blue/5 items-center">
+        <div className="grid grid-cols-1 md:grid-cols-[1fr_80px_100px_120px_140px] gap-3 md:gap-4 px-5 py-3 border-b border-blue/5 hover:bg-blue/5 md:items-center">
             <div>
                 <p className="font-condensed font-semibold text-white text-sm">
                     {user.username}

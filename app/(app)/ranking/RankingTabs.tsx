@@ -100,7 +100,7 @@ export default function RankingTabs({ currentUserId, currentProfile, allProfiles
                                     label: 'Accuracy', color: 'text-blue-light'
                                 },
                             ].map(s => (
-                                <div key={s.label} className="bg-blue/8 border border-blue/20 px-6 py-5 relative group overflow-hidden">
+                                <div key={s.label} className="bg-blue/8 border border-blue/30 px-4 sm:px-6 py-5 relative group overflow-hidden shadow-lg shadow-blue/10 transition-all duration-300 hover:shadow-xl hover:shadow-blue/20">
                                     <div className="absolute bottom-0 left-0 w-full h-px bg-blue-light/20 group-hover:bg-accent/40 transition-colors" />
                                     <div className={`font-bebas text-4xl leading-none ${s.color}`}>{s.val}</div>
                                     <div className="font-condensed text-xs tracking-[3px] uppercase text-gray-muted mt-1">{s.label}</div>
@@ -110,9 +110,9 @@ export default function RankingTabs({ currentUserId, currentProfile, allProfiles
                     )}
 
                     {/* Leaderboard table */}
-                    <div className="border border-blue/30">
-                        <div className="hidden md:grid grid-cols-[52px_1fr_80px_100px_80px_80px] gap-4 px-5 py-3 border-b border-blue/30">
-                            {['#', 'Player', 'Country', 'Points', 'Picks', 'Accuracy'].map(h => (
+                    <div className="border border-blue/30 shadow-lg shadow-blue/10 rounded-sm overflow-hidden">
+                        <div className="hidden md:grid grid-cols-[52px_1fr_100px_80px_80px] gap-4 px-5 py-3 border-b border-blue/20 bg-blue/5">
+                            {['#', 'Player', 'Points', 'Picks', 'Accuracy'].map(h => (
                                 <div key={h} className="font-condensed text-xs tracking-[3px] uppercase text-gray-muted">{h}</div>
                             ))}
                         </div>
@@ -123,36 +123,51 @@ export default function RankingTabs({ currentUserId, currentProfile, allProfiles
                             <>
                                 {allProfiles.slice(0, 10).map((p, i) => {
                                     const isMe   = p.id === currentUserId
-                                    const rank   = p.season_rank ?? i + 1
+                                    const rank   = p.season_rank
+                                    const hasRank = rank !== null && rank !== undefined
                                     const acc    = p.total_predictions > 0
                                         ? `${Math.round((p.correct_predictions / p.total_predictions) * 100)}%`
                                         : '—'
-                                    const isTop3 = rank <= 3
-                                    const top3Bg = rank === 1 ? 'bg-yellow-400/5 border-l-2 border-l-yellow-400' : rank === 2 ? 'bg-gray-400/5 border-l-2 border-l-gray-400' : rank === 3 ? 'bg-orange-400/5 border-l-2 border-l-orange-400' : ''
+                                    const isTop3 = hasRank && rank <= 3
+                                    const top3Bg = hasRank && rank === 1 ? 'bg-yellow-400/5 border-l-2 border-l-yellow-400' : hasRank && rank === 2 ? 'bg-gray-400/5 border-l-2 border-l-gray-400' : hasRank && rank === 3 ? 'bg-orange-400/5 border-l-2 border-l-orange-400' : ''
 
                                     return (
-                                        <div key={p.id} className={`grid grid-cols-[52px_1fr_80px_100px_80px_80px] gap-4 px-5 items-center border-b border-blue/8 last:border-0 transition-colors ${
-                                            isMe ? 'bg-blue/15 border-l-2 border-l-accent' : isTop3 ? top3Bg : 'hover:bg-blue/5'
+                                        <div key={p.id} className={`md:grid md:grid-cols-[52px_1fr_100px_80px_80px] gap-4 px-5 border-b border-blue/8 last:border-0 transition-all duration-300 ${
+                                            isMe ? 'bg-blue/15 border-l-2 border-l-accent' : isTop3 ? top3Bg : 'even:bg-blue/3 hover:bg-blue/8'
                                         } ${isTop3 ? 'py-5' : 'py-4'}`}>
-                                            <div className={`font-bebas leading-none ${isTop3 ? 'text-3xl' : 'text-2xl'}`}>
-                                                <RankDisplay rank={rank} />
-                                            </div>
-                                            <div className="flex items-center gap-3 min-w-0">
-                                                <div
-                                                    className={`rounded-full flex items-center justify-center font-bebas flex-shrink-0 border border-white/20 ${isTop3 ? 'w-9 h-9 text-base' : 'w-8 h-8 text-sm'} ${isMe ? 'ring-2 ring-accent' : ''}`}
-                                                    style={{ backgroundColor: avatarColor(p.username) }}
-                                                >
-                                                    {p.username.charAt(0).toUpperCase()}
+                                            {/* Mobile: flex row with rank + username, desktop: grid item */}
+                                            <div className="md:col-span-2 flex items-center gap-3 mb-3 md:mb-0 md:col-span-1">
+                                                <div className="font-bebas leading-none">
+                                                    {hasRank ? <RankDisplay rank={rank} /> : <span className="text-4xl text-gray-muted">—</span>}
                                                 </div>
-                                                <p className={`font-condensed font-semibold text-white truncate ${isTop3 ? 'text-base' : 'text-sm'}`}>
-                                                    {p.username}
-                                                    {isMe && <span className="text-accent text-xs font-normal ml-2">You</span>}
-                                                </p>
+                                                <div className="flex items-center gap-3 min-w-0">
+                                                    <div
+                                                        className={`rounded-full flex items-center justify-center font-bebas flex-shrink-0 border border-white/20 ${isTop3 ? 'w-9 h-9 text-base' : 'w-8 h-8 text-sm'} ${isMe ? 'ring-2 ring-accent' : ''}`}
+                                                        style={{ backgroundColor: avatarColor(p.username) }}
+                                                    >
+                                                        {p.username.charAt(0).toUpperCase()}
+                                                    </div>
+                                                    <p className={`font-condensed font-semibold text-white ${isTop3 ? 'text-base' : 'text-sm'}`}>
+                                                        {p.username}
+                                                        {isMe && <span className="text-accent text-xs font-normal ml-2">You</span>}
+                                                    </p>
+                                                </div>
                                             </div>
-                                            <div className="font-condensed text-sm text-gray-muted">{p.country ?? '—'}</div>
-                                            <div className={`font-bebas text-white ${isTop3 ? 'text-3xl' : 'text-2xl'}`}>{p.total_points.toLocaleString()}</div>
-                                            <div className="font-condensed text-sm text-gray-muted">{p.total_predictions}</div>
-                                            <div className="font-condensed text-sm text-blue-light">{acc}</div>
+                                            {/* Mobile: row of stats, desktop: grid items */}
+                                            <div className="md:col-span-3 flex gap-4 md:gap-0 md:contents">
+                                                <div className={`flex-1 md:flex-none font-bebas text-white text-center md:text-left ${isTop3 ? 'text-3xl' : 'text-2xl'}`}>
+                                                    <span className="text-gray-muted text-xs md:hidden block mb-1">Points</span>
+                                                    {p.total_points.toLocaleString()}
+                                                </div>
+                                                <div className="flex-1 md:flex-none font-condensed text-sm text-gray-muted text-center md:text-left">
+                                                    <span className="text-gray-muted text-xs md:hidden block mb-1">Picks</span>
+                                                    {p.total_predictions}
+                                                </div>
+                                                <div className="flex-1 md:flex-none font-condensed text-sm text-blue-light text-center md:text-left">
+                                                    <span className="text-gray-muted text-xs md:hidden block mb-1">Acc</span>
+                                                    {acc}
+                                                </div>
+                                            </div>
                                         </div>
                                     )
                                 })}
@@ -163,24 +178,36 @@ export default function RankingTabs({ currentUserId, currentProfile, allProfiles
                                         <div className="px-5 py-2 border-b border-blue/8">
                                             <p className="font-condensed text-xs text-gray-muted/30 tracking-wide">···</p>
                                         </div>
-                                        <div className="grid grid-cols-[52px_1fr_80px_100px_80px_80px] gap-4 px-5 py-4 items-center bg-blue/15 border-l-2 border-l-accent">
-                                            <div className="font-bebas text-2xl text-gray-muted">{currentProfile.season_rank ?? '—'}</div>
-                                            <div className="flex items-center gap-3">
-                                                <div className="w-8 h-8 rounded-full flex items-center justify-center font-bebas text-sm ring-2 ring-accent border border-white/20" style={{ backgroundColor: avatarColor(currentProfile.username) }}>
-                                                    {currentProfile.username.charAt(0).toUpperCase()}
+                                        <div className="md:grid md:grid-cols-[52px_1fr_100px_80px_80px] gap-4 px-5 py-4 bg-blue/15 border-l-2 border-l-accent">
+                                            {/* Mobile: flex row with rank + username, desktop: grid item */}
+                                            <div className="md:col-span-2 flex items-center gap-3 mb-3 md:mb-0 md:col-span-1">
+                                                <div className="font-bebas text-2xl text-gray-muted">{currentProfile.season_rank ?? '—'}</div>
+                                                <div className="flex items-center gap-3">
+                                                    <div className="w-8 h-8 rounded-full flex items-center justify-center font-bebas text-sm ring-2 ring-accent border border-white/20" style={{ backgroundColor: avatarColor(currentProfile.username) }}>
+                                                        {currentProfile.username.charAt(0).toUpperCase()}
+                                                    </div>
+                                                    <p className="font-condensed font-semibold text-sm text-white">
+                                                        {currentProfile.username}
+                                                        <span className="text-accent text-xs font-normal ml-2">You</span>
+                                                    </p>
                                                 </div>
-                                                <p className="font-condensed font-semibold text-sm text-white">
-                                                    {currentProfile.username}
-                                                    <span className="text-accent text-xs font-normal ml-2">You</span>
-                                                </p>
                                             </div>
-                                            <div className="font-condensed text-sm text-gray-muted">{currentProfile.country ?? '—'}</div>
-                                            <div className="font-bebas text-2xl text-yellow-400">{currentProfile.total_points.toLocaleString()}</div>
-                                            <div className="font-condensed text-sm text-gray-muted">{currentProfile.total_predictions}</div>
-                                            <div className="font-condensed text-sm text-blue-light">
-                                                {currentProfile.total_predictions > 0
-                                                    ? `${Math.round((currentProfile.correct_predictions / currentProfile.total_predictions) * 100)}%`
-                                                    : '—'}
+                                            {/* Mobile: row of stats, desktop: grid items */}
+                                            <div className="md:col-span-3 flex gap-4 md:gap-0 md:contents">
+                                                <div className="flex-1 md:flex-none font-bebas text-2xl text-yellow-400 text-center md:text-left">
+                                                    <span className="text-gray-muted text-xs md:hidden block mb-1">Points</span>
+                                                    {currentProfile.total_points.toLocaleString()}
+                                                </div>
+                                                <div className="flex-1 md:flex-none font-condensed text-sm text-gray-muted text-center md:text-left">
+                                                    <span className="text-gray-muted text-xs md:hidden block mb-1">Picks</span>
+                                                    {currentProfile.total_predictions}
+                                                </div>
+                                                <div className="flex-1 md:flex-none font-condensed text-sm text-blue-light text-center md:text-left">
+                                                    <span className="text-gray-muted text-xs md:hidden block mb-1">Acc</span>
+                                                    {currentProfile.total_predictions > 0
+                                                        ? `${Math.round((currentProfile.correct_predictions / currentProfile.total_predictions) * 100)}%`
+                                                        : '—'}
+                                                </div>
                                             </div>
                                         </div>
                                     </>
@@ -242,8 +269,8 @@ export default function RankingTabs({ currentUserId, currentProfile, allProfiles
                             <EmptyState icon="—" title="NO RESULTS" subtitle="No results for this filter." />
                         </div>
                     ) : (
-                        <div className="border border-blue/30">
-                            <div className="hidden md:grid grid-cols-[52px_1fr_80px_120px_90px_200px] gap-3 px-5 py-3 border-b border-blue/30">
+                        <div className="border border-blue/30 shadow-lg shadow-blue/10 rounded-sm overflow-hidden md:overflow-visible overflow-x-auto">
+                            <div className="hidden md:grid grid-cols-[52px_1fr_80px_120px_90px_200px] gap-3 px-5 py-3 border-b border-blue/20 bg-blue/5">
                                 {['#', 'Athlete', 'Nat.', 'Category', 'RIS', 'Lifts'].map(h => (
                                     <div key={h} className="font-condensed text-xs tracking-[3px] uppercase text-gray-muted">{h}</div>
                                 ))}
@@ -262,8 +289,8 @@ export default function RankingTabs({ currentUserId, currentProfile, allProfiles
                                             rank === 3 ? 'text-orange-400' : 'text-gray-muted'
 
                                 return (
-                                    <div key={r.id} className="grid grid-cols-[52px_1fr_80px_120px_90px_200px] gap-3 px-5 py-3.5 items-center border-b border-blue/8 last:border-0 hover:bg-blue/5 transition-colors">
-                                        <div className={`font-bebas text-xl ${rankColor}`}>
+                                    <div key={r.id} className="grid grid-cols-[52px_1fr_80px_120px_90px_200px] gap-3 px-5 py-3.5 items-center border-b border-blue/8 last:border-0 even:bg-blue/3 hover:bg-blue/8 transition-all duration-300">
+                                        <div className={`font-bebas ${rankColor}`}>
                                             <RankDisplay rank={rank} />
                                         </div>
                                         <div>
