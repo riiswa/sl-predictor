@@ -235,8 +235,8 @@ export default function PredictClient({ comp, categories, alreadySubmitted, exis
     return (
         <div className="flex flex-col gap-5">
 
-            {/* Status bar */}
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border border-blue/20 px-5 py-4 bg-blue/5">
+            {/* Status bar — sticky */}
+            <div className="sticky top-0 z-20 flex flex-col sm:flex-row sm:items-center justify-between gap-3 border border-blue/30 px-5 py-4 bg-dark/95 backdrop-blur-sm shadow-lg shadow-blue/10 rounded-sm">
                 {submitted && !editMode ? (
                     <div className="flex items-center gap-3">
                         <div className="w-2 h-2 rounded-full bg-green-400 flex-shrink-0" />
