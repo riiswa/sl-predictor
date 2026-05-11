@@ -84,7 +84,7 @@ export default function PodiumSelector({ categories, onChange, locked = false, i
     return (
         <div className="flex flex-col gap-4">
             {/* Progress — sticky */}
-            <div className="sticky top-0 z-10 bg-dark/95 backdrop-blur-sm py-3 -mx-5 px-5 flex items-center gap-4 shadow-lg shadow-accent/10">
+            <div className="sticky top-0 z-10 bg-dark py-2 px-1 flex items-center gap-4 shadow-md shadow-accent/10 border-b border-blue/20">
                 <div className="flex-1 h-1 bg-blue/15 relative overflow-hidden rounded-full">
                     <div
                         className="absolute inset-y-0 left-0 bg-accent transition-all duration-500"
