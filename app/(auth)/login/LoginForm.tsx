@@ -55,7 +55,7 @@ export default function LoginForm() {
                     placeholder="••••••••"
                 />
                 <div className="flex justify-end">
-                    <Link href="/forgot-password" className="text-xs text-gray-muted/50 hover:text-gray-muted font-condensed tracking-wide transition-colors">
+                    <Link href="/forgot-password" className="text-xs text-gray-muted hover:text-white hover:underline font-condensed tracking-wide transition-colors">
                         Forgot password?
                     </Link>
                 </div>

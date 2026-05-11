@@ -34,12 +34,12 @@ export default function ForgotPasswordForm() {
     if (sent) {
         return (
             <div className="flex flex-col gap-4">
-                <div className="border border-blue/30 bg-blue/8 px-4 py-4">
+                <div className="border border-green-400/20 bg-green-400/5 px-4 py-4">
                     <p className="text-white text-sm font-condensed tracking-wide">
-                        Check your inbox — we sent a reset link to <span className="text-accent">{email}</span>.
+                        ✓ Reset link sent to <span className="text-accent">{email}</span>
                     </p>
-                    <p className="text-gray-muted/50 text-xs font-condensed mt-1">
-                        The link expires in 1 hour.
+                    <p className="text-gray-muted/60 text-xs font-condensed mt-2 leading-relaxed">
+                        Click the link in your email to set a new password. The link expires in 1 hour.
                     </p>
                 </div>
             </div>
