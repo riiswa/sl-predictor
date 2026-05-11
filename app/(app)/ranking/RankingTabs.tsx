@@ -269,7 +269,7 @@ export default function RankingTabs({ currentUserId, currentProfile, allProfiles
                             <EmptyState icon="—" title="NO RESULTS" subtitle="No results for this filter." />
                         </div>
                     ) : (
-                        <div className="border border-blue/30 shadow-lg shadow-blue/10 rounded-sm overflow-hidden">
+                        <div className="border border-blue/30 shadow-lg shadow-blue/10 rounded-sm overflow-hidden md:overflow-visible overflow-x-auto">
                             <div className="hidden md:grid grid-cols-[52px_1fr_80px_120px_90px_200px] gap-3 px-5 py-3 border-b border-blue/20 bg-blue/5">
                                 {['#', 'Athlete', 'Nat.', 'Category', 'RIS', 'Lifts'].map(h => (
                                     <div key={h} className="font-condensed text-xs tracking-[3px] uppercase text-gray-muted">{h}</div>

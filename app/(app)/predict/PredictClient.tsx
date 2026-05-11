@@ -236,7 +236,7 @@ export default function PredictClient({ comp, categories, alreadySubmitted, exis
         <div className="flex flex-col gap-5">
 
             {/* Status bar — sticky below navbar (h-14 = 56px) */}
-            <div className="sticky top-14 z-40 flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-blue/30 px-5 py-3 bg-dark shadow-md shadow-blue/10">
+            <div className="sticky top-14 z-40 flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-blue/30 px-3 sm:px-5 py-3 bg-dark shadow-md shadow-blue/10">
                 {submitted && !editMode ? (
                     <div className="flex items-center gap-3">
                         <div className="w-2 h-2 rounded-full bg-green-400 flex-shrink-0" />
@@ -332,7 +332,7 @@ export default function PredictClient({ comp, categories, alreadySubmitted, exis
                         <button
                             key={tab.id}
                             onClick={() => setActiveTab(tab.id)}
-                            className={`flex-1 px-5 py-3.5 text-left border transition-all relative ${
+                            className={`flex-1 px-3 sm:px-5 py-3.5 text-left border transition-all relative ${
                                 isActive ? 'bg-blue/15 border-blue-light text-white' : 'bg-transparent border-blue/20 text-gray-muted hover:text-white hover:border-blue/40'
                             }`}
                         >
