@@ -15,12 +15,12 @@ const config: Config = {
                 'blue-light': '#2a10d4',
                 'blue-dark':  '#10008a',
                 accent:       '#ff3c00',
-                'off-white':  '#e8e6ff',
-                'gray-muted': '#8880cc',
+                'off-white':  '#f0eeff',
+                'gray-muted': '#b0aad8',
             },
             fontFamily: {
-                sans:      ['var(--font-barlow)', 'sans-serif'],
-                condensed: ['var(--font-barlow-condensed)', 'sans-serif'],
+                sans:      ['var(--font-roboto)', 'sans-serif'],
+                condensed: ['var(--font-roboto-condensed)', 'sans-serif'],
                 bebas:     ['"Bebas Neue"', 'sans-serif'],
             },
             backgroundImage: {

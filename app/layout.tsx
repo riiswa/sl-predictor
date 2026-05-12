@@ -1,17 +1,17 @@
 import type { Metadata } from 'next'
-import { Barlow, Barlow_Condensed } from 'next/font/google'
+import { Roboto, Roboto_Condensed } from 'next/font/google'
 import './globals.css'
 
-const barlow = Barlow({
+const roboto = Roboto({
     subsets: ['latin'],
-    weight: ['300', '400', '500'],
-    variable: '--font-barlow',
+    weight: ['300', '400', '500', '700'],
+    variable: '--font-roboto',
 })
 
-const barlowCondensed = Barlow_Condensed({
+const robotoCondensed = Roboto_Condensed({
     subsets: ['latin'],
-    weight: ['300', '400', '600', '700'],
-    variable: '--font-barlow-condensed',
+    weight: ['300', '400', '700'],
+    variable: '--font-roboto-condensed',
 })
 
 export const metadata: Metadata = {
@@ -21,7 +21,7 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
     return (
-        <html lang="fr" className={`${barlow.variable} ${barlowCondensed.variable}`}>
+        <html lang="fr" className={`${roboto.variable} ${robotoCondensed.variable}`}>
         <head>
             <link rel="preconnect" href="https://fonts.googleapis.com" />
             <link

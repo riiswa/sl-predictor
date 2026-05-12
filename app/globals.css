@@ -2,8 +2,8 @@
 
 /* ── Font declarations for Tailwind v4 ─────────────── */
 @theme {
-  --font-sans:      var(--font-barlow), sans-serif;
-  --font-condensed: var(--font-barlow-condensed), sans-serif;
+  --font-sans:      var(--font-roboto), sans-serif;
+  --font-condensed: var(--font-roboto-condensed), sans-serif;
   --font-bebas:     "Bebas Neue", sans-serif;
 
   --color-dark:        #05003d;
@@ -12,8 +12,8 @@
   --color-blue-light:  #2a10d4;
   --color-blue-dark:   #10008a;
   --color-accent:      #ff3c00;
-  --color-off-white:   #e8e6ff;
-  --color-gray-muted:  #8880cc;
+  --color-off-white:   #f0eeff;
+  --color-gray-muted:  #b0aad8;
 }
 
 /* ── Base ───────────────────────────────────────────── */
@@ -23,8 +23,8 @@ html { scroll-behavior: smooth; }
 body {
   background-color: #05003d;
   color: #ffffff;
-  font-family: var(--font-barlow), sans-serif;
-  font-weight: 300;
+  font-family: var(--font-roboto), sans-serif;
+  font-weight: 400;
   font-size: 16px;
   overflow-x: hidden;
 }
@@ -35,16 +35,16 @@ body {
 
 /* ── Utilities ──────────────────────────────────────── */
 .font-bebas     { font-family: "Bebas Neue", sans-serif; }
-.font-condensed { font-family: var(--font-barlow-condensed), sans-serif; }
+.font-condensed { font-family: var(--font-roboto-condensed), sans-serif; }
 
 .bg-dark        { background-color: #05003d; }
 .bg-darker      { background-color: #040030; }
 .bg-blue        { background-color: #1800ad; }
 .bg-blue-light  { background-color: #2a10d4; }
 .text-accent    { color: #ff3c00; }
-.text-muted     { color: #8880cc; }
-.text-gray-muted { color: #8880cc; }
-.text-off-white { color: #e8e6ff; }
+.text-muted     { color: #b0aad8; }
+.text-gray-muted { color: #b0aad8; }
+.text-off-white { color: #f0eeff; }
 
 .border-blue    { border-color: rgba(24,0,173,0.3); }
 .border-blue-mid { border-color: rgba(24,0,173,0.5); }
