@@ -18,12 +18,38 @@ export interface ParsedRoster {
     athletes:   CSVAthlete[]
     hasResults: boolean
     categories: { gender: 'men' | 'women'; weight_class: string; name: string; display_order: number }[]
+    warnings:   string[]
 }
 
-function parseNum(val: any): number | null {
-    if (val === null || val === undefined || val === '') return null
-    const n = parseFloat(String(val).trim())
-    return isNaN(n) ? null : n
+function parseNum(val: any): { value: number | null; warning?: string } {
+    if (val === null || val === undefined || val === '') return { value: null }
+
+    const str = String(val).trim().toUpperCase()
+
+    // Check for special keywords indicating no lift
+    const dnfKeywords = ['DNF', 'DIS', 'DNS', 'DNA', 'N/A', 'NA', '—', '-', 'X']
+    if (dnfKeywords.includes(str)) {
+        return { value: null }
+    }
+
+    const n = parseFloat(str)
+
+    // Treat 0 as DNF (no lift completed)
+    if (n === 0) {
+        return { value: null }
+    }
+
+    // Invalid number
+    if (isNaN(n)) {
+        return { value: null, warning: `Invalid lift value: "${String(val).trim()}"` }
+    }
+
+    // Out of valid range
+    if (n < 0 || n > 1000) {
+        return { value: null, warning: `Lift value out of valid range: ${n}` }
+    }
+
+    return { value: n }
 }
 
 function parseGender(val: any): 'men' | 'women' {
@@ -42,20 +68,35 @@ function normalizeHeader(h: string): string {
     return String(h).trim().toLowerCase().replace(/\s+/g, '_')
 }
 
-function rowsToAthletes(rows: Record<string, any>[]): { athletes: CSVAthlete[], hasResults: boolean } {
+function rowsToAthletes(rows: Record<string, any>[]): { athletes: CSVAthlete[], hasResults: boolean, warnings: string[] } {
     const athletes: CSVAthlete[] = []
+    const warnings: string[] = []
     let hasResults = false
 
     for (const row of rows) {
-        const firstName = row.first_name || row.firstname || row.prenom || ''
-        const lastName  = row.last_name  || row.lastname  || row.nom   || ''
+        const firstName = (row.first_name || row.firstname || row.prenom || '').toString().trim()
+        const lastName  = (row.last_name  || row.lastname  || row.nom   || '').toString().trim()
+        const athleteName = `${firstName} ${lastName}`.trim()
         if (!firstName && !lastName) continue
 
-        const muscle_up = parseNum(row.muscle_up)
-        const pullup    = parseNum(row.pullup)
-        const dip       = parseNum(row.dip)
-        const squat     = parseNum(row.squat)
-        const bodyweight = parseNum(row.bodyweight)
+        const muscle_upResult = parseNum(row.muscle_up)
+        const pullupResult    = parseNum(row.pullup)
+        const dipResult       = parseNum(row.dip)
+        const squatResult     = parseNum(row.squat)
+        const bodyweightResult = parseNum(row.bodyweight)
+
+        const muscle_up = muscle_upResult.value
+        const pullup    = pullupResult.value
+        const dip       = dipResult.value
+        const squat     = squatResult.value
+        const bodyweight = bodyweightResult.value
+
+        // Collect warnings
+        if (muscle_upResult.warning) warnings.push(`${athleteName}: ${muscle_upResult.warning}`)
+        if (pullupResult.warning) warnings.push(`${athleteName}: ${pullupResult.warning}`)
+        if (dipResult.warning) warnings.push(`${athleteName}: ${dipResult.warning}`)
+        if (squatResult.warning) warnings.push(`${athleteName}: ${squatResult.warning}`)
+        if (bodyweightResult.warning) warnings.push(`${athleteName}: ${bodyweightResult.warning}`)
 
         // Has results if at least one lift is filled
         if (muscle_up !== null || pullup !== null || dip !== null || squat !== null) {
@@ -65,8 +106,8 @@ function rowsToAthletes(rows: Record<string, any>[]): { athletes: CSVAthlete[], 
         const instaId = String(row.instagram_id || row.instagram || row.instagram_handle || '').trim() || null
 
         athletes.push({
-            first_name:   String(firstName).trim(),
-            last_name:    String(lastName).trim(),
+            first_name:   firstName,
+            last_name:    lastName,
             nationality:  String(row.nationality || row.nat || row.country || '').toUpperCase().trim(),
             gender:       parseGender(row.gender || row.genre || ''),
             weight_class: String(row.weight_class || row.category || row.cat || '').trim(),
@@ -79,7 +120,7 @@ function rowsToAthletes(rows: Record<string, any>[]): { athletes: CSVAthlete[], 
         })
     }
 
-    return { athletes, hasResults }
+    return { athletes, hasResults, warnings }
 }
 
 function detectCategories(athletes: CSVAthlete[]) {
@@ -118,8 +159,8 @@ export function parseRosterCSV(text: string): ParsedRoster {
         return row
     })
 
-    const { athletes, hasResults } = rowsToAthletes(rows)
-    return { athletes, hasResults, categories: detectCategories(athletes) }
+    const { athletes, hasResults, warnings } = rowsToAthletes(rows)
+    return { athletes, hasResults, categories: detectCategories(athletes), warnings }
 }
 
 export function parseRosterXLSX(buffer: Buffer): ParsedRoster {
@@ -139,8 +180,8 @@ export function parseRosterXLSX(buffer: Buffer): ParsedRoster {
         return obj
     })
 
-    const { athletes, hasResults } = rowsToAthletes(rows)
-    return { athletes, hasResults, categories: detectCategories(athletes) }
+    const { athletes, hasResults, warnings } = rowsToAthletes(rows)
+    return { athletes, hasResults, categories: detectCategories(athletes), warnings }
 }
 
 export function parseRoster(data: string | Buffer, filename: string): ParsedRoster {

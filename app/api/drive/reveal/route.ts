@@ -20,12 +20,13 @@ export async function POST(req: NextRequest) {
         // 1. Check competition exists and has results
         const { data: comp } = await supabase
             .from('competitions')
-            .select('id, name, results_visible, drive_file_id')
+            .select('id, name, status, results_visible, drive_file_id')
             .eq('id', competition_id)
             .single()
 
         if (!comp) return NextResponse.json({ error: 'Competition not found' }, { status: 404 })
         if (comp.results_visible) return NextResponse.json({ error: 'Results already revealed' }, { status: 400 })
+        if (comp.status !== 'closed') return NextResponse.json({ error: `Cannot reveal results for ${comp.status} competition` }, { status: 400 })
 
         // 2. Calculate scores
         const { updated } = await calculateCompetitionScores(competition_id)

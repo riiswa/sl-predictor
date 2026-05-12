@@ -1,6 +1,28 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
 
+function validateP4P(p4p: any): string | null {
+    if (!p4p) return null
+
+    const validateGender = (picks: any[] | undefined, gender: string) => {
+        if (!picks || picks.length === 0) return null
+        const athleteIds = picks.map(p => p.athlete_id)
+        const uniqueIds = new Set(athleteIds)
+        if (uniqueIds.size !== athleteIds.length) {
+            return `${gender} P4P: Cannot pick same athlete in multiple positions`
+        }
+        return null
+    }
+
+    const menError = validateGender(p4p.men, 'Men')
+    if (menError) return menError
+
+    const womenError = validateGender(p4p.women, 'Women')
+    if (womenError) return womenError
+
+    return null
+}
+
 function buildRows(userId: string, competitionId: string, podium: any, p4p: any, now: string) {
     const rows: any[] = []
 
@@ -58,6 +80,9 @@ export async function POST(req: NextRequest) {
     const body = await req.json()
     const { competition_id, podium, p4p } = body
 
+    const p4pError = validateP4P(p4p)
+    if (p4pError) return NextResponse.json({ error: p4pError }, { status: 400 })
+
     const { data: comp } = await supabase
         .from('competitions')
         .select('status, prediction_deadline')
@@ -97,6 +122,9 @@ export async function PUT(req: NextRequest) {
     const body = await req.json()
     const { competition_id, podium, p4p } = body
 
+    const p4pError = validateP4P(p4p)
+    if (p4pError) return NextResponse.json({ error: p4pError }, { status: 400 })
+
     const { data: comp } = await supabase
         .from('competitions')
         .select('status, prediction_deadline')
@@ -115,6 +143,17 @@ export async function PUT(req: NextRequest) {
         .eq('competition_id', competition_id)
 
     if (deleteError) return NextResponse.json({ error: deleteError.message }, { status: 500 })
+
+    // Re-check deadline before insert (race condition protection)
+    const { data: compAfterDelete } = await supabase
+        .from('competitions')
+        .select('status, prediction_deadline')
+        .eq('id', competition_id)
+        .single()
+
+    if (!compAfterDelete) return NextResponse.json({ error: 'Competition not found' }, { status: 404 })
+    if (compAfterDelete.status !== 'open') return NextResponse.json({ error: 'Competition is not open' }, { status: 400 })
+    if (new Date() > new Date(compAfterDelete.prediction_deadline)) return NextResponse.json({ error: 'Deadline has passed' }, { status: 400 })
 
     // Re-insert with new submitted_at (tiebreaker resets)
     const now  = new Date().toISOString()

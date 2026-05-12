@@ -276,10 +276,10 @@ export default function RankingTabs({ currentUserId, currentProfile, allProfiles
                                 ))}
                             </div>
 
-                            {filteredResults.map((r, i) => {
+                            {filteredResults.map((r) => {
                                 const athlete = r.athletes
                                 const cat     = r.categories
-                                const rank    = r.rank_in_category ?? i + 1
+                                const rank    = r.rank_in_category
                                 const ris     = r.ris_score?.toFixed(2) ?? '—'
                                 const lifts   = [r.muscle_up, r.pullup, r.dip, r.squat]
                                 const liftLabels = ['MU', 'PU', 'DIP', 'SQ']
@@ -291,7 +291,7 @@ export default function RankingTabs({ currentUserId, currentProfile, allProfiles
                                 return (
                                     <div key={r.id} className="grid grid-cols-[52px_1fr_80px_120px_90px_200px] gap-3 px-5 py-3.5 items-center border-b border-blue/8 last:border-0 even:bg-blue/3 hover:bg-blue/8 transition-all duration-300">
                                         <div className={`font-bebas ${rankColor}`}>
-                                            <RankDisplay rank={rank} />
+                                            {rank !== null ? <RankDisplay rank={rank} /> : <span className="text-gray-muted">—</span>}
                                         </div>
                                         <div>
                                             <p className="font-condensed font-semibold text-sm text-white">

@@ -13,10 +13,11 @@ export function computeRIS(
     squat:     number | null,
     bodyweight: number | null
 ): { ris_score: number | null; dnf: boolean; missing_data: boolean } {
-    // DNF if all lifts are null
     const lifts = [muscle_up, pullup, dip, squat]
     const allNull = lifts.every(l => l === null)
-    if (allNull) return { ris_score: null, dnf: false, missing_data: false }
+
+    // Missing data if all lifts are null
+    if (allNull) return { ris_score: null, dnf: false, missing_data: true }
 
     // DNF if any lift is missing (partial result = did not complete)
     const anyNull = lifts.some(l => l === null)
@@ -150,6 +151,9 @@ export async function calculateCompetitionScores(competitionId: string) {
                 is_exact:      isExact,
                 is_partial:    isPartial,
             })
+        } else {
+            warnings.push(`Invalid prediction module: ${pred.module}`)
+            updates.push({ id: pred.id, points_earned: 0, is_exact: null, is_partial: null })
         }
     }
 
@@ -162,10 +166,13 @@ export async function calculateCompetitionScores(competitionId: string) {
     }
 
     // Upsert one row per user into the competition_scores ledger
+    const predMap = new Map(predictions.map(p => [p.id, p]))
     const userPoints: Record<string, number> = {}
     for (const u of updates) {
-        const pred = predictions.find(p => p.id === u.id)!
-        userPoints[pred.user_id] = (userPoints[pred.user_id] ?? 0) + u.points_earned
+        const pred = predMap.get(u.id)
+        if (pred) {
+            userPoints[pred.user_id] = (userPoints[pred.user_id] ?? 0) + u.points_earned
+        }
     }
 
     const ledgerRows = Object.entries(userPoints).map(([userId, pts]) => ({
