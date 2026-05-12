@@ -12,11 +12,11 @@ const config: Config = {
                 dark:         '#05003d',
                 darker:       '#040030',
                 blue:         '#1800ad',
-                'blue-light': '#2a10d4',
+                'blue-light': '#4a2cff',
                 'blue-dark':  '#10008a',
                 accent:       '#ff3c00',
                 'off-white':  '#f0eeff',
-                'gray-muted': '#b0aad8',
+                'gray-muted': '#d5d0f0',
             },
             fontFamily: {
                 sans:      ['var(--font-roboto)', 'sans-serif'],

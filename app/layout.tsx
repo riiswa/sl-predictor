@@ -30,7 +30,10 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
             />
         </head>
         <body className="bg-dark text-white antialiased">
-        {children}
+            <a href="#main-content" className="sr-only focus:not-sr-only focus:block focus:fixed focus:top-0 focus:left-0 focus:z-[9999] focus:bg-accent focus:text-dark focus:px-4 focus:py-2 focus:font-bold">
+                Skip to main content
+            </a>
+            {children}
         </body>
         </html>
     )

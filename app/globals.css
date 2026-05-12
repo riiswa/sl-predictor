@@ -9,11 +9,11 @@
   --color-dark:        #05003d;
   --color-darker:      #040030;
   --color-blue:        #1800ad;
-  --color-blue-light:  #2a10d4;
+  --color-blue-light:  #4a2cff;
   --color-blue-dark:   #10008a;
   --color-accent:      #ff3c00;
   --color-off-white:   #f0eeff;
-  --color-gray-muted:  #b0aad8;
+  --color-gray-muted:  #d5d0f0;
 }
 
 /* ── Base ───────────────────────────────────────────── */
@@ -40,11 +40,57 @@ body {
 .bg-dark        { background-color: #05003d; }
 .bg-darker      { background-color: #040030; }
 .bg-blue        { background-color: #1800ad; }
-.bg-blue-light  { background-color: #2a10d4; }
+.bg-blue-light  { background-color: #4a2cff; }
 .text-accent    { color: #ff3c00; }
-.text-muted     { color: #b0aad8; }
-.text-gray-muted { color: #b0aad8; }
+.text-muted     { color: #d5d0f0; }
+.text-gray-muted { color: #d5d0f0; }
 .text-off-white { color: #f0eeff; }
+
+/* ── Accessibility ────────────────────────────────── */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border-width: 0;
+}
+
+.focus\:not-sr-only:focus {
+  position: static;
+  width: auto;
+  height: auto;
+  padding: 0;
+  margin: 0;
+  overflow: visible;
+  clip: auto;
+  white-space: normal;
+}
+
+/* Focus ring utility for keyboard navigation */
+button:focus-visible,
+a:focus-visible,
+input:focus-visible,
+select:focus-visible,
+textarea:focus-visible {
+  outline: 2px solid #ff3c00;
+  outline-offset: 2px;
+}
+
+/* Reduce motion for accessibility */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
 
 .border-blue    { border-color: rgba(24,0,173,0.3); }
 .border-blue-mid { border-color: rgba(24,0,173,0.5); }

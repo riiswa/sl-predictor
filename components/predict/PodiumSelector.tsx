@@ -150,7 +150,9 @@ function CategoryBlock({ cat, getPickForPosition, isAthleteUsed, getAthletePosit
         <div className={`border transition-all ${complete ? 'border-blue/40 bg-blue/5' : 'border-blue/25'}`}>
             <button
                 onClick={() => setOpen(o => !o)}
-                className="w-full flex items-center justify-between px-4 py-3 hover:bg-blue/5 transition-colors"
+                aria-expanded={open}
+                aria-controls={`category-${cat.id}`}
+                className="w-full flex items-center justify-between px-4 py-3 hover:bg-blue/5 transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
             >
                 <div className="flex items-center gap-3">
                     <span className={`font-bebas text-base sm:text-lg tracking-wide ${cat.gender === 'women' ? 'text-pink-400' : 'text-blue-light'}`}>
@@ -161,13 +163,13 @@ function CategoryBlock({ cat, getPickForPosition, isAthleteUsed, getAthletePosit
                 <div className="flex items-center gap-2">
                     {complete
                         ? <span className="font-condensed text-xs tracking-[1px] uppercase text-green-400">✓ Done</span>
-                        : <span className="font-condensed text-xs text-gray-muted/60">{open ? '▲' : '▼'}</span>
+                        : <span className="font-condensed text-xs text-gray-muted/60" aria-hidden="true">{open ? '▲' : '▼'}</span>
                     }
                 </div>
             </button>
 
             {open && (
-                <div className="border-t border-blue/10">
+                <div id={`category-${cat.id}`} className="border-t border-blue/10">
                     {/* Podium preview */}
                     <div className="grid grid-cols-3 gap-px border-b border-blue/10">
                         {POSITIONS.map(pos => {
@@ -211,7 +213,8 @@ function CategoryBlock({ cat, getPickForPosition, isAthleteUsed, getAthletePosit
                                                     <button
                                                         key={p}
                                                         onClick={() => pick(cat.id, p, athlete)}
-                                                        className={`w-9 h-9 sm:w-7 sm:h-7 font-condensed text-xs border transition-all ${
+                                                        aria-label={`Select ${POS_LABEL[p - 1]} position for ${athlete.first_name} ${athlete.last_name}`}
+                                                        className={`w-10 h-10 sm:w-9 sm:h-9 font-condensed text-xs border transition-all focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent ${
                                                             isThisPick ? 'bg-accent border-accent text-white'
                                                                 : slotTaken ? 'border-blue/10 text-gray-muted/20 hover:border-blue/30 hover:text-gray-muted/50'
                                                                     : 'border-blue/20 text-gray-muted hover:border-blue-light hover:text-white'
