@@ -20,10 +20,11 @@ export async function DELETE(
     if (!comp) return NextResponse.json({ error: 'Competition not found' }, { status: 404 })
 
     // Delete in order (respecting foreign key constraints)
-    await supabase.from('predictions') .delete().eq('competition_id', compId)
-    await supabase.from('results')     .delete().eq('competition_id', compId)
-    await supabase.from('athletes')    .delete().eq('competition_id', compId)
-    await supabase.from('categories')  .delete().eq('competition_id', compId)
+    await supabase.from('predictions')             .delete().eq('competition_id', compId)
+    await supabase.from('results')                 .delete().eq('competition_id', compId)
+    await supabase.from('athletes')                .delete().eq('competition_id', compId)
+    await supabase.from('competitions_categories') .delete().eq('competition_id', compId)
+    // Note: global categories are NOT deleted — they are shared across competitions
 
     // Unlink drive file (don't delete the file record, just unlink)
     if (comp.drive_file_id) {

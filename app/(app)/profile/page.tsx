@@ -13,7 +13,6 @@ interface Athlete {
 
 interface Category {
     id: string
-    name: string
     gender: string
     weight_class: string
 }
@@ -66,7 +65,7 @@ export default async function ProfilePage() {
             id, module, position, points_earned, is_exact, is_partial, submitted_at,
             competitions ( id, name, flag, status, results_visible, date_start ),
             athletes ( id, first_name, last_name, nationality ),
-            categories ( id, name, gender, weight_class )
+            categories ( id, gender, weight_class )
         `)
         .eq('user_id', user.id)
         .order('submitted_at', { ascending: false }) as { data: Prediction[] | null }
@@ -228,7 +227,9 @@ export default async function ProfilePage() {
                                                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-px">
                                                     {podiumPreds
                                                         .sort((a, b) => {
-                                                            const cat = (a.categories?.name ?? '').localeCompare(b.categories?.name ?? '')
+                                                            const catA = a.categories ? `${a.categories.gender} ${a.categories.weight_class}` : ''
+                                                            const catB = b.categories ? `${b.categories.gender} ${b.categories.weight_class}` : ''
+                                                            const cat = catA.localeCompare(catB)
                                                             return cat !== 0 ? cat : a.position - b.position
                                                         })
                                                         .map((pred) => <PredRow key={pred.id} pred={pred} hasResults={hasResults} />)
@@ -310,7 +311,7 @@ function PredRow({ pred, hasResults }: { pred: Prediction; hasResults: boolean }
                 <Medal position={pred.position as 1|2|3} />
                 <div className="min-w-0">
                     {pred.module === 'podium' && pred.categories && (
-                        <p className="font-condensed text-xs text-gray-muted/60 tracking-[1px] uppercase truncate leading-tight">{pred.categories.name}</p>
+                        <p className="font-condensed text-xs text-gray-muted/60 tracking-[1px] uppercase truncate leading-tight">{pred.categories.gender === 'men' ? 'Men' : 'Women'} {pred.categories.weight_class}</p>
                     )}
                     <p className="font-condensed text-sm font-semibold text-white truncate leading-tight">
                         {pred.athletes?.first_name} {pred.athletes?.last_name}

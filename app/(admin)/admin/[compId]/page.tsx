@@ -23,11 +23,19 @@ export default async function ManageCompPage({ params }: { params: Promise<{ com
 
     if (!comp) notFound()
 
-    const { data: categories } = await supabase
-        .from('categories')
-        .select('id, name, gender, weight_class, display_order')
+    const { data: catLinks } = await supabase
+        .from('competitions_categories')
+        .select('categories ( id, gender, weight_class )')
         .eq('competition_id', compId)
-        .order('display_order')
+
+    const categories = (catLinks ?? [])
+        .map(link => link.categories as { id: string; gender: string; weight_class: string } | null)
+        .filter(Boolean)
+        .map(cat => ({
+            ...cat!,
+            name: `${cat!.gender === 'men' ? 'Men' : 'Women'} ${cat!.weight_class}`,
+        }))
+        .sort((a, b) => a.name.localeCompare(b.name))
 
     const { data: athletes } = await supabase
         .from('athletes')

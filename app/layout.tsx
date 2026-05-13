@@ -1,4 +1,4 @@
-import type { Metadata } from 'next'
+import type { Metadata, Viewport } from 'next'
 import { Roboto, Roboto_Condensed } from 'next/font/google'
 import './globals.css'
 
@@ -39,7 +39,12 @@ export const metadata: Metadata = {
         description: "La plateforme de pronostics de la communauté Streetlifting européenne.",
         images: ['https://streetliftingmax.com/og-image.png'],
     },
-    viewport: 'width=device-width, initial-scale=1, maximum-scale=5',
+}
+
+export const viewport: Viewport = {
+    width: 'device-width',
+    initialScale: 1,
+    maximumScale: 5,
 }
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
