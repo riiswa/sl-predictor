@@ -12,11 +12,12 @@ export default async function RankingPage() {
         .eq('id', user!.id)
         .single()
 
-    // Full predictor leaderboard
+    // Full predictor leaderboard (sort by points, then by predictions to show active users first)
     const { data: allProfiles } = await supabase
         .from('predictor_standings')
         .select('id, username, total_points, season_rank, country, total_predictions, correct_predictions')
         .order('total_points', { ascending: false })
+        .order('total_predictions', { ascending: false })
 
     // RIS results — only from visible competitions
     const { data: results } = await supabase
