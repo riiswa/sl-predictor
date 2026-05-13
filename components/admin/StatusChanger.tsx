@@ -61,9 +61,9 @@ export default function StatusChanger({ compId, currentStatus }: { compId: strin
                             key={s.value}
                             onClick={() => changeStatus(s.value)}
                             disabled={loading || isCurrent || !isAllowed}
-                            className={`font-condensed text-sm tracking-[1px] uppercase px-5 py-2.5 border transition-all ${
+                            className={`font-condensed text-xs tracking-[2px] uppercase px-4 py-2 border transition-all ${
                                 isCurrent
-                                    ? 'bg-blue border-blue-light text-white cursor-default'
+                                    ? 'bg-blue/8 border-blue-light text-white cursor-default'
                                     : isAllowed
                                         ? 'bg-transparent border-blue/30 text-gray-muted hover:text-white hover:border-blue-light cursor-pointer disabled:opacity-50'
                                         : 'bg-transparent border-blue/10 text-gray-muted/20 cursor-not-allowed'
