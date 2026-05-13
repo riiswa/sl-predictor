@@ -37,7 +37,16 @@ export async function POST(req: NextRequest) {
 
     if (ledgerError) return NextResponse.json({ error: `Failed to deactivate scores: ${ledgerError.message}` }, { status: 500 })
 
-    // 3. Reset competition flags
+    // 3. Clear result ranks so they don't show in the RIS tab
+    const { error: ranksError } = await supabase
+        .from('results')
+        .update({ rank_in_category: null })
+        .eq('competition_id', competition_id)
+        .not('rank_in_category', 'is', null)
+
+    if (ranksError) return NextResponse.json({ error: `Failed to clear ranks: ${ranksError.message}` }, { status: 500 })
+
+    // 4. Reset competition flags
     const { error: compError } = await supabase
         .from('competitions')
         .update({ results_visible: false, status: 'closed' })
