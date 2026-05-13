@@ -17,6 +17,29 @@ const robotoCondensed = Roboto_Condensed({
 export const metadata: Metadata = {
     title: 'SL Predictor — European Streetlifting League 2026',
     description: "La plateforme de pronostics de la communauté Streetlifting européenne.",
+    keywords: ['streetlifting', 'predictions', 'european league', 'calisthenics', 'strength sport'],
+    authors: [{ name: 'SL Predictor' }],
+    openGraph: {
+        title: 'SL Predictor — European Streetlifting League 2026',
+        description: "La plateforme de pronostics de la communauté Streetlifting européenne.",
+        url: 'https://streetliftingmax.com',
+        siteName: 'SL Predictor',
+        locale: 'fr_FR',
+        type: 'website',
+        images: [{
+            url: 'https://streetliftingmax.com/og-image.png',
+            width: 1200,
+            height: 630,
+            alt: 'SL Predictor',
+        }],
+    },
+    twitter: {
+        card: 'summary_large_image',
+        title: 'SL Predictor — European Streetlifting League 2026',
+        description: "La plateforme de pronostics de la communauté Streetlifting européenne.",
+        images: ['https://streetliftingmax.com/og-image.png'],
+    },
+    viewport: 'width=device-width, initial-scale=1, maximum-scale=5',
 }
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {

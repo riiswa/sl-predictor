@@ -45,35 +45,6 @@ export default function AccountSettings({ email, username }: { email: string; us
         router.refresh()
     }
 
-    // — Change password —
-    const [newPassword, setNewPassword] = useState('')
-    const [pwLoading,   setPwLoading]   = useState(false)
-
-    async function handleChangePassword(e: React.FormEvent) {
-        e.preventDefault()
-        if (newPassword.length < 8) { toast('Password must be at least 8 characters.', 'error'); return }
-        setPwLoading(true)
-        const { error } = await supabase.auth.updateUser({ password: newPassword })
-        setPwLoading(false)
-        if (error) { toast(error.message, 'error'); return }
-        toast('Password updated.')
-        setNewPassword('')
-    }
-
-    // — Change email —
-    const [newEmail,   setNewEmail]   = useState('')
-    const [emlLoading, setEmlLoading] = useState(false)
-
-    async function handleChangeEmail(e: React.FormEvent) {
-        e.preventDefault()
-        setEmlLoading(true)
-        const { error } = await supabase.auth.updateUser({ email: newEmail })
-        setEmlLoading(false)
-        if (error) { toast(error.message, 'error'); return }
-        toast(`Confirmation sent to ${newEmail}. Check your inbox.`)
-        setNewEmail('')
-    }
-
     // — Delete account —
     const [deleteConfirm, setDeleteConfirm] = useState('')
     const [delLoading,    setDelLoading]    = useState(false)
@@ -94,6 +65,18 @@ export default function AccountSettings({ email, username }: { email: string; us
     return (
         <div className="flex flex-col gap-4">
 
+            {/* Account info */}
+            <Section title="Account Info">
+                <div className="flex flex-col gap-2 -mt-2">
+                    <p className="text-gray-muted/50 text-xs font-condensed tracking-wide">
+                        Email: <span className="text-gray-muted">{email}</span>
+                    </p>
+                    <p className="text-gray-muted/30 text-xs font-condensed">
+                        To change your email or password, use the forgot password link on the login page.
+                    </p>
+                </div>
+            </Section>
+
             {/* Change username */}
             <Section title="Change Username">
                 <p className="text-gray-muted/50 text-xs font-condensed tracking-wide -mt-2">
@@ -113,49 +96,6 @@ export default function AccountSettings({ email, username }: { email: string; us
                     <div>
                         <Button type="submit" size="md" loading={unLoading}>
                             Update username →
-                        </Button>
-                    </div>
-                </form>
-            </Section>
-
-            {/* Change password */}
-            <Section title="Change Password">
-                <form onSubmit={handleChangePassword} className="flex flex-col gap-4">
-                    <Input
-                        label="New password"
-                        hint="(min. 8 characters)"
-                        type="password"
-                        required
-                        minLength={8}
-                        value={newPassword}
-                        onChange={e => setNewPassword(e.target.value)}
-                        placeholder="••••••••"
-                    />
-                    <div>
-                        <Button type="submit" size="md" loading={pwLoading}>
-                            Update password →
-                        </Button>
-                    </div>
-                </form>
-            </Section>
-
-            {/* Change email */}
-            <Section title="Change Email">
-                <p className="text-gray-muted/50 text-xs font-condensed tracking-wide -mt-2">
-                    Current: <span className="text-gray-muted">{email}</span>
-                </p>
-                <form onSubmit={handleChangeEmail} className="flex flex-col gap-4">
-                    <Input
-                        label="New email"
-                        type="email"
-                        required
-                        value={newEmail}
-                        onChange={e => setNewEmail(e.target.value)}
-                        placeholder="new@email.com"
-                    />
-                    <div>
-                        <Button type="submit" size="md" loading={emlLoading}>
-                            Update email →
                         </Button>
                     </div>
                 </form>
