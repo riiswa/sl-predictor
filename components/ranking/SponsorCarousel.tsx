@@ -16,7 +16,7 @@ const SPONSORS: Sponsor[] = [
     { name: 'Tatakai',          image: '/sponsors/tatakai.png' },
 ]
 
-const INTERVAL = 3500
+const INTERVAL = 4000
 
 export default function SponsorCarousel() {
     const [index,  setIndex]  = useState(0)
@@ -33,88 +33,72 @@ export default function SponsorCarousel() {
         return () => { if (timerRef.current) clearTimeout(timerRef.current) }
     }, [index, paused, next])
 
-    // Always render 3 slots: on mobile only 2 are shown via CSS
-    const slots = [
-        SPONSORS[index % count],
-        SPONSORS[(index + 1) % count],
-        SPONSORS[(index + 2) % count],
-    ]
+    const sponsor = SPONSORS[index]
 
     return (
-        <div
-            className="mb-8"
-            onMouseEnter={() => setPaused(true)}
-            onMouseLeave={() => setPaused(false)}
-        >
-            <p className="font-condensed text-xs tracking-[4px] uppercase text-gray-muted/50 mb-3">
-                Partners
-            </p>
+        <div className="mb-12 -mx-6">
+            <div
+                className="relative h-[40vh] sm:h-[50vh] flex items-center justify-center overflow-hidden border-t border-b border-blue/20 bg-gradient-to-b from-blue/8 to-transparent"
+                onMouseEnter={() => setPaused(true)}
+                onMouseLeave={() => setPaused(false)}
+            >
+                {/* Background image */}
+                <div className="absolute inset-0 z-0">
+                    <Image
+                        key={sponsor.name}
+                        src={sponsor.image}
+                        alt={sponsor.name}
+                        fill
+                        className="object-cover opacity-90 transition-opacity duration-300"
+                        priority
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-r from-black/70 via-black/50 to-transparent" />
+                </div>
 
-            <div className="flex items-center gap-3">
+                {/* Navigation - left */}
                 <button
                     onClick={prev}
                     aria-label="Previous sponsor"
-                    className="flex-shrink-0 w-8 h-8 flex items-center justify-center border border-blue/20 text-gray-muted hover:text-white hover:border-blue/40 transition-colors text-lg leading-none"
+                    className="absolute left-6 top-1/2 -translate-y-1/2 z-10 w-12 h-12 flex items-center justify-center border border-white/20 hover:border-accent hover:bg-accent/10 text-white hover:text-accent transition-all text-2xl leading-none font-light"
                 >
                     ‹
                 </button>
 
-                {/* 2 cols on mobile, 3 on sm+ */}
-                <div className="flex-1 grid grid-cols-2 sm:grid-cols-3 gap-3">
-                    {slots.map((s, i) => (
-                        <div key={i} className={i === 2 ? 'hidden sm:block' : ''}>
-                            <SponsorCard sponsor={s} />
-                        </div>
-                    ))}
-                </div>
-
+                {/* Navigation - right */}
                 <button
                     onClick={next}
                     aria-label="Next sponsor"
-                    className="flex-shrink-0 w-8 h-8 flex items-center justify-center border border-blue/20 text-gray-muted hover:text-white hover:border-blue/40 transition-colors text-lg leading-none"
+                    className="absolute right-6 top-1/2 -translate-y-1/2 z-10 w-12 h-12 flex items-center justify-center border border-white/20 hover:border-accent hover:bg-accent/10 text-white hover:text-accent transition-all text-2xl leading-none font-light"
                 >
                     ›
                 </button>
-            </div>
 
-            {/* Indicator dots */}
-            <div className="flex justify-center gap-1.5 mt-3">
-                {SPONSORS.map((_, i) => (
-                    <button
-                        key={i}
-                        onClick={() => setIndex(i)}
-                        aria-label={`Sponsor ${i + 1}`}
-                        className={`h-1.5 rounded-full transition-all duration-300 ${
-                            i === index ? 'w-4 bg-accent' : 'w-1.5 bg-blue/30 hover:bg-blue/50'
-                        }`}
-                    />
-                ))}
-            </div>
-        </div>
-    )
-}
+                {/* Sponsor name overlay (bottom left) */}
+                <div className="absolute bottom-8 left-8 z-10 max-w-md">
+                    <p className="font-condensed text-sm tracking-[4px] uppercase text-gray-muted/70 mb-2">
+                        Featured Partner
+                    </p>
+                    <h3 className="font-bebas text-3xl sm:text-5xl text-white tracking-wide">
+                        {sponsor.name}
+                    </h3>
+                </div>
 
-function SponsorCard({ sponsor }: { sponsor: Sponsor }) {
-    const card = (
-        <div className="border border-blue/20 bg-blue/5 hover:bg-blue/10 hover:border-blue/40 transition-all px-4 py-4 flex items-center justify-center h-20">
-            <div className="relative w-full h-full">
-                <Image
-                    src={sponsor.image}
-                    alt={sponsor.name}
-                    fill
-                    className="object-contain opacity-80 hover:opacity-100 transition-opacity"
-                    sizes="(max-width: 640px) 40vw, 25vw"
-                />
+                {/* Indicator dots - centered at bottom */}
+                <div className="absolute bottom-6 left-1/2 -translate-x-1/2 z-10 flex gap-2">
+                    {SPONSORS.map((_, i) => (
+                        <button
+                            key={i}
+                            onClick={() => setIndex(i)}
+                            aria-label={`Sponsor ${i + 1}`}
+                            className={`rounded-full transition-all duration-300 ${
+                                i === index
+                                    ? 'w-3 h-3 bg-accent'
+                                    : 'w-2 h-2 bg-white/30 hover:bg-white/60'
+                            }`}
+                        />
+                    ))}
+                </div>
             </div>
         </div>
     )
-
-    if (sponsor.url) {
-        return (
-            <a href={sponsor.url} target="_blank" rel="noopener noreferrer" className="block">
-                {card}
-            </a>
-        )
-    }
-    return card
 }
