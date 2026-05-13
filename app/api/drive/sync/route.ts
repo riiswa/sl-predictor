@@ -59,7 +59,7 @@ export async function POST(req: NextRequest) {
                     status:              'upcoming',
                     results_visible:     false,
                     scoring_config: {
-                        podium: { points_exact: 10, points_partial: 5, positions: 3 },
+                        podium: { points_exact: 10, points_partial: 3, positions: 3 },
                         p4p:    { points_exact: 20, points_partial: 10, positions: 3 },
                     },
                 })
