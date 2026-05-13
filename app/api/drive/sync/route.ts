@@ -88,26 +88,48 @@ export async function POST(req: NextRequest) {
             }
         }
 
-        // Upsert categories
-        const { data: existingCats } = await supabase
-            .from('categories')
-            .select('id, gender, weight_class')
-            .eq('competition_id', competitionId)
-
+        // Upsert global categories and link to competition
         const existingCatMap: Record<string, string> = {}
-        for (const c of existingCats ?? []) {
-            existingCatMap[`${c.gender}_${c.weight_class}`] = c.id
-        }
 
         for (const cat of categories) {
             const key = `${cat.gender}_${cat.weight_class}`
-            if (!existingCatMap[key]) {
-                const { data: newCat } = await supabase
+
+            // Try to find or create the global category
+            const { data: existingCat } = await supabase
+                .from('categories')
+                .select('id')
+                .eq('gender', cat.gender)
+                .eq('weight_class', cat.weight_class)
+                .maybeSingle()
+
+            let categoryId: string
+            if (existingCat) {
+                categoryId = existingCat.id
+            } else {
+                // Create new global category
+                const { data: newCat, error: catError } = await supabase
                     .from('categories')
-                    .insert({ ...cat, competition_id: competitionId })
+                    .insert({ gender: cat.gender, weight_class: cat.weight_class })
                     .select('id')
                     .single()
-                if (newCat) existingCatMap[key] = newCat.id
+                if (catError || !newCat) continue
+                categoryId = newCat.id
+            }
+
+            existingCatMap[key] = categoryId
+
+            // Link competition to this category if not already linked
+            const { data: existingLink } = await supabase
+                .from('competitions_categories')
+                .select('id')
+                .eq('competition_id', competitionId)
+                .eq('category_id', categoryId)
+                .maybeSingle()
+
+            if (!existingLink) {
+                await supabase
+                    .from('competitions_categories')
+                    .insert({ competition_id: competitionId, category_id: categoryId })
             }
         }
 

@@ -90,14 +90,18 @@ export async function calculateCompetitionScores(
 
     if (!predictions || predictions.length === 0) return { updated: 0, warnings: [], scoring_run_id: '' }
 
-    // Get category genders
+    // Get category genders for this competition
     const { data: categories } = await supabase
-        .from('categories')
-        .select('id, gender')
+        .from('competitions_categories')
+        .select('category_id, categories(id, gender)')
         .eq('competition_id', competitionId)
 
     const catGender: Record<string, string> = {}
-    for (const c of categories ?? []) catGender[c.id] = c.gender
+    for (const link of categories ?? []) {
+        if (link.categories) {
+            catGender[link.categories.id] = link.categories.gender
+        }
+    }
 
     // Build P4P RIS rankings per gender
     const p4pMen = results
