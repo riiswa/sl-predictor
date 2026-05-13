@@ -19,10 +19,10 @@ export default async function AppLayout({ children }: { children: React.ReactNod
         <div className="min-h-screen bg-dark flex flex-col">
             <header className="sticky top-0 z-50">
                 <NavBar profile={profile} />
-                {openComp && (
-                    <DeadlineBanner deadline={openComp.prediction_deadline} compName={openComp.name} />
-                )}
             </header>
+            {openComp && (
+                <DeadlineBanner deadline={openComp.prediction_deadline} compName={openComp.name} />
+            )}
             <main id="main-content" className="flex-1">{children}</main>
             <Toaster />
         </div>

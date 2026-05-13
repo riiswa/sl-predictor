@@ -87,26 +87,6 @@ function LockedRecap({
 
     return (
         <div className="flex flex-col gap-4">
-            <div className="border border-green-400/20 bg-green-400/5 px-5 py-4 flex items-center justify-between gap-4">
-                <div className="flex items-center gap-3">
-                    <div className="w-2 h-2 rounded-full bg-green-400 flex-shrink-0" />
-                    <div>
-                        <p className="font-condensed text-sm font-semibold text-green-400 tracking-wide">Your picks are locked in</p>
-                        <p className="text-gray-muted text-xs mt-0.5">
-                            {canEdit ? 'You can still modify until the deadline.' : 'Results will appear here after the competition.'}
-                        </p>
-                    </div>
-                </div>
-                {canEdit && (
-                    <button
-                        onClick={onEdit}
-                        className="font-condensed text-xs tracking-[2px] uppercase text-gray-muted hover:text-white transition-colors flex-shrink-0"
-                    >
-                        ✏ Modify
-                    </button>
-                )}
-            </div>
-
             {/* Podium picks */}
             {catsWithPicks.length > 0 && (
                 <div className="border border-blue/20 p-5 flex flex-col gap-4">
