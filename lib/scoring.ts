@@ -5,13 +5,39 @@ interface ScoringConfig {
     p4p:    { points_exact: number; points_partial: number; positions: number }
 }
 
-// RIS = (muscle_up + pullup + dip + squat) / bodyweight * 100
+// FinaRep RIS formula (2026 constants)
+// f(x) = A + (K - A) / (1 + Q * e^(-B*(x-v)))  ≈ expected total of an average elite athlete at bodyweight x
+// RIS  = (athlete_total / f(x)) * 100
+
+const RIS_CONSTANTS = {
+    men: {
+        A: 335.5625,
+        K: 556.1103380806655,
+        Q: 0.4973075488457353,
+        v: 76.74125992622565,
+        B: 0.10289374204365953,
+    },
+    women: {
+        A: 189.0625,
+        K: 281.8317115772956,
+        Q: 0.004337919108356886,
+        v: 69.83492229989282,
+        B: 0.28812554082125424,
+    },
+}
+
+function expectedEliteTotal(bodyweight: number, gender: 'men' | 'women'): number {
+    const { A, K, Q, v, B } = RIS_CONSTANTS[gender]
+    return A + (K - A) / (1 + Q * Math.exp(-B * (bodyweight - v)))
+}
+
 export function computeRIS(
     muscle_up: number | null,
     pullup:    number | null,
     dip:       number | null,
     squat:     number | null,
-    bodyweight: number | null
+    bodyweight: number | null,
+    gender: 'men' | 'women',
 ): { ris_score: number | null; dnf: boolean; missing_data: boolean } {
     const lifts = [muscle_up, pullup, dip, squat]
     const allNull = lifts.every(l => l === null)
@@ -28,13 +54,17 @@ export function computeRIS(
         return { ris_score: null, dnf: false, missing_data: true }
     }
 
-    const total = muscle_up! + pullup! + dip! + squat!
-    const ris   = (total / bodyweight) * 100
+    const total    = muscle_up! + pullup! + dip! + squat!
+    const expected = expectedEliteTotal(bodyweight, gender)
+    const ris      = (total / expected) * 100
 
     return { ris_score: Math.round(ris * 100) / 100, dnf: false, missing_data: false }
 }
 
-export async function calculateCompetitionScores(competitionId: string) {
+export async function calculateCompetitionScores(
+    competitionId: string,
+    scoredBy?: string,
+): Promise<{ updated: number; warnings: string[]; scoring_run_id: string }> {
     const supabase = await createClient()
 
     const { data: comp } = await supabase
@@ -58,16 +88,20 @@ export async function calculateCompetitionScores(competitionId: string) {
         .select('*')
         .eq('competition_id', competitionId)
 
-    if (!predictions || predictions.length === 0) return { updated: 0, warnings: [] }
+    if (!predictions || predictions.length === 0) return { updated: 0, warnings: [], scoring_run_id: '' }
 
-    // Get category genders
+    // Get category genders for this competition
     const { data: categories } = await supabase
-        .from('categories')
-        .select('id, gender')
+        .from('competitions_categories')
+        .select('category_id, categories(id, gender)')
         .eq('competition_id', competitionId)
 
     const catGender: Record<string, string> = {}
-    for (const c of categories ?? []) catGender[c.id] = c.gender
+    for (const link of categories ?? []) {
+        if (link.categories) {
+            catGender[link.categories.id] = link.categories.gender
+        }
+    }
 
     // Build P4P RIS rankings per gender
     const p4pMen = results
@@ -165,7 +199,17 @@ export async function calculateCompetitionScores(competitionId: string) {
             .eq('id', u.id)
     }
 
-    // Upsert one row per user into the competition_scores ledger
+    // Generate scoring_run_id (UUID format)
+    const scoringRunId = crypto.randomUUID()
+
+    // Mark any existing active scores for this competition as inactive
+    await supabase
+        .from('competition_scores')
+        .update({ is_active: false })
+        .eq('competition_id', competitionId)
+        .eq('is_active', true)
+
+    // Insert new competition scores with scoring_run_id
     const predMap = new Map(predictions.map(p => [p.id, p]))
     const userPoints: Record<string, number> = {}
     for (const u of updates) {
@@ -176,17 +220,21 @@ export async function calculateCompetitionScores(competitionId: string) {
     }
 
     const ledgerRows = Object.entries(userPoints).map(([userId, pts]) => ({
-        user_id:        userId,
-        competition_id: competitionId,
-        points:         pts,
-        scored_at:      new Date().toISOString(),
+        user_id:                    userId,
+        competition_id:             competitionId,
+        scoring_run_id:             scoringRunId,
+        points:                     pts,
+        is_active:                  true,
+        scoring_config_snapshot:    config,
+        scored_by:                  scoredBy,
+        scored_at:                  new Date().toISOString(),
     }))
 
     if (ledgerRows.length > 0) {
         await supabase
             .from('competition_scores')
-            .upsert(ledgerRows, { onConflict: 'user_id,competition_id' })
+            .insert(ledgerRows)
     }
 
-    return { updated: updates.length, warnings }
+    return { updated: updates.length, warnings, scoring_run_id: scoringRunId }
 }
