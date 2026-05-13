@@ -28,7 +28,7 @@ interface Result {
     disqualified: boolean
     missing_data: boolean
     athletes: { id: string; first_name: string; last_name: string; nationality: string; bodyweight: number | null } | null
-    categories: { id: string; name: string; gender: string; weight_class: string; competition_id: string } | null
+    categories: { id: string; gender: string; weight_class: string } | null
     competitions: { id: string; name: string; flag: string | null; country: string } | null
 }
 
@@ -317,7 +317,7 @@ export default function RankingTabs({ currentUserId, currentProfile, allProfiles
                                         </div>
                                         <div className="font-condensed text-sm text-gray-muted">{athlete?.nationality}</div>
                                         <div>
-                                            <p className="font-condensed text-xs text-gray-muted">{cat?.name}</p>
+                                            <p className="font-condensed text-xs text-gray-muted">{cat ? `${cat.gender === 'men' ? 'Men' : 'Women'} ${cat.weight_class}` : '—'}</p>
                                         </div>
                                         <div className={`font-bebas text-xl ${rank <= 3 ? 'text-yellow-400' : 'text-white'}`}>{ris}</div>
                                         <div className="flex gap-2">

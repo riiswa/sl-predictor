@@ -24,7 +24,7 @@ export default async function RankingPage() {
         .select(`
             id, rank_in_category, ris_score, muscle_up, pullup, dip, squat, dnf, disqualified, missing_data,
             athletes ( id, first_name, last_name, nationality, bodyweight ),
-            categories ( id, name, gender, weight_class, competition_id ),
+            categories ( id, gender, weight_class ),
             competitions ( id, name, flag, country, results_visible )
         `)
         .eq('competitions.results_visible', true)

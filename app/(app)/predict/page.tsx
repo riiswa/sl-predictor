@@ -32,11 +32,26 @@ export default async function PredictPage() {
     // Load all data for all open competitions
     const competitionData = await Promise.all(
         comps.map(async (comp) => {
-            const { data: categories } = await supabase
-                .from('categories')
-                .select('id, name, gender, weight_class, display_order, athletes ( id, first_name, last_name, nationality )')
+            // Fetch categories via junction table (global categories)
+            const { data: catLinks } = await supabase
+                .from('competitions_categories')
+                .select('categories ( id, gender, weight_class )')
                 .eq('competition_id', comp.id)
-                .order('display_order')
+
+            // Fetch athletes for this competition grouped by category
+            const { data: athletes } = await supabase
+                .from('athletes')
+                .select('id, first_name, last_name, nationality, category_id')
+                .eq('competition_id', comp.id)
+
+            const categories = (catLinks ?? [])
+                .map(link => link.categories as { id: string; gender: string; weight_class: string } | null)
+                .filter(Boolean)
+                .map(cat => ({
+                    ...cat!,
+                    name: `${cat!.gender === 'men' ? 'Men' : 'Women'} ${cat!.weight_class}`,
+                    athletes: (athletes ?? []).filter(a => a.category_id === cat!.id),
+                }))
 
             const { data: existingPredictions } = await supabase
                 .from('predictions')
@@ -46,7 +61,7 @@ export default async function PredictPage() {
 
             return {
                 comp,
-                categories: categories ?? [],
+                categories,
                 existingPredictions: existingPredictions ?? [],
                 alreadySubmitted: (existingPredictions?.length ?? 0) > 0,
             }
