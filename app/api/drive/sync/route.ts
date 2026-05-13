@@ -190,7 +190,7 @@ export async function POST(req: NextRequest) {
                 // Generate deterministic dummy Instagram ID if not provided
                 if (!a.instagram_id) {
                     const nameHash = createHash('sha256')
-                        .update(`${a.first_name}${a.last_name}`.toLowerCase())
+                        .update(`${competitionId}${a.first_name}${a.last_name}`.toLowerCase())
                         .digest('hex')
                         .substring(0, 12)
                     const dummyId = `dummy_${nameHash}`
@@ -210,6 +210,11 @@ export async function POST(req: NextRequest) {
         let missingDataCount = 0
 
         if (hasResults) {
+            // Wipe existing results for this competition before re-inserting.
+            // Avoids duplicate rows if sync is run multiple times — the results
+            // table has no unique constraint on (competition_id, athlete_id).
+            await supabase.from('results').delete().eq('competition_id', competitionId)
+
             // Group athletes by category to compute ranks
             const catAthletes: Record<string, {
                 athleteId: string
@@ -277,18 +282,7 @@ export async function POST(req: NextRequest) {
                         imported_at:      new Date().toISOString(),
                     }
 
-                    const { data: existingResult } = await supabase
-                        .from('results')
-                        .select('id')
-                        .eq('competition_id', competitionId)
-                        .eq('athlete_id', entry.athleteId)
-                        .maybeSingle()
-
-                    if (existingResult) {
-                        await supabase.from('results').update(resultData).eq('id', existingResult.id)
-                    } else {
-                        await supabase.from('results').insert(resultData)
-                    }
+                    await supabase.from('results').insert(resultData)
 
                     if (!entry.dnf && !entry.missing_data) rank++
                 }
