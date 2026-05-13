@@ -4,6 +4,7 @@ import { useState } from 'react'
 import { avatarColor } from '@/lib/avatar'
 import EmptyState from '@/components/ui/EmptyState'
 import { RankDisplay } from '@/components/ui/Medal'
+import ShareRankingButton from '@/components/ranking/ShareRankingButton'
 
 interface Profile {
     id: string
@@ -107,6 +108,19 @@ export default function RankingTabs({ currentUserId, currentProfile, allProfiles
                                 </div>
                             ))}
                         </div>
+
+                        {/* Share button */}
+                        {currentProfile && (
+                            <div className="mb-8">
+                                <ShareRankingButton
+                                    username={currentProfile.username}
+                                    rank={currentProfile.season_rank}
+                                    points={currentProfile.total_points}
+                                    accuracy={currentProfile.total_predictions > 0 ? Math.round((currentProfile.correct_predictions / currentProfile.total_predictions) * 100) : null}
+                                    country={currentProfile.country}
+                                />
+                            </div>
+                        )}
                     )}
 
                     {/* Leaderboard table */}
