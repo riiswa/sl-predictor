@@ -19,6 +19,8 @@ export async function GET() {
         const dbMap: Record<string, any> = {}
         for (const f of dbFiles ?? []) dbMap[f.drive_file_id] = f
 
+        const driveFileIds = new Set(driveFiles.map(f => f.id))
+
         for (const file of driveFiles) {
             const existing      = dbMap[file.id]
             const driveModified = new Date(file.modifiedTime)
@@ -33,8 +35,11 @@ export async function GET() {
                     has_results:   false,
                 })
             } else {
-                const lastSynced = existing.last_synced_at ? new Date(existing.last_synced_at) : null
-                if (!lastSynced || driveModified > lastSynced) {
+                const lastSynced    = existing.last_synced_at ? new Date(existing.last_synced_at) : null
+                const nameChanged   = existing.file_name !== file.name
+                const fileModified  = !lastSynced || driveModified > lastSynced
+
+                if (fileModified || nameChanged) {
                     await supabase
                         .from('drive_files')
                         .update({
@@ -48,6 +53,13 @@ export async function GET() {
                         })
                         .eq('drive_file_id', file.id)
                 }
+            }
+        }
+
+        // Remove DB entries for files that no longer exist on Drive
+        for (const dbFile of dbFiles ?? []) {
+            if (!driveFileIds.has(dbFile.drive_file_id)) {
+                await supabase.from('drive_files').delete().eq('drive_file_id', dbFile.drive_file_id)
             }
         }
 
