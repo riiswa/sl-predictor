@@ -47,9 +47,16 @@ export default function EditCompForm({ comp }: Props) {
     const [org,      setOrg]      = useState(comp.organizer ?? '')
     const [start,    setStart]    = useState(comp.date_start?.slice(0, 10) ?? '')
     const [end,      setEnd]      = useState(comp.date_end?.slice(0, 10) ?? '')
-    const [deadline, setDeadline] = useState(
-        comp.prediction_deadline ? comp.prediction_deadline.slice(0, 16) : ''
-    )
+    const [deadline, setDeadline] = useState(() => {
+        if (!comp.prediction_deadline) return ''
+        const utcDate = new Date(comp.prediction_deadline)
+        const year = utcDate.getFullYear()
+        const month = String(utcDate.getMonth() + 1).padStart(2, '0')
+        const day = String(utcDate.getDate()).padStart(2, '0')
+        const hours = String(utcDate.getHours()).padStart(2, '0')
+        const minutes = String(utcDate.getMinutes()).padStart(2, '0')
+        return `${year}-${month}-${day}T${hours}:${minutes}`
+    })
 
     // Scoring config fields
     const sc = comp.scoring_config
@@ -71,6 +78,12 @@ export default function EditCompForm({ comp }: Props) {
         setError(null)
         setSaved(false)
 
+        // Convert local datetime-local input to UTC ISO string
+        // datetime-local format: "2026-05-20T14:30" is treated as local time
+        // We need to convert it back to UTC
+        const localDate = new Date(deadline)
+        const utcDeadline = localDate.toISOString()
+
         const { error } = await supabase
             .from('competitions')
             .update({
@@ -80,7 +93,7 @@ export default function EditCompForm({ comp }: Props) {
                 organizer:           org  || null,
                 date_start:          start,
                 date_end:            end  || null,
-                prediction_deadline: deadline,
+                prediction_deadline: utcDeadline,
                 scoring_config: {
                     podium: { points_exact: podiumExact, points_partial: podiumPartial, positions: podiumPos },
                     p4p:    { points_exact: p4pExact,    points_partial: p4pPartial,    positions: p4pPos    },
@@ -129,7 +142,7 @@ export default function EditCompForm({ comp }: Props) {
                             <Input label="End date"   type="date"         value={end}   onChange={e => setEnd(e.target.value)} />
                         </div>
                         <Input
-                            label="Prediction deadline"
+                            label="Prediction deadline (your timezone)"
                             type="datetime-local"
                             required
                             value={deadline}
