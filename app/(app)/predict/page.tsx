@@ -20,7 +20,7 @@ export default async function PredictPage() {
             <div>
                 <PageHeader tag="Season 2026" title="PREDICT" subtitle="No competition open right now" />
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 py-20 text-center">
-                    <p className="font-bebas text-3xl tracking-wide text-gray-muted/60 mb-3">NO OPEN COMPETITION</p>
+                    <p className="font-bebas text-4xl tracking-wide text-gray-muted/60 mb-3">NO OPEN COMPETITION</p>
                     <p className="text-gray-muted/50 text-sm font-condensed tracking-wide">
                         Check back when the next competition opens for predictions.
                     </p>
