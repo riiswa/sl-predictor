@@ -189,13 +189,15 @@ return (
                                     {syncResult.warnings.length > 0 && (
                                         <button
                                             onClick={() => setShowWarnings(w => !w)}
-                                            className="text-gray-muted/50 text-xs font-condensed hover:text-gray-muted mt-1 transition-colors"
+                                            aria-expanded={showWarnings}
+                                            aria-controls="sync-warnings"
+                                            className="text-gray-muted/50 text-xs font-condensed hover:text-gray-muted mt-1 transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
                                         >
-                                            {showWarnings ? '▲ Hide details' : '▼ Show details'}
+                                            <span aria-hidden="true">{showWarnings ? '▲' : '▼'}</span> {showWarnings ? 'Hide details' : 'Show details'}
                                         </button>
                                     )}
                                     {showWarnings && (
-                                        <div className="mt-2 flex flex-col gap-0.5">
+                                        <div id="sync-warnings" className="mt-2 flex flex-col gap-0.5">
                                             {syncResult.warnings.map((w, i) => (
                                                 <p key={i} className="text-yellow-400/60 text-xs font-condensed">· {w}</p>
                                             ))}
@@ -244,9 +246,10 @@ return (
                             </div>
                             <button
                                 onClick={() => setShowModal(false)}
-                                className="text-gray-muted hover:text-white transition-colors text-xl"
+                                aria-label="Close competition details dialog"
+                                className="text-gray-muted hover:text-white transition-colors text-xl focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
                             >
-                                ✕
+                                <span aria-hidden="true">✕</span>
                             </button>
                         </div>
 

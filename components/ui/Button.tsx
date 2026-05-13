@@ -15,7 +15,7 @@ export default function Button({
                                    disabled,
                                    ...props
                                }: ButtonProps) {
-    const base = 'font-condensed font-semibold tracking-[2px] uppercase transition-all duration-200 clip-skew disabled:opacity-50 disabled:cursor-not-allowed hover:scale-105 active:scale-95'
+    const base = 'font-condensed font-semibold tracking-[2px] uppercase transition-all duration-200 clip-skew disabled:opacity-50 disabled:cursor-not-allowed hover:scale-105 active:scale-95 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent'
 
     const variants = {
         primary: 'bg-accent text-white hover:bg-orange-500 hover:shadow-lg hover:shadow-orange-400/20',
@@ -33,6 +33,7 @@ export default function Button({
         <button
             className={`${base} ${variants[variant]} ${sizes[size]} ${className}`}
             disabled={disabled || loading}
+            aria-busy={loading}
             {...props}
         >
             {loading ? 'Loading...' : children}

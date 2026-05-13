@@ -113,12 +113,17 @@ export default function P4PSelector({ menAthletes, womenAthletes, onChange, lock
                         {/* Search */}
                         {!locked && (
                             <div className="px-3 py-2 border-b border-blue/10">
+                                <label htmlFor={`p4p-search-${gender}`} className="sr-only">
+                                    Search {gender} athletes by name, nationality, or category
+                                </label>
                                 <input
+                                    id={`p4p-search-${gender}`}
                                     type="text"
                                     placeholder="Search athlete..."
                                     value={search[gender]}
                                     onChange={e => setSearch(s => ({ ...s, [gender]: e.target.value }))}
-                                    className="w-full bg-transparent text-xs font-condensed text-white placeholder:text-gray-muted/30 focus:outline-none tracking-wide"
+                                    aria-label={`Search ${gender} athletes`}
+                                    className="w-full bg-transparent text-xs font-condensed text-white placeholder:text-gray-muted/30 focus:outline-none tracking-wide focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
                                 />
                             </div>
                         )}
@@ -150,7 +155,8 @@ export default function P4PSelector({ menAthletes, womenAthletes, onChange, lock
                                                         <button
                                                             key={p}
                                                             onClick={() => pick(gender, p, athlete)}
-                                                            className={`w-9 h-9 sm:w-7 sm:h-7 font-condensed text-xs border transition-all ${
+                                                            aria-label={`Select ${POS_LABEL[p - 1]} position for ${athlete.first_name} ${athlete.last_name} (${gender} P4P)`}
+                                                            className={`w-10 h-10 sm:w-9 sm:h-9 font-condensed text-xs border transition-all focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent ${
                                                                 isThisPick ? 'bg-accent border-accent text-white'
                                                                     : slotTaken ? 'border-blue/10 text-gray-muted/20 hover:border-blue/30 hover:text-gray-muted/50'
                                                                         : 'border-blue/20 text-gray-muted hover:border-blue-light hover:text-white'
