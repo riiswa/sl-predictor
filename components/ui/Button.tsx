@@ -15,7 +15,7 @@ export default function Button({
                                    disabled,
                                    ...props
                                }: ButtonProps) {
-    const base = 'font-condensed font-semibold tracking-[2px] uppercase text-white transition-all duration-200 clip-skew disabled:opacity-50 disabled:cursor-not-allowed hover:scale-105 active:scale-95 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent'
+    const base = 'font-condensed tracking-[2px] uppercase text-white transition-all duration-200 clip-skew disabled:opacity-50 disabled:cursor-not-allowed hover:scale-105 active:scale-95 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent'
 
     const variants = {
         primary: 'bg-accent hover:bg-orange-500 hover:shadow-lg hover:shadow-orange-400/20',
