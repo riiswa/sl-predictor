@@ -87,7 +87,7 @@ export default function RegisterForm() {
                                 A confirmation email has been sent to <span className="font-semibold">{email}</span>
                             </p>
                             <p className="text-green-400/60 text-xs mt-3">
-                                Click the link in the email to verify your account and start predicting.
+                                Click the link in the email to verify your account and start predicting. (Please check your spam folder if you don't see it)
                             </p>
                         </div>
                     </div>
