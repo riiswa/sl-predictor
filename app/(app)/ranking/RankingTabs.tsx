@@ -18,6 +18,7 @@ interface Profile {
 
 interface Result {
     id: string
+    competition_id: string
     rank_in_category: number | null
     ris_score: number | null
     muscle_up: number | null
@@ -29,7 +30,6 @@ interface Result {
     missing_data: boolean
     athletes: { id: string; first_name: string; last_name: string; nationality: string; bodyweight: number | null } | null
     categories: { id: string; gender: string; weight_class: string } | null
-    competitions: { id: string; name: string; flag: string | null; country: string } | null
 }
 
 interface Comp { id: string; name: string; flag: string | null }
@@ -58,7 +58,7 @@ export default function RankingTabs({ currentUserId, currentProfile, allProfiles
 
     // Filter RIS results
     const filteredResults = results.filter(r => {
-        if (compFilter && r.competitions?.id !== compFilter) return false
+        if (compFilter && r.competition_id !== compFilter) return false
         if (genderFilter !== 'all' && r.categories?.gender !== genderFilter) return false
         return true
     }).sort((a, b) => (b.ris_score ?? 0) - (a.ris_score ?? 0))
