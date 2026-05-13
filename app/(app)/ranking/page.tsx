@@ -27,7 +27,6 @@ export default async function RankingPage() {
             categories ( id, gender, weight_class ),
             competitions ( id, name, flag, country, results_visible )
         `)
-        .eq('competitions.results_visible', true)
         .not('ris_score', 'is', null)
         .order('ris_score', { ascending: false })
 
@@ -50,7 +49,7 @@ export default async function RankingPage() {
                     currentUserId={user!.id}
                     currentProfile={currentProfile}
                     allProfiles={allProfiles ?? []}
-                    results={(results ?? []).filter(r => r.competitions?.results_visible)}
+                    results={results ?? []}
                     visibleComps={visibleComps ?? []}
                 />
             </div>
