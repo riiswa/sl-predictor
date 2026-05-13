@@ -54,8 +54,9 @@ export default function RankingTabs({ currentUserId, currentProfile, allProfiles
     const [tab,         setTab]         = useState<Tab>('predictors')
     const [compFilter,  setCompFilter]  = useState<string>(visibleComps[0]?.id ?? '')
     const [genderFilter, setGenderFilter] = useState<'all' | 'men' | 'women'>('all')
+    const [visibleCount, setVisibleCount] = useState(10)
 
-    const isInTop10 = allProfiles.slice(0, 10).some(p => p.id === currentUserId)
+    const isInTop10 = allProfiles.slice(0, visibleCount).some(p => p.id === currentUserId)
 
     // Filter RIS results
     const filteredResults = results.filter(r => {
@@ -140,7 +141,7 @@ export default function RankingTabs({ currentUserId, currentProfile, allProfiles
                             <EmptyState icon="—" title="NO SCORES YET" subtitle="Rankings populate after the first competition results are revealed." />
                         ) : (
                             <>
-                                {allProfiles.slice(0, 10).map((p, i) => {
+                                {allProfiles.slice(0, visibleCount).map((p, i) => {
                                     const isMe   = p.id === currentUserId
                                     const rank   = p.season_rank
                                     const hasRank = rank !== null && rank !== undefined
@@ -191,7 +192,19 @@ export default function RankingTabs({ currentUserId, currentProfile, allProfiles
                                     )
                                 })}
 
-                                {/* User row if not in top 10 */}
+                                {/* Show more */}
+                                {visibleCount < allProfiles.length && (
+                                    <div className="px-5 py-3 border-t border-blue/20 flex justify-center">
+                                        <button
+                                            onClick={() => setVisibleCount(c => c + 10)}
+                                            className="font-condensed text-xs tracking-[3px] uppercase text-gray-muted hover:text-white transition-colors px-4 py-2 border border-blue/20 hover:border-blue/40"
+                                        >
+                                            Show more
+                                        </button>
+                                    </div>
+                                )}
+
+                                {/* User row if not visible */}
                                 {!isInTop10 && currentProfile && (
                                     <>
                                         <div className="px-5 py-2 border-b border-blue/30">

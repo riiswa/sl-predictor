@@ -17,6 +17,7 @@ export default async function RankingPage() {
         .from('predictor_standings')
         .select('id, username, total_points, season_rank, country, total_predictions, correct_predictions')
         .order('total_points', { ascending: false })
+        .order('total_predictions', { ascending: false })
 
     // RIS results — only from visible competitions
     const { data: results } = await supabase
