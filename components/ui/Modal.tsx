@@ -27,7 +27,7 @@ export default function Modal({ onClose, children, borderColor = 'border-blue-li
             role="presentation"
             onMouseDown={(e) => { if (e.target === e.currentTarget) onClose() }}
         >
-            <div className={`bg-dark border border-blue/30 p-6 sm:p-8 max-w-md w-full max-h-[90vh] overflow-y-auto`}>
+            <div className="bg-dark border border-blue/30 p-6 sm:p-8 max-w-md w-full max-h-[90vh] overflow-y-auto rounded-sm">
                 {children}
             </div>
         </div>

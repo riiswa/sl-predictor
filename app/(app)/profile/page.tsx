@@ -124,8 +124,8 @@ export default async function ProfilePage() {
                         { val: accuracy !== null ? `${accuracy}%` : '—',        label: 'Accuracy',color: 'text-blue-light', sub: 'exact + partial' },
                     ].map(s => (
                         <div key={s.label} className="bg-blue/8 border border-blue/30 px-4 sm:px-6 py-6 relative group overflow-hidden shadow-lg shadow-blue/10 transition-all duration-300 hover:shadow-xl hover:shadow-blue/20 rounded-sm">
-                            <div className="absolute bottom-0 left-0 w-full h-px bg-blue-light/20 group-hover:bg-accent/50 transition-colors duration-300" />
-                            <div className={`font-bebas text-4xl leading-none text-white ${s.color}`}>{s.val}</div>
+                            <div className="absolute bottom-0 left-0 w-full h-px bg-blue-light/20 group-hover:bg-accent/40 transition-colors duration-300" />
+                            <div className={`font-bebas text-4xl leading-none ${s.color}`}>{s.val}</div>
                             <div className="font-condensed text-xs tracking-[3px] uppercase text-gray-muted mt-2">{s.label}</div>
                             <div className="font-condensed text-xs text-gray-muted/50 mt-1">{s.sub}</div>
                         </div>
@@ -135,7 +135,7 @@ export default async function ProfilePage() {
                 {/* Accuracy breakdown bar */}
                 {totalPreds > 0 && (
                     <div className="border border-blue/30 p-6 shadow-lg shadow-blue/10 rounded-sm">
-                        <p className="font-condensed text-xs tracking-[4px] uppercase text-accent mb-5">Season Breakdown</p>
+                        <p className="font-condensed text-sm tracking-[4px] uppercase text-accent mb-5">Season Breakdown</p>
                         <div className="flex flex-col gap-4">
                             <div className="flex h-2 gap-px overflow-hidden">
                                 {totalExact > 0 && (
@@ -154,10 +154,10 @@ export default async function ProfilePage() {
                                     { count: totalPartial, label: 'Partial',  color: 'text-yellow-400', dot: 'bg-yellow-400', pts: '5/10 pts'  },
                                     { count: totalMissed,  label: 'Missed',   color: 'text-gray-muted', dot: 'bg-blue/20',    pts: '0 pts'     },
                                 ].map(s => (
-                                    <div key={s.label} className="bg-dark/40 border border-blue/10 px-4 py-3 flex items-center gap-3">
+                                    <div key={s.label} className="bg-dark/40 border border-blue/20 px-4 py-3 flex items-center gap-3">
                                         <div className={`w-2 h-2 rounded-full flex-shrink-0 ${s.dot}`} />
                                         <div>
-                                            <p className={`font-bebas text-3xl leading-none text-white ${s.color}`}>{s.count}</p>
+                                            <p className={`font-bebas text-3xl leading-none ${s.color}`}>{s.count}</p>
                                             <p className="font-condensed text-xs text-gray-muted tracking-wide">{s.label}</p>
                                             <p className="font-condensed text-xs text-gray-muted/50">{s.pts}</p>
                                         </div>
@@ -171,18 +171,18 @@ export default async function ProfilePage() {
                 {/* History */}
                 {/* Account settings */}
                 <div className="flex flex-col gap-4">
-                    <p className="font-condensed text-xs tracking-[4px] uppercase text-accent">Account Settings</p>
+                    <p className="font-condensed text-sm tracking-[4px] uppercase text-accent">Account Settings</p>
                     <AccountSettings email={user.email ?? ''} username={profile?.username ?? ''} />
                 </div>
 
                 {compEntries.length === 0 ? (
                     <div className="border border-blue/30 px-6 py-20 text-center">
                         <p className="font-bebas text-3xl tracking-wide text-gray-muted/60 mb-2">NO PREDICTIONS YET</p>
-                        <p className="text-gray-muted/50 text-sm font-condensed">Submit your first predictions when a competition opens.</p>
+                        <p className="font-condensed text-sm text-gray-muted/50">Submit your first predictions when a competition opens.</p>
                     </div>
                 ) : (
                     <div className="flex flex-col gap-3">
-                        <p className="font-condensed text-xs tracking-[4px] uppercase text-accent">Prediction History</p>
+                        <p className="font-condensed text-sm tracking-[4px] uppercase text-accent">Prediction History</p>
                         {compEntries.map(({ comp, predictions: preds, points, exact, partial, total }) => {
                             const hasResults  = comp.results_visible
                             const missed      = total - exact - partial
@@ -192,19 +192,19 @@ export default async function ProfilePage() {
 
                             return (
                                 <div key={comp.id} className="border border-blue/30 overflow-hidden shadow-lg shadow-blue/10 rounded-sm transition-all duration-300 hover:shadow-xl hover:shadow-blue/20">
-                                    <div className="flex items-center justify-between px-5 py-4 bg-blue/5 border-b border-blue/10">
+                                    <div className="flex items-center justify-between px-5 py-4 bg-blue/5 border-b border-blue/20">
                                         <div>
-                                            <p className="font-condensed font-semibold text-white flex items-center gap-2">
+                                            <p className="font-condensed text-sm text-white flex items-center gap-2">
                                                 {comp.flag && <span>{comp.flag}</span>}
                                                 {comp.name}
                                             </p>
-                                            <p className="text-gray-muted text-xs mt-0.5 font-condensed">
+                                            <p className="font-condensed text-xs text-gray-muted mt-0.5">
                                                 {new Date(comp.date_start).toLocaleDateString('en-GB', { day: '2-digit', month: 'long', year: 'numeric' })}
                                             </p>
                                         </div>
                                         {hasResults ? (
                                             <div className="text-right">
-                                                <p className={`font-bebas text-3xl leading-none text-white ${points > 0 ? 'text-yellow-400' : 'text-gray-muted'}`}>
+                                                <p className={`font-bebas text-3xl leading-none ${points > 0 ? 'text-yellow-400' : 'text-gray-muted'}`}>
                                                     +{points} pts
                                                 </p>
                                                 <div className="flex items-center gap-3 mt-1 justify-end">
@@ -223,7 +223,7 @@ export default async function ProfilePage() {
                                     <div className="p-5 flex flex-col gap-5">
                                         {podiumPreds.length > 0 && (
                                             <div>
-                                                <p className="font-condensed text-xs tracking-[3px] uppercase text-gray-muted/70 mb-2">Podium</p>
+                                                <p className="font-condensed text-xs tracking-[4px] uppercase text-gray-muted/70 mb-2">Podium</p>
                                                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-px">
                                                     {podiumPreds
                                                         .sort((a, b) => {
@@ -239,7 +239,7 @@ export default async function ProfilePage() {
                                         )}
                                         {p4pMen.length > 0 && (
                                             <div>
-                                                <p className="font-condensed text-xs tracking-[3px] uppercase text-blue-light/80 mb-2">P4P Men</p>
+                                                <p className="font-condensed text-xs tracking-[4px] uppercase text-blue-light/80 mb-2">P4P Men</p>
                                                 <div className="grid grid-cols-1 sm:grid-cols-3 gap-px">
                                                     {p4pMen.sort((a, b) => a.position - b.position).map((pred) => (
                                                         <PredRow key={pred.id} pred={pred} hasResults={hasResults} />
@@ -249,7 +249,7 @@ export default async function ProfilePage() {
                                         )}
                                         {p4pWomen.length > 0 && (
                                             <div>
-                                                <p className="font-condensed text-xs tracking-[3px] uppercase text-pink-400/80 mb-2">P4P Women</p>
+                                                <p className="font-condensed text-xs tracking-[4px] uppercase text-pink-400/80 mb-2">P4P Women</p>
                                                 <div className="grid grid-cols-1 sm:grid-cols-3 gap-px">
                                                     {p4pWomen.sort((a, b) => a.position - b.position).map((pred) => (
                                                         <PredRow key={pred.id} pred={pred} hasResults={hasResults} />
@@ -311,9 +311,9 @@ function PredRow({ pred, hasResults }: { pred: Prediction; hasResults: boolean }
                 <Medal position={pred.position as 1|2|3} />
                 <div className="min-w-0">
                     {pred.module === 'podium' && pred.categories && (
-                        <p className="font-condensed text-xs text-gray-muted/60 tracking-[1px] uppercase truncate leading-tight">{pred.categories.gender === 'men' ? 'Men' : 'Women'} {pred.categories.weight_class}</p>
+                        <p className="font-condensed text-xs text-gray-muted/60 tracking-[3px] uppercase truncate leading-tight">{pred.categories.gender === 'men' ? 'Men' : 'Women'} {pred.categories.weight_class}</p>
                     )}
-                    <p className="font-condensed text-sm font-semibold text-white truncate leading-tight">
+                    <p className="font-condensed text-sm text-white truncate leading-tight">
                         {pred.athletes?.first_name} {pred.athletes?.last_name}
                     </p>
                 </div>

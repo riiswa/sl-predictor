@@ -29,14 +29,14 @@ export default function Input({ label, hint, error: externalError, validate, cla
                 className={`
                     bg-dark/40 border text-white placeholder:text-gray-muted/30
                     px-4 py-3 text-sm focus:outline-none transition-colors
-                    ${error ? 'border-accent/60 focus:border-accent' : 'border-blue/30 focus:border-blue-light'}
+                    ${error ? 'border-accent focus:border-accent' : 'border-blue/30 focus:border-blue-light'}
                     ${className}
                 `}
                 onBlur={handleBlur}
                 {...props}
             />
             {error && (
-                <p className="text-accent text-xs font-condensed tracking-wide">{error}</p>
+                <p className="text-accent text-xs font-condensed">{error}</p>
             )}
         </div>
     )
