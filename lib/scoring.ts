@@ -1,4 +1,5 @@
 import { createClient } from '@/lib/supabase/server'
+import { createAdminClient } from '@/lib/supabase/admin'
 
 interface ScoringConfig {
     podium: { points_exact: number; points_partial: number; positions: number }
@@ -65,7 +66,8 @@ export async function calculateCompetitionScores(
     competitionId: string,
     scoredBy?: string,
 ): Promise<{ updated: number; warnings: string[]; scoring_run_id: string }> {
-    const supabase = await createClient()
+    const supabase      = await createClient()
+    const adminSupabase = createAdminClient()
 
     const { data: comp } = await supabase
         .from('competitions')
@@ -83,7 +85,7 @@ export async function calculateCompetitionScores(
 
     if (!results || results.length === 0) throw new Error('No results found')
 
-    const { data: predictions } = await supabase
+    const { data: predictions } = await adminSupabase
         .from('predictions')
         .select('*')
         .eq('competition_id', competitionId)
@@ -193,7 +195,7 @@ export async function calculateCompetitionScores(
 
     // Batch update predictions
     for (const u of updates) {
-        await supabase
+        await adminSupabase
             .from('predictions')
             .update({ points_earned: u.points_earned, is_exact: u.is_exact, is_partial: u.is_partial })
             .eq('id', u.id)
@@ -203,7 +205,7 @@ export async function calculateCompetitionScores(
     const scoringRunId = crypto.randomUUID()
 
     // Mark any existing active scores for this competition as inactive
-    await supabase
+    await adminSupabase
         .from('competition_scores')
         .update({ is_active: false })
         .eq('competition_id', competitionId)
@@ -231,7 +233,7 @@ export async function calculateCompetitionScores(
     }))
 
     if (ledgerRows.length > 0) {
-        await supabase
+        await adminSupabase
             .from('competition_scores')
             .insert(ledgerRows)
     }

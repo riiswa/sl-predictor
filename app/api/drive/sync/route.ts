@@ -187,10 +187,11 @@ export async function POST(req: NextRequest) {
                     .single()
                 athleteId = inserted!.id
 
-                // Generate deterministic dummy Instagram ID if not provided
+                // Generate deterministic dummy Instagram ID if not provided.
+                // Include competition_id in the hash to avoid collisions across competitions.
                 if (!a.instagram_id) {
                     const nameHash = createHash('sha256')
-                        .update(`${a.first_name}${a.last_name}`.toLowerCase())
+                        .update(`${competitionId}${a.first_name}${a.last_name}`.toLowerCase())
                         .digest('hex')
                         .substring(0, 12)
                     const dummyId = `dummy_${nameHash}`
