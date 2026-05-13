@@ -16,35 +16,8 @@ export default function Modal({ onClose, children, borderColor = 'border-blue-li
     useEffect(() => {
         previousActiveElement.current = document.activeElement as HTMLElement
 
-        if (panelRef.current) {
-            panelRef.current.focus()
-        }
-
         function onKey(e: KeyboardEvent) {
             if (e.key === 'Escape') onClose()
-
-            // Focus trap
-            if (e.key === 'Tab') {
-                const focusableElements = panelRef.current?.querySelectorAll(
-                    'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
-                )
-                if (!focusableElements?.length) return
-
-                const firstElement = focusableElements[0] as HTMLElement
-                const lastElement = focusableElements[focusableElements.length - 1] as HTMLElement
-
-                if (e.shiftKey) {
-                    if (document.activeElement === firstElement) {
-                        e.preventDefault()
-                        lastElement.focus()
-                    }
-                } else {
-                    if (document.activeElement === lastElement) {
-                        e.preventDefault()
-                        firstElement.focus()
-                    }
-                }
-            }
         }
         window.addEventListener('keydown', onKey)
         return () => {
