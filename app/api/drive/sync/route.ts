@@ -212,7 +212,7 @@ export async function POST(req: NextRequest) {
                 if (a.muscle_up === null && a.pullup === null && a.dip === null && a.squat === null) continue
 
                 const { ris_score, dnf, missing_data } = computeRIS(
-                    a.muscle_up, a.pullup, a.dip, a.squat, a.bodyweight
+                    a.muscle_up, a.pullup, a.dip, a.squat, a.bodyweight, a.gender as 'men' | 'women'
                 )
 
                 if (missing_data) {

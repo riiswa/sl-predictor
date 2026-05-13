@@ -28,13 +28,14 @@ export async function POST(req: NextRequest) {
 
     if (predError) return NextResponse.json({ error: `Failed to reset predictions: ${predError.message}` }, { status: 500 })
 
-    // 2. Delete ledger rows for this competition
+    // 2. Mark ledger rows as inactive instead of deleting (non-destructive)
     const { error: ledgerError } = await supabase
         .from('competition_scores')
-        .delete()
+        .update({ is_active: false })
         .eq('competition_id', competition_id)
+        .eq('is_active', true)
 
-    if (ledgerError) return NextResponse.json({ error: `Failed to delete scores: ${ledgerError.message}` }, { status: 500 })
+    if (ledgerError) return NextResponse.json({ error: `Failed to deactivate scores: ${ledgerError.message}` }, { status: 500 })
 
     // 3. Reset competition flags
     const { error: compError } = await supabase

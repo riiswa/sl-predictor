@@ -29,7 +29,7 @@ export async function POST(req: NextRequest) {
         if (comp.status !== 'closed') return NextResponse.json({ error: `Cannot reveal results for ${comp.status} competition` }, { status: 400 })
 
         // 2. Calculate scores
-        const { updated } = await calculateCompetitionScores(competition_id)
+        const { updated } = await calculateCompetitionScores(competition_id, user.id)
 
         // 3. Reveal results + update status
         await supabase
