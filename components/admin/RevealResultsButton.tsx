@@ -35,7 +35,7 @@ export default function RevealResultsButton({ compId }: { compId: string }) {
                 Reveal Results & Score Predictions
             </Button>
             {error && (
-                <p className="text-accent text-xs font-condensed mt-2">{error}</p>
+                <p className="text-accent text-xs font-condensed tracking-wide mt-2">{error}</p>
             )}
         </div>
     )
