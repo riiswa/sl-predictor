@@ -104,7 +104,7 @@ export default function RankingTabs({ currentUserId, currentProfile, allProfiles
                                 ].map(s => (
                                     <div key={s.label} className="bg-blue/8 border border-blue/30 px-4 sm:px-6 py-5 relative group overflow-hidden shadow-lg shadow-blue/10 transition-all duration-300 hover:shadow-xl hover:shadow-blue/20">
                                         <div className="absolute bottom-0 left-0 w-full h-px bg-blue-light/20 group-hover:bg-accent/40 transition-colors" />
-                                        <div className={`font-bebas text-4xl leading-none ${s.color}`}>{s.val}</div>
+                                        <div className={`font-bebas text-4xl leading-none text-white ${s.color}`}>{s.val}</div>
                                         <div className="font-condensed text-xs tracking-[3px] uppercase text-gray-muted mt-1">{s.label}</div>
                                     </div>
                                 ))}
@@ -152,7 +152,7 @@ export default function RankingTabs({ currentUserId, currentProfile, allProfiles
                                         } ${isTop3 ? 'py-5' : 'py-4'}`}>
                                             {/* Mobile: flex row with rank + username, desktop: grid item */}
                                             <div className="md:col-span-2 flex items-center gap-3 mb-3 md:mb-0 md:col-span-1">
-                                                <div className="font-bebas leading-none">
+                                                <div className="font-bebas text-white leading-none">
                                                     {hasRank ? <RankDisplay rank={rank} /> : <span className="text-4xl text-gray-muted">—</span>}
                                                 </div>
                                                 <div className="flex items-center gap-3 min-w-0">
@@ -170,7 +170,7 @@ export default function RankingTabs({ currentUserId, currentProfile, allProfiles
                                             </div>
                                             {/* Mobile: row of stats, desktop: grid items */}
                                             <div className="md:col-span-3 flex gap-4 md:gap-0 md:contents">
-                                                <div className={`flex-1 md:flex-none font-bebas text-white text-center md:text-left ${isTop3 ? 'text-3xl' : 'text-2xl'}`}>
+                                                <div className={`flex-1 md:flex-none font-bebas text-center md:text-left ${isTop3 ? 'text-3xl' : 'text-2xl'} ${isTop3 ? 'text-yellow-400' : 'text-white'}`}>
                                                     <span className="text-gray-muted text-xs md:hidden block mb-1">Points</span>
                                                     {p.total_points.toLocaleString()}
                                                 </div>
@@ -196,7 +196,7 @@ export default function RankingTabs({ currentUserId, currentProfile, allProfiles
                                         <div className="md:grid md:grid-cols-[52px_1fr_100px_80px_80px] gap-4 px-5 py-4 bg-blue/15 border-l-2 border-l-accent">
                                             {/* Mobile: flex row with rank + username, desktop: grid item */}
                                             <div className="md:col-span-2 flex items-center gap-3 mb-3 md:mb-0 md:col-span-1">
-                                                <div className="font-bebas text-2xl text-gray-muted">{currentProfile.season_rank ?? '—'}</div>
+                                                <div className="font-bebas text-2xl text-white">{currentProfile.season_rank ?? '—'}</div>
                                                 <div className="flex items-center gap-3">
                                                     <div className="w-8 h-8 rounded-full flex items-center justify-center font-bebas text-sm ring-2 ring-accent border border-white/20" style={{ backgroundColor: avatarColor(currentProfile.username) }}>
                                                         {currentProfile.username.charAt(0).toUpperCase()}
@@ -209,7 +209,7 @@ export default function RankingTabs({ currentUserId, currentProfile, allProfiles
                                             </div>
                                             {/* Mobile: row of stats, desktop: grid items */}
                                             <div className="md:col-span-3 flex gap-4 md:gap-0 md:contents">
-                                                <div className="flex-1 md:flex-none font-bebas text-2xl text-yellow-400 text-center md:text-left">
+                                                <div className="flex-1 md:flex-none font-bebas text-2xl text-white text-center md:text-left">
                                                     <span className="text-gray-muted text-xs md:hidden block mb-1">Points</span>
                                                     {currentProfile.total_points.toLocaleString()}
                                                 </div>
@@ -305,7 +305,7 @@ export default function RankingTabs({ currentUserId, currentProfile, allProfiles
 
                                 return (
                                     <div key={r.id} className="grid grid-cols-[52px_1fr_80px_120px_90px_200px] gap-3 px-5 py-3.5 items-center border-b border-blue/8 last:border-0 even:bg-blue/3 hover:bg-blue/8 transition-all duration-300">
-                                        <div className={`font-bebas ${rankColor}`}>
+                                        <div className={`font-bebas text-white ${rankColor}`}>
                                             {rank !== null ? <RankDisplay rank={rank} /> : <span className="text-gray-muted">—</span>}
                                         </div>
                                         <div>
@@ -319,7 +319,7 @@ export default function RankingTabs({ currentUserId, currentProfile, allProfiles
                                         <div>
                                             <p className="font-condensed text-xs text-gray-muted">{cat ? `${cat.gender === 'men' ? 'Men' : 'Women'} ${cat.weight_class}` : '—'}</p>
                                         </div>
-                                        <div className={`font-bebas text-xl ${rank <= 3 ? 'text-yellow-400' : 'text-white'}`}>{ris}</div>
+                                        <div className={`font-bebas text-2xl ${rank <= 3 ? 'text-yellow-400' : 'text-white'}`}>{ris}</div>
                                         <div className="flex gap-2">
                                             {lifts.map((val, li) => (
                                                 <div key={li} className="flex flex-col items-center">

@@ -125,7 +125,7 @@ export default async function ProfilePage() {
                     ].map(s => (
                         <div key={s.label} className="bg-blue/8 border border-blue/30 px-4 sm:px-6 py-6 relative group overflow-hidden shadow-lg shadow-blue/10 transition-all duration-300 hover:shadow-xl hover:shadow-blue/20 rounded-sm">
                             <div className="absolute bottom-0 left-0 w-full h-px bg-blue-light/20 group-hover:bg-accent/50 transition-colors duration-300" />
-                            <div className={`font-bebas text-4xl leading-none ${s.color}`}>{s.val}</div>
+                            <div className={`font-bebas text-4xl leading-none text-white ${s.color}`}>{s.val}</div>
                             <div className="font-condensed text-xs tracking-[3px] uppercase text-gray-muted mt-2">{s.label}</div>
                             <div className="font-condensed text-xs text-gray-muted/50 mt-1">{s.sub}</div>
                         </div>
@@ -157,7 +157,7 @@ export default async function ProfilePage() {
                                     <div key={s.label} className="bg-dark/40 border border-blue/10 px-4 py-3 flex items-center gap-3">
                                         <div className={`w-2 h-2 rounded-full flex-shrink-0 ${s.dot}`} />
                                         <div>
-                                            <p className={`font-bebas text-2xl leading-none ${s.color}`}>{s.count}</p>
+                                            <p className={`font-bebas text-3xl leading-none text-white ${s.color}`}>{s.count}</p>
                                             <p className="font-condensed text-xs text-gray-muted tracking-wide">{s.label}</p>
                                             <p className="font-condensed text-xs text-gray-muted/50">{s.pts}</p>
                                         </div>
@@ -204,7 +204,7 @@ export default async function ProfilePage() {
                                         </div>
                                         {hasResults ? (
                                             <div className="text-right">
-                                                <p className={`font-bebas text-3xl leading-none ${points > 0 ? 'text-yellow-400' : 'text-gray-muted'}`}>
+                                                <p className={`font-bebas text-3xl leading-none text-white ${points > 0 ? 'text-yellow-400' : 'text-gray-muted'}`}>
                                                     +{points} pts
                                                 </p>
                                                 <div className="flex items-center gap-3 mt-1 justify-end">

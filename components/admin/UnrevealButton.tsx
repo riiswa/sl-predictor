@@ -29,7 +29,7 @@ export default function UnrevealButton({ compId }: { compId: string }) {
             <Button variant="danger" size="md" onClick={handleUnreveal} loading={loading}>
                 Un-reveal & Reset Scores
             </Button>
-            {error && <p className="text-accent text-xs font-condensed mt-2">{error}</p>}
+            {error && <p className="text-accent text-xs font-condensed tracking-wide mt-2">{error}</p>}
         </div>
     )
 }

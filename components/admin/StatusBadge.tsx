@@ -1,9 +1,9 @@
 const STATUS_CONFIG = {
-    upcoming:   { label: 'Upcoming',   color: 'text-yellow-400 bg-yellow-400/10 border-yellow-400/20' },
-    open:       { label: 'Open',       color: 'text-green-400  bg-green-400/10  border-green-400/20'  },
-    closed:     { label: 'Closed',     color: 'text-gray-muted bg-blue/10       border-blue/20'        },
-    results_in: { label: 'Results in', color: 'text-blue-light bg-blue/20       border-blue-light/20'  },
-    cancelled:  { label: 'Cancelled',  color: 'text-accent     bg-accent/10     border-accent/20'      },
+    upcoming:   { label: 'Upcoming',   color: 'text-yellow-400 bg-yellow-400/8 border-yellow-400/20' },
+    open:       { label: 'Open',       color: 'text-green-400  bg-green-400/8  border-green-400/20'  },
+    closed:     { label: 'Closed',     color: 'text-gray-muted bg-blue/5       border-blue/20'        },
+    results_in: { label: 'Results in', color: 'text-blue-light bg-blue/5       border-blue/20'  },
+    cancelled:  { label: 'Cancelled',  color: 'text-accent     bg-accent/8     border-accent/20'      },
 } as const
 
 type Status = keyof typeof STATUS_CONFIG

@@ -38,14 +38,14 @@ export default function DeleteCompButton({ compId, compName }: { compId: string;
             </Button>
 
             {showModal && (
-                <Modal onClose={() => { setShowModal(false); setConfirm('') }} borderColor="border-accent/40">
+                <Modal onClose={() => { setShowModal(false); setConfirm('') }}>
                     <div>
-                        <p className="font-bebas text-3xl tracking-wide text-accent mb-1">Delete Competition</p>
-                        <p className="text-gray-muted text-sm mb-6">
+                        <p className="font-bebas text-4xl tracking-wide text-accent mb-2">Delete Competition</p>
+                        <p className="text-gray-muted text-sm font-condensed mb-6">
                             This will permanently delete <span className="text-white font-semibold">{compName}</span> and all associated data — categories, athletes, results, and predictions. This cannot be undone.
                         </p>
 
-                        <div className="border border-accent/20 bg-accent/5 px-4 py-3 mb-5">
+                        <div className="border border-accent/30 bg-accent/8 px-4 py-3 mb-5">
                             <p className="text-accent text-xs font-condensed tracking-wide mb-3">
                                 ⚠ The Drive file will be unlinked but not deleted — it will appear as "New" in Drive Sync again.
                             </p>
@@ -57,12 +57,12 @@ export default function DeleteCompButton({ compId, compName }: { compId: string;
                                 value={confirm}
                                 onChange={e => setConfirm(e.target.value)}
                                 placeholder={compName}
-                                className="w-full bg-dark/60 border border-blue/30 text-white px-3 py-2 text-sm font-condensed focus:outline-none focus:border-accent/60 transition-colors"
+                                className="w-full bg-dark/40 border border-blue/30 text-white px-3 py-2 text-sm font-condensed focus:outline-none focus:border-accent/60 transition-colors"
                             />
                         </div>
 
                         {error && (
-                            <p className="text-accent text-xs font-condensed mb-4 border border-accent/20 bg-accent/5 px-3 py-2">{error}</p>
+                            <p className="text-accent text-xs font-condensed tracking-wide mb-4 border border-accent/30 bg-accent/8 px-3 py-2">{error}</p>
                         )}
 
                         <div className="flex gap-3">
