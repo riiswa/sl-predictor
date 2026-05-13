@@ -100,7 +100,7 @@ export default function EditCompForm({ comp }: Props) {
                 onClick={() => setOpen(o => !o)}
                 className="w-full flex items-center justify-between px-6 py-5 hover:bg-blue/5 transition-colors"
             >
-                <p className="font-condensed text-xs tracking-[4px] uppercase text-accent">
+                <p className="font-condensed text-sm tracking-[4px] uppercase text-accent">
                     Edit Competition
                 </p>
                 <span className="text-gray-muted text-sm">{open ? '▲' : '▼'}</span>
@@ -111,7 +111,7 @@ export default function EditCompForm({ comp }: Props) {
 
                     {/* Metadata */}
                     <div className="flex flex-col gap-4">
-                        <p className="font-condensed text-xs tracking-[4px] uppercase text-gray-muted">Details</p>
+                        <p className="font-condensed text-sm tracking-[4px] uppercase text-gray-muted">Details</p>
                         <Input label="Name" required value={name} onChange={e => setName(e.target.value)} />
                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                             <Input
@@ -139,10 +139,10 @@ export default function EditCompForm({ comp }: Props) {
 
                     {/* Scoring config */}
                     <div className="flex flex-col gap-4 border-t border-blue/30 pt-5">
-                        <p className="font-condensed text-xs tracking-[4px] uppercase text-gray-muted">Scoring Config</p>
+                        <p className="font-condensed text-sm tracking-[4px] uppercase text-gray-muted">Scoring Config</p>
                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-px">
                             <div className="bg-dark/40 border border-blue/20 px-4 py-4 flex flex-col gap-3">
-                                <p className="font-condensed text-xs tracking-[3px] uppercase text-gray-muted/70">Podium</p>
+                                <p className="font-condensed text-xs tracking-[4px] uppercase text-gray-muted/70">Podium</p>
                                 <div className="grid grid-cols-3 gap-2">
                                     <Input label="Exact pts"   type="number" min={0} value={podiumExact}   onChange={e => setPodiumExact(+e.target.value)} />
                                     <Input label="Partial pts" type="number" min={0} value={podiumPartial} onChange={e => setPodiumPartial(+e.target.value)} />
@@ -150,7 +150,7 @@ export default function EditCompForm({ comp }: Props) {
                                 </div>
                             </div>
                             <div className="bg-dark/40 border border-blue/20 px-4 py-4 flex flex-col gap-3">
-                                <p className="font-condensed text-xs tracking-[3px] uppercase text-gray-muted/70">P4P (RIS)</p>
+                                <p className="font-condensed text-xs tracking-[4px] uppercase text-gray-muted/70">P4P (RIS)</p>
                                 <div className="grid grid-cols-3 gap-2">
                                     <Input label="Exact pts"   type="number" min={0} value={p4pExact}   onChange={e => setP4pExact(+e.target.value)} />
                                     <Input label="Partial pts" type="number" min={0} value={p4pPartial} onChange={e => setP4pPartial(+e.target.value)} />
@@ -162,12 +162,12 @@ export default function EditCompForm({ comp }: Props) {
 
                     {error && (
                         <div className="border border-accent/30 bg-accent/8 px-4 py-3">
-                            <p className="text-accent text-sm font-condensed">{error}</p>
+                            <p className="font-condensed text-sm text-accent">{error}</p>
                         </div>
                     )}
                     {saved && (
                         <div className="border border-green-400/30 bg-green-400/8 px-4 py-3">
-                            <p className="text-green-400 text-sm font-condensed">Saved.</p>
+                            <p className="font-condensed text-sm text-green-400">Saved.</p>
                         </div>
                     )}
 
