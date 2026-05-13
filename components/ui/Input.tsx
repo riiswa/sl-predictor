@@ -30,8 +30,6 @@ export default function Input({ label, hint, error: externalError, validate, cla
             </label>
             <input
                 id={inputId}
-                aria-invalid={!!error}
-                aria-describedby={error ? errorId : undefined}
                 className={`
                     bg-dark/60 border text-white placeholder:text-gray-muted/30
                     px-4 py-3 text-sm focus:outline-none transition-colors
