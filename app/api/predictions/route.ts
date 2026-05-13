@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
+import { createAdminClient } from '@/lib/supabase/admin'
 
 function validateP4P(p4p: any): string | null {
     if (!p4p) return null
@@ -70,7 +71,7 @@ function buildRows(userId: string, competitionId: string, podium: any, p4p: any,
     return rows
 }
 
-// ── POST — first submission ─────────────────────────────────
+// ── POST — first submission ─────────────────────────────
 
 export async function POST(req: NextRequest) {
     const supabase = await createClient()
@@ -136,7 +137,9 @@ export async function PUT(req: NextRequest) {
     if (new Date() > new Date(comp.prediction_deadline)) return NextResponse.json({ error: 'Deadline has passed' }, { status: 400 })
 
     // Delete all existing predictions for this user + competition
-    const { error: deleteError } = await supabase
+    // Uses admin client because the predictions table has no own_delete RLS policy
+    const adminSupabase = createAdminClient()
+    const { error: deleteError } = await adminSupabase
         .from('predictions')
         .delete()
         .eq('user_id', user.id)
