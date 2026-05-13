@@ -44,8 +44,15 @@ export default function ShareRankingButton({
     async function generateAndShare() {
         setLoading(true)
         try {
-            // Wait for fonts to be ready
+            // Wait for fonts and logo to be ready
             await document.fonts.ready
+
+            const logo = new Image()
+            logo.src = '/logo.png'
+            await new Promise<void>((resolve, reject) => {
+                logo.onload = () => resolve()
+                logo.onerror = () => resolve() // don't block if logo fails
+            })
 
             const W = 1080
             const H = 1920
@@ -92,6 +99,27 @@ export default function ShareRankingButton({
 
             // ── Logo section ─────────────────────────────────────────
             const PAD = 80
+
+            // Logo image (top-right corner)
+            const logoSize = 180
+            const logoX = W - PAD - logoSize
+            const logoY = 60
+            if (logo.complete && logo.naturalWidth > 0) {
+                // Circular clip for logo
+                ctx.save()
+                ctx.beginPath()
+                ctx.arc(logoX + logoSize / 2, logoY + logoSize / 2, logoSize / 2, 0, Math.PI * 2)
+                ctx.clip()
+                ctx.drawImage(logo, logoX, logoY, logoSize, logoSize)
+                ctx.restore()
+
+                // Logo ring
+                ctx.strokeStyle = 'rgba(255, 60, 0, 0.6)'
+                ctx.lineWidth = 3
+                ctx.beginPath()
+                ctx.arc(logoX + logoSize / 2, logoY + logoSize / 2, logoSize / 2 + 4, 0, Math.PI * 2)
+                ctx.stroke()
+            }
 
             // "SL" — large, white
             ctx.textAlign = 'left'
@@ -299,7 +327,7 @@ export default function ShareRankingButton({
 
             ctx.font = 'bold 44px "Bebas Neue"'
             ctx.fillStyle = '#ff3c00'
-            ctx.fillText('sl-predictor.com', W / 2, 1800)
+            ctx.fillText('streetliftingmax.com', W / 2, 1800)
 
             // ── Bottom accent bar ────────────────────────────────────
             ctx.fillStyle = '#ff3c00'

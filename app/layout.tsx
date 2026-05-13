@@ -22,12 +22,12 @@ export const metadata: Metadata = {
     openGraph: {
         title: 'SL Predictor — European Streetlifting League 2026',
         description: "La plateforme de pronostics de la communauté Streetlifting européenne.",
-        url: 'https://sl-predictor.com',
+        url: 'https://streetliftingmax.com',
         siteName: 'SL Predictor',
         locale: 'fr_FR',
         type: 'website',
         images: [{
-            url: 'https://sl-predictor.com/og-image.png',
+            url: 'https://streetliftingmax.com/og-image.png',
             width: 1200,
             height: 630,
             alt: 'SL Predictor',
@@ -37,7 +37,7 @@ export const metadata: Metadata = {
         card: 'summary_large_image',
         title: 'SL Predictor — European Streetlifting League 2026',
         description: "La plateforme de pronostics de la communauté Streetlifting européenne.",
-        images: ['https://sl-predictor.com/og-image.png'],
+        images: ['https://streetliftingmax.com/og-image.png'],
     },
     viewport: 'width=device-width, initial-scale=1, maximum-scale=5',
 }
