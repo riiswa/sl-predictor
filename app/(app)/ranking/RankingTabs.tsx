@@ -73,13 +73,13 @@ export default function RankingTabs({ currentUserId, currentProfile, allProfiles
                         onClick={() => setTab(t.id)}
                         className={`flex-1 px-5 py-3.5 text-left border transition-all relative ${
                             tab === t.id
-                                ? 'bg-blue/15 border-blue-light text-white'
-                                : 'bg-transparent border-blue/30 text-gray-muted hover:text-white hover:border-blue/50'
+                                ? 'bg-blue/8 border-blue-light text-white'
+                                : 'bg-transparent border-blue/20 text-gray-muted hover:text-white hover:border-blue/30'
                         }`}
                     >
                         {tab === t.id && <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-accent" />}
-                        <p className="font-condensed text-sm font-semibold tracking-[1px] uppercase">{t.label}</p>
-                        <p className="text-xs opacity-60 normal-case tracking-normal mt-0.5">{t.desc}</p>
+                        <p className="font-condensed text-sm tracking-[3px] uppercase text-white">{t.label}</p>
+                        <p className="text-xs text-gray-muted/50 normal-case tracking-normal mt-0.5">{t.desc}</p>
                     </button>
                 ))}
             </div>
@@ -104,8 +104,8 @@ export default function RankingTabs({ currentUserId, currentProfile, allProfiles
                                 ].map(s => (
                                     <div key={s.label} className="bg-blue/8 border border-blue/30 px-4 sm:px-6 py-5 relative group overflow-hidden shadow-lg shadow-blue/10 transition-all duration-300 hover:shadow-xl hover:shadow-blue/20">
                                         <div className="absolute bottom-0 left-0 w-full h-px bg-blue-light/20 group-hover:bg-accent/40 transition-colors" />
-                                        <div className={`font-bebas text-4xl leading-none text-white ${s.color}`}>{s.val}</div>
-                                        <div className="font-condensed text-xs tracking-[3px] uppercase text-gray-muted mt-1">{s.label}</div>
+                                        <div className={`font-bebas text-4xl leading-none ${s.color}`}>{s.val}</div>
+                                        <div className="font-condensed text-xs tracking-[3px] uppercase text-gray-muted mt-2">{s.label}</div>
                                     </div>
                                 ))}
                             </div>
@@ -128,7 +128,7 @@ export default function RankingTabs({ currentUserId, currentProfile, allProfiles
                     <div className="border border-blue/30 shadow-lg shadow-blue/10 rounded-sm overflow-hidden">
                         <div className="hidden md:grid grid-cols-[52px_1fr_100px_80px_80px] gap-4 px-5 py-3 border-b border-blue/20 bg-blue/5">
                             {['#', 'Player', 'Points', 'Picks', 'Accuracy'].map(h => (
-                                <div key={h} className="font-condensed text-xs tracking-[3px] uppercase text-gray-muted">{h}</div>
+                                <div key={h} className="font-condensed text-xs tracking-[4px] uppercase text-gray-muted">{h}</div>
                             ))}
                         </div>
 
@@ -147,12 +147,12 @@ export default function RankingTabs({ currentUserId, currentProfile, allProfiles
                                     const top3Bg = hasRank && rank === 1 ? 'bg-yellow-400/5 border-l-2 border-l-yellow-400' : hasRank && rank === 2 ? 'bg-gray-400/5 border-l-2 border-l-gray-400' : hasRank && rank === 3 ? 'bg-orange-400/5 border-l-2 border-l-orange-400' : ''
 
                                     return (
-                                        <div key={p.id} className={`md:grid md:grid-cols-[52px_1fr_100px_80px_80px] gap-4 px-5 border-b border-blue/8 last:border-0 transition-all duration-300 ${
-                                            isMe ? 'bg-blue/15 border-l-2 border-l-accent' : isTop3 ? top3Bg : 'even:bg-blue/3 hover:bg-blue/8'
+                                        <div key={p.id} className={`md:grid md:grid-cols-[52px_1fr_100px_80px_80px] gap-4 px-5 border-b border-blue/30 last:border-0 transition-all duration-300 ${
+                                            isMe ? 'bg-blue/8 border-l-2 border-l-accent' : isTop3 ? top3Bg : 'even:bg-blue/5 hover:bg-blue/8'
                                         } ${isTop3 ? 'py-5' : 'py-4'}`}>
                                             {/* Mobile: flex row with rank + username, desktop: grid item */}
                                             <div className="md:col-span-2 flex items-center gap-3 mb-3 md:mb-0 md:col-span-1">
-                                                <div className="font-bebas text-white leading-none">
+                                                <div className="font-bebas leading-none text-white">
                                                     {hasRank ? <RankDisplay rank={rank} /> : <span className="text-4xl text-gray-muted">—</span>}
                                                 </div>
                                                 <div className="flex items-center gap-3 min-w-0">
@@ -162,24 +162,24 @@ export default function RankingTabs({ currentUserId, currentProfile, allProfiles
                                                     >
                                                         {p.username.charAt(0).toUpperCase()}
                                                     </div>
-                                                    <p className={`font-condensed font-semibold text-white ${isTop3 ? 'text-base' : 'text-sm'}`}>
+                                                    <p className={`font-condensed text-white ${isTop3 ? 'text-base' : 'text-sm'}`}>
                                                         {p.username}
-                                                        {isMe && <span className="text-accent text-xs font-normal ml-2">You</span>}
+                                                        {isMe && <span className="text-accent text-xs ml-2">You</span>}
                                                     </p>
                                                 </div>
                                             </div>
                                             {/* Mobile: row of stats, desktop: grid items */}
                                             <div className="md:col-span-3 flex gap-4 md:gap-0 md:contents">
                                                 <div className={`flex-1 md:flex-none font-bebas text-center md:text-left ${isTop3 ? 'text-3xl' : 'text-2xl'} ${isTop3 ? 'text-yellow-400' : 'text-white'}`}>
-                                                    <span className="text-gray-muted text-xs md:hidden block mb-1">Points</span>
+                                                    <span className="font-condensed text-xs text-gray-muted md:hidden block mb-1">Points</span>
                                                     {p.total_points.toLocaleString()}
                                                 </div>
                                                 <div className="flex-1 md:flex-none font-condensed text-sm text-gray-muted text-center md:text-left">
-                                                    <span className="text-gray-muted text-xs md:hidden block mb-1">Picks</span>
+                                                    <span className="font-condensed text-xs text-gray-muted md:hidden block mb-1">Picks</span>
                                                     {p.total_predictions}
                                                 </div>
                                                 <div className="flex-1 md:flex-none font-condensed text-sm text-blue-light text-center md:text-left">
-                                                    <span className="text-gray-muted text-xs md:hidden block mb-1">Acc</span>
+                                                    <span className="font-condensed text-xs text-gray-muted md:hidden block mb-1">Acc</span>
                                                     {acc}
                                                 </div>
                                             </div>
@@ -190,10 +190,10 @@ export default function RankingTabs({ currentUserId, currentProfile, allProfiles
                                 {/* User row if not in top 10 */}
                                 {!isInTop10 && currentProfile && (
                                     <>
-                                        <div className="px-5 py-2 border-b border-blue/8">
+                                        <div className="px-5 py-2 border-b border-blue/30">
                                             <p className="font-condensed text-xs text-gray-muted/30 tracking-wide">···</p>
                                         </div>
-                                        <div className="md:grid md:grid-cols-[52px_1fr_100px_80px_80px] gap-4 px-5 py-4 bg-blue/15 border-l-2 border-l-accent">
+                                        <div className="md:grid md:grid-cols-[52px_1fr_100px_80px_80px] gap-4 px-5 py-4 bg-blue/8 border-l-2 border-l-accent">
                                             {/* Mobile: flex row with rank + username, desktop: grid item */}
                                             <div className="md:col-span-2 flex items-center gap-3 mb-3 md:mb-0 md:col-span-1">
                                                 <div className="font-bebas text-2xl text-white">{currentProfile.season_rank ?? '—'}</div>
@@ -245,10 +245,10 @@ export default function RankingTabs({ currentUserId, currentProfile, allProfiles
                                     <button
                                         key={c.id}
                                         onClick={() => setCompFilter(c.id)}
-                                        className={`font-condensed text-xs tracking-[1px] uppercase px-4 py-2 border transition-colors ${
+                                        className={`font-condensed text-xs tracking-[3px] uppercase px-4 py-2 border transition-colors ${
                                             compFilter === c.id
-                                                ? 'bg-blue border-blue-light text-white'
-                                                : 'border-blue/20 text-gray-muted hover:text-white hover:border-blue/40'
+                                                ? 'bg-blue/8 border-blue-light text-white'
+                                                : 'border-blue/20 text-gray-muted hover:text-white hover:border-blue/30'
                                         }`}
                                     >
                                         {c.flag} {c.name}
@@ -263,10 +263,10 @@ export default function RankingTabs({ currentUserId, currentProfile, allProfiles
                                 <button
                                     key={g}
                                     onClick={() => setGenderFilter(g)}
-                                    className={`font-condensed text-xs tracking-[1px] uppercase px-4 py-2 border transition-colors ${
+                                    className={`font-condensed text-xs tracking-[3px] uppercase px-4 py-2 border transition-colors ${
                                         genderFilter === g
-                                            ? 'bg-blue border-blue-light text-white'
-                                            : 'border-blue/20 text-gray-muted hover:text-white hover:border-blue/40'
+                                            ? 'bg-blue/8 border-blue-light text-white'
+                                            : 'border-blue/20 text-gray-muted hover:text-white hover:border-blue/30'
                                     }`}
                                 >
                                     {g === 'all' ? 'All' : g === 'men' ? '♂ Men' : '♀ Women'}
@@ -287,7 +287,7 @@ export default function RankingTabs({ currentUserId, currentProfile, allProfiles
                         <div className="border border-blue/30 shadow-lg shadow-blue/10 rounded-sm overflow-hidden md:overflow-visible overflow-x-auto">
                             <div className="hidden md:grid grid-cols-[52px_1fr_80px_120px_90px_200px] gap-3 px-5 py-3 border-b border-blue/20 bg-blue/5">
                                 {['#', 'Athlete', 'Nat.', 'Category', 'RIS', 'Lifts'].map(h => (
-                                    <div key={h} className="font-condensed text-xs tracking-[3px] uppercase text-gray-muted">{h}</div>
+                                    <div key={h} className="font-condensed text-xs tracking-[4px] uppercase text-gray-muted">{h}</div>
                                 ))}
                             </div>
 
@@ -304,8 +304,8 @@ export default function RankingTabs({ currentUserId, currentProfile, allProfiles
                                             rank === 3 ? 'text-orange-400' : 'text-gray-muted'
 
                                 return (
-                                    <div key={r.id} className="grid grid-cols-[52px_1fr_80px_120px_90px_200px] gap-3 px-5 py-3.5 items-center border-b border-blue/8 last:border-0 even:bg-blue/3 hover:bg-blue/8 transition-all duration-300">
-                                        <div className={`font-bebas text-white ${rankColor}`}>
+                                    <div key={r.id} className="grid grid-cols-[52px_1fr_80px_120px_90px_200px] gap-3 px-5 py-3.5 items-center border-b border-blue/30 last:border-0 even:bg-blue/5 hover:bg-blue/8 transition-all duration-300">
+                                        <div className={`font-bebas ${rankColor}`}>
                                             {rank !== null ? <RankDisplay rank={rank} /> : <span className="text-gray-muted">—</span>}
                                         </div>
                                         <div>
