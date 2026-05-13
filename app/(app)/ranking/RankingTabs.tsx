@@ -115,8 +115,10 @@ export default function RankingTabs({ currentUserId, currentProfile, allProfiles
                                     username={currentProfile.username}
                                     rank={currentProfile.season_rank}
                                     points={currentProfile.total_points}
-                                    accuracy={currentProfile.total_predictions > 0 ? Math.round((currentProfile.correct_predictions / currentProfile.total_predictions) * 100) : null}
+                                    totalPredictions={currentProfile.total_predictions}
+                                    correctPredictions={currentProfile.correct_predictions}
                                     country={currentProfile.country}
+                                    totalParticipants={allProfiles.length}
                                 />
                             </div>
                         </>
