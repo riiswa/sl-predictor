@@ -5,6 +5,7 @@ import { avatarColor } from '@/lib/avatar'
 import EmptyState from '@/components/ui/EmptyState'
 import { RankDisplay } from '@/components/ui/Medal'
 import ShareRankingButton from '@/components/ranking/ShareRankingButton'
+import SponsorCarousel from '@/components/ranking/SponsorCarousel'
 
 interface Profile {
     id: string
@@ -65,6 +66,9 @@ export default function RankingTabs({ currentUserId, currentProfile, allProfiles
 
     return (
         <div>
+            {/* Sponsors */}
+            <SponsorCarousel />
+
             {/* Tabs */}
             <div className="flex gap-px mb-8">
                 {TABS.map(t => (
