@@ -18,24 +18,26 @@ export default async function RankingPage() {
         .select('id, username, total_points, season_rank, country, total_predictions, correct_predictions')
         .order('total_points', { ascending: false })
 
-    // RIS results — only from visible competitions
-    const { data: results } = await supabase
-        .from('results')
-        .select(`
-            id, rank_in_category, ris_score, muscle_up, pullup, dip, squat, dnf, disqualified, missing_data,
-            athletes ( id, first_name, last_name, nationality, bodyweight ),
-            categories ( id, gender, weight_class ),
-            competitions ( id, name, flag, country, results_visible )
-        `)
-        .not('ris_score', 'is', null)
-        .order('ris_score', { ascending: false })
-
     // Visible competitions list for filter
     const { data: visibleComps } = await supabase
         .from('competitions')
         .select('id, name, flag')
         .eq('results_visible', true)
         .order('date_start', { ascending: false })
+
+    const visibleCompIds = (visibleComps ?? []).map(c => c.id)
+
+    // RIS results — only from visible competitions
+    const { data: results } = visibleCompIds.length === 0 ? { data: [] } : await supabase
+        .from('results')
+        .select(`
+            id, competition_id, rank_in_category, ris_score, muscle_up, pullup, dip, squat, dnf, disqualified, missing_data,
+            athletes ( id, first_name, last_name, nationality, bodyweight ),
+            categories ( id, gender, weight_class )
+        `)
+        .in('competition_id', visibleCompIds)
+        .not('ris_score', 'is', null)
+        .order('ris_score', { ascending: false })
 
     return (
         <div>
