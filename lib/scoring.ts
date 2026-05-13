@@ -199,17 +199,8 @@ export async function calculateCompetitionScores(
             .eq('id', u.id)
     }
 
-    // Generate scoring_run_id (UUID format)
     const scoringRunId = crypto.randomUUID()
 
-    // Mark any existing active scores for this competition as inactive
-    await supabase
-        .from('competition_scores')
-        .update({ is_active: false })
-        .eq('competition_id', competitionId)
-        .eq('is_active', true)
-
-    // Insert new competition scores with scoring_run_id
     const predMap = new Map(predictions.map(p => [p.id, p]))
     const userPoints: Record<string, number> = {}
     for (const u of updates) {
@@ -231,9 +222,10 @@ export async function calculateCompetitionScores(
     }))
 
     if (ledgerRows.length > 0) {
+        // Upsert: PK is (user_id, competition_id) so re-scoring overwrites the existing row
         await supabase
             .from('competition_scores')
-            .insert(ledgerRows)
+            .upsert(ledgerRows, { onConflict: 'user_id,competition_id' })
     }
 
     return { updated: updates.length, warnings, scoring_run_id: scoringRunId }
