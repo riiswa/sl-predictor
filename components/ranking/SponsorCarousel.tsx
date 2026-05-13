@@ -38,7 +38,7 @@ export default function SponsorCarousel() {
     return (
         <div className="mb-12 -mx-6">
             <div
-                className="relative h-[40vh] sm:h-[50vh] flex items-center justify-center overflow-hidden border-t border-b border-blue/20 bg-gradient-to-b from-blue/8 to-transparent"
+                className="relative h-[50vh] sm:h-[75vh] flex items-center justify-center overflow-hidden border-t border-b border-blue/20 bg-gradient-to-b from-blue/8 to-transparent"
                 onMouseEnter={() => setPaused(true)}
                 onMouseLeave={() => setPaused(false)}
             >
@@ -49,10 +49,10 @@ export default function SponsorCarousel() {
                         src={sponsor.image}
                         alt={sponsor.name}
                         fill
-                        className="object-cover opacity-90 transition-opacity duration-300"
+                        className="object-cover opacity-100 transition-opacity duration-300"
                         priority
                     />
-                    <div className="absolute inset-0 bg-gradient-to-r from-black/70 via-black/50 to-transparent" />
+                    <div className="absolute inset-0 bg-gradient-to-r from-black/40 via-black/20 to-transparent" />
                 </div>
 
                 {/* Navigation - left */}
