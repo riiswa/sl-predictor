@@ -31,6 +31,7 @@ export default function RegisterForm() {
     const [country,  setCountry]  = useState('')
     const [error,    setError]    = useState<string | null>(null)
     const [loading,  setLoading]  = useState(false)
+    const [success,  setSuccess]  = useState(false)
 
     async function handleSubmit(e: React.FormEvent) {
         e.preventDefault()
@@ -70,8 +71,35 @@ export default function RegisterForm() {
             return
         }
 
-        router.push('/ranking')
-        router.refresh()
+        setSuccess(true)
+        setLoading(false)
+    }
+
+    if (success) {
+        return (
+            <div className="flex flex-col gap-4">
+                <div className="border border-green-400/30 bg-green-400/8 px-6 py-5 rounded-none">
+                    <div className="flex items-start gap-3">
+                        <span className="text-green-400 text-xl flex-shrink-0">✓</span>
+                        <div>
+                            <p className="text-green-400 font-semibold font-condensed tracking-wide mb-1">Account created!</p>
+                            <p className="text-green-400/80 text-sm">
+                                A confirmation email has been sent to <span className="font-semibold">{email}</span>
+                            </p>
+                            <p className="text-green-400/60 text-xs mt-3">
+                                Click the link in the email to verify your account and start predicting.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+                <Link href="/login">
+                    <Button variant="ghost" size="lg" className="w-full">
+                        Back to login →
+                    </Button>
+                </Link>
+            </div>
+        )
     }
 
     return (
