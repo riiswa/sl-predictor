@@ -89,36 +89,37 @@ export default function RankingTabs({ currentUserId, currentProfile, allProfiles
                 <div>
                     {/* Your stats */}
                     {currentProfile && (
-                        <div className="grid grid-cols-2 md:grid-cols-4 gap-px mb-8">
-                            {[
-                                { val: currentProfile.total_points.toLocaleString(), label: 'Your Points',  color: 'text-yellow-400' },
-                                { val: currentProfile.season_rank ? `#${currentProfile.season_rank}` : '—', label: 'Your Rank', color: 'text-white' },
-                                { val: currentProfile.total_predictions.toString(), label: 'Predictions', color: 'text-white' },
-                                {
-                                    val: currentProfile.total_predictions > 0
-                                        ? `${Math.round((currentProfile.correct_predictions / currentProfile.total_predictions) * 100)}%`
-                                        : '—',
-                                    label: 'Accuracy', color: 'text-blue-light'
-                                },
-                            ].map(s => (
-                                <div key={s.label} className="bg-blue/8 border border-blue/30 px-4 sm:px-6 py-5 relative group overflow-hidden shadow-lg shadow-blue/10 transition-all duration-300 hover:shadow-xl hover:shadow-blue/20">
-                                    <div className="absolute bottom-0 left-0 w-full h-px bg-blue-light/20 group-hover:bg-accent/40 transition-colors" />
-                                    <div className={`font-bebas text-4xl leading-none ${s.color}`}>{s.val}</div>
-                                    <div className="font-condensed text-xs tracking-[3px] uppercase text-gray-muted mt-1">{s.label}</div>
-                                </div>
-                            ))}
-                        </div>
+                        <>
+                            <div className="grid grid-cols-2 md:grid-cols-4 gap-px mb-8">
+                                {[
+                                    { val: currentProfile.total_points.toLocaleString(), label: 'Your Points',  color: 'text-yellow-400' },
+                                    { val: currentProfile.season_rank ? `#${currentProfile.season_rank}` : '—', label: 'Your Rank', color: 'text-white' },
+                                    { val: currentProfile.total_predictions.toString(), label: 'Predictions', color: 'text-white' },
+                                    {
+                                        val: currentProfile.total_predictions > 0
+                                            ? `${Math.round((currentProfile.correct_predictions / currentProfile.total_predictions) * 100)}%`
+                                            : '—',
+                                        label: 'Accuracy', color: 'text-blue-light'
+                                    },
+                                ].map(s => (
+                                    <div key={s.label} className="bg-blue/8 border border-blue/30 px-4 sm:px-6 py-5 relative group overflow-hidden shadow-lg shadow-blue/10 transition-all duration-300 hover:shadow-xl hover:shadow-blue/20">
+                                        <div className="absolute bottom-0 left-0 w-full h-px bg-blue-light/20 group-hover:bg-accent/40 transition-colors" />
+                                        <div className={`font-bebas text-4xl leading-none ${s.color}`}>{s.val}</div>
+                                        <div className="font-condensed text-xs tracking-[3px] uppercase text-gray-muted mt-1">{s.label}</div>
+                                    </div>
+                                ))}
+                            </div>
 
-                        {/* Share button */}
-                        <div className="mb-8">
-                            <ShareRankingButton
-                                username={currentProfile.username}
-                                rank={currentProfile.season_rank}
-                                points={currentProfile.total_points}
-                                accuracy={currentProfile.total_predictions > 0 ? Math.round((currentProfile.correct_predictions / currentProfile.total_predictions) * 100) : null}
-                                country={currentProfile.country}
-                            />
-                        </div>
+                            <div className="mb-8">
+                                <ShareRankingButton
+                                    username={currentProfile.username}
+                                    rank={currentProfile.season_rank}
+                                    points={currentProfile.total_points}
+                                    accuracy={currentProfile.total_predictions > 0 ? Math.round((currentProfile.correct_predictions / currentProfile.total_predictions) * 100) : null}
+                                    country={currentProfile.country}
+                                />
+                            </div>
+                        </>
                     )}
 
                     {/* Leaderboard table */}
