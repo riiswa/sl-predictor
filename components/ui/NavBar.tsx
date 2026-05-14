@@ -25,7 +25,7 @@ function Avatar({ username, size = 'w-8 h-8' }: { username: string; size?: strin
     )
 }
 
-export default function NavBar({ profile }: { profile: Profile | null }) {
+export default function NavBar({ profile, isLive = false }: { profile: Profile | null; isLive?: boolean }) {
     const pathname = usePathname()
     const router   = useRouter()
     const supabase = createClient()
@@ -40,6 +40,7 @@ export default function NavBar({ profile }: { profile: Profile | null }) {
     const links = [
         { href: '/ranking', label: 'Ranking' },
         { href: '/predict', label: 'Predict' },
+        ...(isLive ? [{ href: '/live', label: 'Live', isLive: true }] : []),
         { href: '/profile', label: 'Profile' },
     ]
 
@@ -66,12 +67,19 @@ export default function NavBar({ profile }: { profile: Profile | null }) {
                         <Link
                             key={link.href}
                             href={link.href}
-                            className={`font-condensed text-xs tracking-[2px] uppercase px-5 h-14 flex items-center border-b-2 transition-colors ${
-                                pathname.startsWith(link.href)
+                            className={`font-condensed text-xs tracking-[2px] uppercase px-5 h-14 flex items-center gap-2 border-b-2 transition-colors ${'isLive' in link && link.isLive
+                                ? 'text-accent border-accent'
+                                : pathname.startsWith(link.href)
                                     ? 'text-white border-accent'
                                     : 'text-gray-muted border-transparent hover:text-off-white'
                             }`}
                         >
+                            {'isLive' in link && link.isLive && (
+                                <span className="relative flex h-1.5 w-1.5">
+                                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-accent opacity-75" />
+                                    <span className="relative inline-flex rounded-full h-1.5 w-1.5 bg-accent" />
+                                </span>
+                            )}
                             {link.label}
                         </Link>
                     ))}

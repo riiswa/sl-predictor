@@ -3,9 +3,15 @@ import { createClient } from '@/lib/supabase/server'
 import PageHeader from '@/components/ui/PageHeader'
 import Button from '@/components/ui/Button'
 import StatusBadge from '@/components/admin/StatusBadge'
+import LivePanel from '@/components/admin/LivePanel'
 
 export default async function AdminPage() {
     const supabase = await createClient()
+
+    const { data: liveSession } = await supabase
+        .from('live_sessions')
+        .select('is_active, sheet_id, label')
+        .single()
 
     const { data: competitions } = await supabase
         .from('competitions')
@@ -47,6 +53,9 @@ export default async function AdminPage() {
             </PageHeader>
 
             <div className="max-w-7xl mx-auto px-6 py-10">
+
+                {/* Live session panel */}
+                <LivePanel initial={liveSession ?? { is_active: false, sheet_id: null, label: null }} />
 
                 {/* Drive alert if files need attention */}
                 {needsAttention > 0 && (
