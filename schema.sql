@@ -64,20 +64,54 @@ $$;
 ALTER FUNCTION "public"."handle_new_user"() OWNER TO "postgres";
 
 
-CREATE OR REPLACE FUNCTION "public"."increment_user_points"("user_id" "uuid", "points" integer) RETURNS "void"
+CREATE OR REPLACE FUNCTION "public"."sync_profile_prediction_counts"() RETURNS "trigger"
     LANGUAGE "plpgsql" SECURITY DEFINER
     AS $$
-begin
-  update public.profiles
-  set
-    total_points        = total_points + points,
-    total_predictions   = total_predictions + 1
-  where id = user_id;
-end;
+DECLARE
+  target_user_id UUID;
+BEGIN
+  target_user_id := COALESCE(NEW.user_id, OLD.user_id);
+  UPDATE profiles
+  SET
+    total_predictions = (
+      SELECT COUNT(*)
+      FROM predictions
+      WHERE user_id = target_user_id
+    ),
+    correct_predictions = (
+      SELECT COUNT(*)
+      FROM predictions
+      WHERE user_id = target_user_id AND is_exact = true
+    )
+  WHERE id = target_user_id;
+  RETURN NEW;
+END;
 $$;
 
 
-ALTER FUNCTION "public"."increment_user_points"("user_id" "uuid", "points" integer) OWNER TO "postgres";
+ALTER FUNCTION "public"."sync_profile_prediction_counts"() OWNER TO "postgres";
+
+
+CREATE OR REPLACE FUNCTION "public"."sync_profile_total_points"() RETURNS "trigger"
+    LANGUAGE "plpgsql" SECURITY DEFINER
+    AS $$
+DECLARE
+  target_user_id UUID;
+BEGIN
+  target_user_id := COALESCE(NEW.user_id, OLD.user_id);
+  UPDATE profiles
+  SET total_points = (
+    SELECT COALESCE(SUM(points), 0)
+    FROM competition_scores
+    WHERE user_id = target_user_id AND is_active = TRUE
+  )
+  WHERE id = target_user_id;
+  RETURN NEW;
+END;
+$$;
+
+
+ALTER FUNCTION "public"."sync_profile_total_points"() OWNER TO "postgres";
 
 SET default_tablespace = '';
 
@@ -97,24 +131,54 @@ CREATE TABLE IF NOT EXISTS "public"."athletes" (
     "dip" numeric,
     "squat" numeric,
     "instagram_id" "text",
-    "instagram_is_dummy" boolean DEFAULT false
+    "instagram_is_dummy" boolean DEFAULT false,
+    CONSTRAINT "check_valid_bodyweight" CHECK ((("bodyweight" IS NULL) OR (("bodyweight" > (0)::numeric) AND ("bodyweight" <= (1000)::numeric)))),
+    CONSTRAINT "check_valid_lifts" CHECK (((("muscle_up" IS NULL) OR (("muscle_up" >= (0)::numeric) AND ("muscle_up" <= (1000)::numeric))) AND (("pullup" IS NULL) OR (("pullup" >= (0)::numeric) AND ("pullup" <= (1000)::numeric))) AND (("dip" IS NULL) OR (("dip" >= (0)::numeric) AND ("dip" <= (1000)::numeric))) AND (("squat" IS NULL) OR (("squat" >= (0)::numeric) AND ("squat" <= (1000)::numeric)))))
 );
 
 
 ALTER TABLE "public"."athletes" OWNER TO "postgres";
 
 
+CREATE TABLE IF NOT EXISTS "public"."audit_logs" (
+    "id" "uuid" DEFAULT "gen_random_uuid"() NOT NULL,
+    "admin_id" "uuid" NOT NULL,
+    "action" "text" NOT NULL,
+    "table_name" "text" NOT NULL,
+    "record_id" "uuid" NOT NULL,
+    "old_values" "jsonb",
+    "new_values" "jsonb",
+    "created_at" timestamp with time zone DEFAULT "now"() NOT NULL,
+    CONSTRAINT "audit_logs_action_check" CHECK (("action" = ANY (ARRAY['CREATE'::"text", 'UPDATE'::"text", 'DELETE'::"text"])))
+);
+
+
+ALTER TABLE "public"."audit_logs" OWNER TO "postgres";
+
+
 CREATE TABLE IF NOT EXISTS "public"."categories" (
     "id" "uuid" DEFAULT "gen_random_uuid"() NOT NULL,
-    "competition_id" "uuid",
-    "name" "text" NOT NULL,
     "gender" "text" NOT NULL,
-    "weight_class" "text" NOT NULL,
-    "display_order" integer DEFAULT 0
+    "weight_class" "text" NOT NULL
 );
 
 
 ALTER TABLE "public"."categories" OWNER TO "postgres";
+
+
+CREATE TABLE IF NOT EXISTS "public"."competition_scores" (
+    "user_id" "uuid" NOT NULL,
+    "competition_id" "uuid" NOT NULL,
+    "points" integer DEFAULT 0 NOT NULL,
+    "scored_at" timestamp with time zone DEFAULT "now"() NOT NULL,
+    "scoring_run_id" "uuid" DEFAULT "gen_random_uuid"() NOT NULL,
+    "is_active" boolean DEFAULT true NOT NULL,
+    "scoring_config_snapshot" "jsonb",
+    "scored_by" "uuid"
+);
+
+
+ALTER TABLE "public"."competition_scores" OWNER TO "postgres";
 
 
 CREATE TABLE IF NOT EXISTS "public"."competitions" (
@@ -135,6 +199,15 @@ CREATE TABLE IF NOT EXISTS "public"."competitions" (
 
 
 ALTER TABLE "public"."competitions" OWNER TO "postgres";
+
+
+CREATE TABLE IF NOT EXISTS "public"."competitions_categories" (
+    "competition_id" "uuid" NOT NULL,
+    "category_id" "uuid" NOT NULL
+);
+
+
+ALTER TABLE "public"."competitions_categories" OWNER TO "postgres";
 
 
 CREATE TABLE IF NOT EXISTS "public"."drive_files" (
@@ -165,7 +238,9 @@ CREATE TABLE IF NOT EXISTS "public"."predictions" (
     "points_earned" integer DEFAULT 0,
     "is_exact" boolean,
     "is_partial" boolean,
-    "submitted_at" timestamp with time zone DEFAULT "now"()
+    "submitted_at" timestamp with time zone DEFAULT "now"(),
+    CONSTRAINT "check_valid_module" CHECK (("module" = ANY (ARRAY['podium'::"text", 'p4p_men'::"text", 'p4p_women'::"text"]))),
+    CONSTRAINT "check_valid_position" CHECK (("position" = ANY (ARRAY[1, 2, 3])))
 );
 
 
@@ -188,6 +263,26 @@ CREATE TABLE IF NOT EXISTS "public"."profiles" (
 ALTER TABLE "public"."profiles" OWNER TO "postgres";
 
 
+CREATE OR REPLACE VIEW "public"."predictor_standings" WITH ("security_invoker"='true') AS
+ SELECT "p"."id",
+    "p"."username",
+    "p"."country",
+    "p"."role",
+    "p"."total_predictions",
+    "p"."correct_predictions",
+    (COALESCE("sum"("cs"."points"), (0)::bigint))::integer AS "total_points",
+        CASE
+            WHEN ("p"."total_predictions" = 0) THEN NULL::bigint
+            ELSE "rank"() OVER (ORDER BY COALESCE("sum"("cs"."points"), (0)::bigint) DESC)
+        END AS "season_rank"
+   FROM ("public"."profiles" "p"
+     LEFT JOIN "public"."competition_scores" "cs" ON ((("cs"."user_id" = "p"."id") AND ("cs"."is_active" = true))))
+  GROUP BY "p"."id", "p"."username", "p"."country", "p"."role", "p"."total_predictions", "p"."correct_predictions";
+
+
+ALTER VIEW "public"."predictor_standings" OWNER TO "postgres";
+
+
 CREATE TABLE IF NOT EXISTS "public"."results" (
     "id" "uuid" DEFAULT "gen_random_uuid"() NOT NULL,
     "competition_id" "uuid",
@@ -203,7 +298,8 @@ CREATE TABLE IF NOT EXISTS "public"."results" (
     "pullup" numeric,
     "dip" numeric,
     "squat" numeric,
-    "missing_data" boolean DEFAULT false
+    "missing_data" boolean DEFAULT false,
+    CONSTRAINT "check_valid_rank" CHECK ((("rank_in_category" IS NULL) OR ("rank_in_category" > 0)))
 );
 
 
@@ -226,16 +322,42 @@ ALTER TABLE "public"."season_predictions" OWNER TO "postgres";
 
 
 ALTER TABLE ONLY "public"."athletes"
-    ADD CONSTRAINT "athletes_pkey" PRIMARY KEY ("id");
-
-
-ALTER TABLE ONLY "public"."athletes"
     ADD CONSTRAINT "athletes_instagram_id_key" UNIQUE ("instagram_id");
 
 
 
+ALTER TABLE ONLY "public"."athletes"
+    ADD CONSTRAINT "athletes_pkey" PRIMARY KEY ("id");
+
+
+
+ALTER TABLE ONLY "public"."audit_logs"
+    ADD CONSTRAINT "audit_logs_pkey" PRIMARY KEY ("id");
+
+
+
 ALTER TABLE ONLY "public"."categories"
-    ADD CONSTRAINT "categories_pkey" PRIMARY KEY ("id");
+    ADD CONSTRAINT "categories_global_gender_weight_class_key" UNIQUE ("gender", "weight_class");
+
+
+
+ALTER TABLE ONLY "public"."categories"
+    ADD CONSTRAINT "categories_global_pkey" PRIMARY KEY ("id");
+
+
+
+ALTER TABLE ONLY "public"."competition_scores"
+    ADD CONSTRAINT "competition_scores_pkey" PRIMARY KEY ("user_id", "competition_id");
+
+
+
+ALTER TABLE ONLY "public"."competition_scores"
+    ADD CONSTRAINT "competition_scores_user_comp_run_key" UNIQUE ("user_id", "competition_id", "scoring_run_id");
+
+
+
+ALTER TABLE ONLY "public"."competitions_categories"
+    ADD CONSTRAINT "competitions_categories_pkey" PRIMARY KEY ("competition_id", "category_id");
 
 
 
@@ -275,6 +397,11 @@ ALTER TABLE ONLY "public"."profiles"
 
 
 ALTER TABLE ONLY "public"."results"
+    ADD CONSTRAINT "results_competition_athlete_unique" UNIQUE ("competition_id", "athlete_id");
+
+
+
+ALTER TABLE ONLY "public"."results"
     ADD CONSTRAINT "results_pkey" PRIMARY KEY ("id");
 
 
@@ -289,8 +416,39 @@ ALTER TABLE ONLY "public"."season_predictions"
 
 
 
-ALTER TABLE ONLY "public"."athletes"
-    ADD CONSTRAINT "athletes_category_id_fkey" FOREIGN KEY ("category_id") REFERENCES "public"."categories"("id") ON DELETE CASCADE;
+CREATE INDEX "idx_audit_logs_admin_id" ON "public"."audit_logs" USING "btree" ("admin_id");
+
+
+
+CREATE INDEX "idx_audit_logs_created_at" ON "public"."audit_logs" USING "btree" ("created_at");
+
+
+
+CREATE INDEX "idx_audit_logs_table_action" ON "public"."audit_logs" USING "btree" ("table_name", "action");
+
+
+
+CREATE INDEX "idx_categories_gender_weight" ON "public"."categories" USING "btree" ("gender", "weight_class");
+
+
+
+CREATE INDEX "idx_competition_scores_active" ON "public"."competition_scores" USING "btree" ("competition_id", "user_id") WHERE ("is_active" = true);
+
+
+
+CREATE INDEX "idx_competitions_categories_category" ON "public"."competitions_categories" USING "btree" ("category_id");
+
+
+
+CREATE INDEX "idx_competitions_categories_competition" ON "public"."competitions_categories" USING "btree" ("competition_id");
+
+
+
+CREATE OR REPLACE TRIGGER "trg_sync_prediction_counts" AFTER INSERT OR DELETE OR UPDATE ON "public"."predictions" FOR EACH ROW EXECUTE FUNCTION "public"."sync_profile_prediction_counts"();
+
+
+
+CREATE OR REPLACE TRIGGER "trg_sync_total_points" AFTER INSERT OR DELETE OR UPDATE OF "is_active", "points" ON "public"."competition_scores" FOR EACH ROW EXECUTE FUNCTION "public"."sync_profile_total_points"();
 
 
 
@@ -299,8 +457,33 @@ ALTER TABLE ONLY "public"."athletes"
 
 
 
-ALTER TABLE ONLY "public"."categories"
-    ADD CONSTRAINT "categories_competition_id_fkey" FOREIGN KEY ("competition_id") REFERENCES "public"."competitions"("id") ON DELETE CASCADE;
+ALTER TABLE ONLY "public"."audit_logs"
+    ADD CONSTRAINT "audit_logs_admin_id_fkey" FOREIGN KEY ("admin_id") REFERENCES "auth"."users"("id") ON DELETE CASCADE;
+
+
+
+ALTER TABLE ONLY "public"."competition_scores"
+    ADD CONSTRAINT "competition_scores_competition_id_fkey" FOREIGN KEY ("competition_id") REFERENCES "public"."competitions"("id") ON DELETE CASCADE;
+
+
+
+ALTER TABLE ONLY "public"."competition_scores"
+    ADD CONSTRAINT "competition_scores_scored_by_fkey" FOREIGN KEY ("scored_by") REFERENCES "auth"."users"("id");
+
+
+
+ALTER TABLE ONLY "public"."competition_scores"
+    ADD CONSTRAINT "competition_scores_user_id_fkey" FOREIGN KEY ("user_id") REFERENCES "public"."profiles"("id") ON DELETE CASCADE;
+
+
+
+ALTER TABLE ONLY "public"."competitions_categories"
+    ADD CONSTRAINT "competitions_categories_category_id_fkey" FOREIGN KEY ("category_id") REFERENCES "public"."categories"("id") ON DELETE CASCADE;
+
+
+
+ALTER TABLE ONLY "public"."competitions_categories"
+    ADD CONSTRAINT "competitions_categories_competition_id_fkey" FOREIGN KEY ("competition_id") REFERENCES "public"."competitions"("id") ON DELETE CASCADE;
 
 
 
@@ -309,13 +492,23 @@ ALTER TABLE ONLY "public"."drive_files"
 
 
 
+ALTER TABLE ONLY "public"."competition_scores"
+    ADD CONSTRAINT "fk_competition_scores_users" FOREIGN KEY ("user_id") REFERENCES "auth"."users"("id") ON DELETE CASCADE;
+
+
+
+ALTER TABLE ONLY "public"."predictions"
+    ADD CONSTRAINT "fk_predictions_athletes" FOREIGN KEY ("athlete_id") REFERENCES "public"."athletes"("id") ON DELETE CASCADE;
+
+
+
+ALTER TABLE ONLY "public"."results"
+    ADD CONSTRAINT "fk_results_athletes" FOREIGN KEY ("athlete_id") REFERENCES "public"."athletes"("id") ON DELETE CASCADE;
+
+
+
 ALTER TABLE ONLY "public"."predictions"
     ADD CONSTRAINT "predictions_athlete_id_fkey" FOREIGN KEY ("athlete_id") REFERENCES "public"."athletes"("id") ON DELETE CASCADE;
-
-
-
-ALTER TABLE ONLY "public"."predictions"
-    ADD CONSTRAINT "predictions_category_id_fkey" FOREIGN KEY ("category_id") REFERENCES "public"."categories"("id");
 
 
 
@@ -340,11 +533,6 @@ ALTER TABLE ONLY "public"."results"
 
 
 ALTER TABLE ONLY "public"."results"
-    ADD CONSTRAINT "results_category_id_fkey" FOREIGN KEY ("category_id") REFERENCES "public"."categories"("id") ON DELETE CASCADE;
-
-
-
-ALTER TABLE ONLY "public"."results"
     ADD CONSTRAINT "results_competition_id_fkey" FOREIGN KEY ("competition_id") REFERENCES "public"."competitions"("id") ON DELETE CASCADE;
 
 
@@ -359,13 +547,17 @@ ALTER TABLE ONLY "public"."season_predictions"
 
 
 
-CREATE POLICY "admin_all" ON "public"."athletes" USING ((EXISTS ( SELECT 1
+CREATE POLICY "Admins manage scores" ON "public"."competition_scores" TO "authenticated" USING ((EXISTS ( SELECT 1
    FROM "public"."profiles"
   WHERE (("profiles"."id" = "auth"."uid"()) AND ("profiles"."role" = 'admin'::"text")))));
 
 
 
-CREATE POLICY "admin_all" ON "public"."categories" USING ((EXISTS ( SELECT 1
+CREATE POLICY "Users read own scores" ON "public"."competition_scores" FOR SELECT TO "authenticated" USING (("user_id" = "auth"."uid"()));
+
+
+
+CREATE POLICY "admin_all" ON "public"."athletes" USING ((EXISTS ( SELECT 1
    FROM "public"."profiles"
   WHERE (("profiles"."id" = "auth"."uid"()) AND ("profiles"."role" = 'admin'::"text")))));
 
@@ -383,16 +575,31 @@ CREATE POLICY "admin_all" ON "public"."drive_files" USING ((EXISTS ( SELECT 1
 
 
 
+CREATE POLICY "admin_all" ON "public"."predictions" USING ((EXISTS ( SELECT 1
+   FROM "public"."profiles"
+  WHERE (("profiles"."id" = "auth"."uid"()) AND ("profiles"."role" = 'admin'::"text")))));
+
+
+
 CREATE POLICY "admin_all" ON "public"."results" USING ((EXISTS ( SELECT 1
    FROM "public"."profiles"
   WHERE (("profiles"."id" = "auth"."uid"()) AND ("profiles"."role" = 'admin'::"text")))));
 
 
 
+CREATE POLICY "admin_update" ON "public"."profiles" FOR UPDATE WITH CHECK ((EXISTS ( SELECT 1
+   FROM "public"."profiles" "profiles_1"
+  WHERE (("profiles_1"."id" = "auth"."uid"()) AND ("profiles_1"."role" = 'admin'::"text")))));
+
+
+
 ALTER TABLE "public"."athletes" ENABLE ROW LEVEL SECURITY;
 
 
-ALTER TABLE "public"."categories" ENABLE ROW LEVEL SECURITY;
+ALTER TABLE "public"."audit_logs" ENABLE ROW LEVEL SECURITY;
+
+
+ALTER TABLE "public"."competition_scores" ENABLE ROW LEVEL SECURITY;
 
 
 ALTER TABLE "public"."competitions" ENABLE ROW LEVEL SECURITY;
@@ -420,10 +627,6 @@ CREATE POLICY "own_read" ON "public"."season_predictions" FOR SELECT USING (("au
 CREATE POLICY "own_update" ON "public"."profiles" FOR UPDATE USING (("auth"."uid"() = "id"));
 
 
-CREATE POLICY "admin_update" ON "public"."profiles" FOR UPDATE WITH CHECK ((EXISTS ( SELECT 1
-   FROM "public"."profiles"
-  WHERE (("profiles"."id" = "auth"."uid"()) AND ("profiles"."role" = 'admin'::"text")))));
-
 
 ALTER TABLE "public"."predictions" ENABLE ROW LEVEL SECURITY;
 
@@ -435,7 +638,7 @@ CREATE POLICY "public_read" ON "public"."athletes" FOR SELECT USING (true);
 
 
 
-CREATE POLICY "public_read" ON "public"."categories" FOR SELECT USING (true);
+CREATE POLICY "public_read" ON "public"."competition_scores" FOR SELECT USING (true);
 
 
 
@@ -628,9 +831,15 @@ GRANT ALL ON FUNCTION "public"."handle_new_user"() TO "service_role";
 
 
 
-GRANT ALL ON FUNCTION "public"."increment_user_points"("user_id" "uuid", "points" integer) TO "anon";
-GRANT ALL ON FUNCTION "public"."increment_user_points"("user_id" "uuid", "points" integer) TO "authenticated";
-GRANT ALL ON FUNCTION "public"."increment_user_points"("user_id" "uuid", "points" integer) TO "service_role";
+GRANT ALL ON FUNCTION "public"."sync_profile_prediction_counts"() TO "anon";
+GRANT ALL ON FUNCTION "public"."sync_profile_prediction_counts"() TO "authenticated";
+GRANT ALL ON FUNCTION "public"."sync_profile_prediction_counts"() TO "service_role";
+
+
+
+GRANT ALL ON FUNCTION "public"."sync_profile_total_points"() TO "anon";
+GRANT ALL ON FUNCTION "public"."sync_profile_total_points"() TO "authenticated";
+GRANT ALL ON FUNCTION "public"."sync_profile_total_points"() TO "service_role";
 
 
 
@@ -655,15 +864,33 @@ GRANT ALL ON TABLE "public"."athletes" TO "service_role";
 
 
 
+GRANT ALL ON TABLE "public"."audit_logs" TO "anon";
+GRANT ALL ON TABLE "public"."audit_logs" TO "authenticated";
+GRANT ALL ON TABLE "public"."audit_logs" TO "service_role";
+
+
+
 GRANT ALL ON TABLE "public"."categories" TO "anon";
 GRANT ALL ON TABLE "public"."categories" TO "authenticated";
 GRANT ALL ON TABLE "public"."categories" TO "service_role";
 
 
 
+GRANT ALL ON TABLE "public"."competition_scores" TO "anon";
+GRANT ALL ON TABLE "public"."competition_scores" TO "authenticated";
+GRANT ALL ON TABLE "public"."competition_scores" TO "service_role";
+
+
+
 GRANT ALL ON TABLE "public"."competitions" TO "anon";
 GRANT ALL ON TABLE "public"."competitions" TO "authenticated";
 GRANT ALL ON TABLE "public"."competitions" TO "service_role";
+
+
+
+GRANT ALL ON TABLE "public"."competitions_categories" TO "anon";
+GRANT ALL ON TABLE "public"."competitions_categories" TO "authenticated";
+GRANT ALL ON TABLE "public"."competitions_categories" TO "service_role";
 
 
 
@@ -682,6 +909,12 @@ GRANT ALL ON TABLE "public"."predictions" TO "service_role";
 GRANT ALL ON TABLE "public"."profiles" TO "anon";
 GRANT ALL ON TABLE "public"."profiles" TO "authenticated";
 GRANT ALL ON TABLE "public"."profiles" TO "service_role";
+
+
+
+GRANT ALL ON TABLE "public"."predictor_standings" TO "anon";
+GRANT ALL ON TABLE "public"."predictor_standings" TO "authenticated";
+GRANT ALL ON TABLE "public"."predictor_standings" TO "service_role";
 
 
 
