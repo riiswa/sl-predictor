@@ -40,6 +40,7 @@ export default function NavBar({ profile }: { profile: Profile | null }) {
     const links = [
         { href: '/ranking', label: 'Ranking' },
         { href: '/predict', label: 'Predict' },
+        { href: '/live',    label: 'Live' },
         { href: '/profile', label: 'Profile' },
     ]
 
